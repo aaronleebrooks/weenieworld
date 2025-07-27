@@ -52,11 +52,11 @@ offset_bottom = -60.0
 
 [node name="SaveListContainer" type="VBoxContainer" parent="MenuPanel/SaveList"]
 layout_mode = 2
-size_flags_horizontal = Control.SIZE_EXPAND_FILL
+size_flags_horizontal = 3
 
 [node name="NoSavesLabel" type="Label" parent="MenuPanel/SaveList/SaveListContainer"]
 layout_mode = 2
-size_flags_vertical = Control.SIZE_EXPAND_FILL
+size_flags_vertical = 3
 text = "No save files found"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -75,5 +75,5 @@ offset_bottom = -10.0
 
 [node name="BackButton" type="Button" parent="MenuPanel/ButtonContainer"]
 layout_mode = 2
-size_flags_horizontal = Control.SIZE_EXPAND_FILL
+size_flags_horizontal = 3
 text = "Back" 

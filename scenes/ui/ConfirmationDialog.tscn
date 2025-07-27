@@ -70,10 +70,10 @@ offset_bottom = -10.0
 
 [node name="NoButton" type="Button" parent="DialogPanel/ButtonContainer"]
 layout_mode = 2
-size_flags_horizontal = Control.SIZE_EXPAND_FILL
+size_flags_horizontal = 3
 text = "No"
 
 [node name="YesButton" type="Button" parent="DialogPanel/ButtonContainer"]
 layout_mode = 2
-size_flags_horizontal = Control.SIZE_EXPAND_FILL
+size_flags_horizontal = 3
 text = "Yes" 
