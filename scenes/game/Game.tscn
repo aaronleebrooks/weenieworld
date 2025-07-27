@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://m4hu22y7axg6" path="res://scenes/game/Game.gd" id="1_0x0x0"]
 [ext_resource type="PackedScene" path="res://scenes/game/CurrencyDisplay.tscn" id="2_0x0x0"]
-[ext_resource type="PackedScene" uid="uid://gxvn8yqxqxqx" path="res://scenes/game/ProgressBar.tscn" id="3_0x0x0"]
-[ext_resource type="PackedScene" uid="uid://hxvn8yqxqxqx" path="res://scenes/game/CurrencyGainButton.tscn" id="4_0x0x0"]
+[ext_resource type="PackedScene" path="res://scenes/game/ProgressBar.tscn" id="3_0x0x0"]
+[ext_resource type="PackedScene" path="res://scenes/game/CurrencyGainButton.tscn" id="4_0x0x0"]
 
 [node name="Game" type="Control"]
 layout_mode = 3
@@ -30,10 +30,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -150.0
-offset_top = -50.0
-offset_right = 150.0
-offset_bottom = 50.0
+offset_left = -200.0
+offset_top = -250.0
+offset_right = 200.0
+offset_bottom = -150.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "Hello World!"
@@ -55,8 +55,8 @@ anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -150.0
-offset_top = 30.0
+offset_top = 100.0
 offset_right = -30.0
-offset_bottom = 80.0
+offset_bottom = 150.0
 grow_horizontal = 0
 text = "Back to Menu"

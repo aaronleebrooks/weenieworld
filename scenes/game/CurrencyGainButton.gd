@@ -10,6 +10,10 @@ var currency_manager: Node
 var is_pressed: bool = false
 var is_held: bool = false
 
+# Hold detection variables
+var _hold_timer_started: bool = false
+var _hold_start_time: Dictionary
+
 # Button states
 enum ButtonState {IDLE, CLICKED, HELD}
 var current_state: ButtonState = ButtonState.IDLE
@@ -67,9 +71,11 @@ func _on_button_pressed():
 	"""Handle button press (single click)"""
 	print("CurrencyGainButton: Button pressed")
 	if click_manager and not click_manager.is_action_in_progress():
-		click_manager.start_click_action()
-		current_state = ButtonState.CLICKED
-		_update_visual_state()
+		# Only start click action if we're not already holding
+		if not is_held:
+			click_manager.start_click_action()
+			current_state = ButtonState.CLICKED
+			_update_visual_state()
 
 func _on_button_down():
 	"""Handle button down (start of hold)"""
@@ -81,6 +87,9 @@ func _on_button_up():
 	"""Handle button up (end of press)"""
 	print("CurrencyGainButton: Button up")
 	is_pressed = false
+	
+	# Reset hold timer
+	_hold_timer_started = false
 	
 	# If we were holding and button is released, stop the hold action
 	if is_held and click_manager:
@@ -118,6 +127,28 @@ func _input(event):
 			is_held = true
 			current_state = ButtonState.HELD
 			_update_visual_state()
+
+func _process(delta):
+	"""Process hold detection without requiring mouse movement"""
+	if is_pressed and not is_held and click_manager and not click_manager.is_action_in_progress():
+		# Check if we've been holding for a short time
+		if not _hold_timer_started:
+			_hold_timer_started = true
+			_hold_start_time = Time.get_time_dict_from_system()
+		
+		var current_time = Time.get_time_dict_from_system()
+		var hold_duration = (current_time.hour - _hold_start_time.hour) * 3600 + \
+						   (current_time.minute - _hold_start_time.minute) * 60 + \
+						   (current_time.second - _hold_start_time.second) + \
+						   (current_time.msec - _hold_start_time.msec) / 1000.0
+		
+		if hold_duration >= 0.1:  # 100ms hold threshold
+			print("CurrencyGainButton: Starting hold action (process)")
+			click_manager.start_hold_action()
+			is_held = true
+			current_state = ButtonState.HELD
+			_update_visual_state()
+			_hold_timer_started = false
 
 func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 	"""Update button state based on click manager state"""

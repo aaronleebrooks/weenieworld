@@ -42,6 +42,8 @@ func _ready():
 	# Connect to currency manager for timing updates
 	if currency_manager:
 		currency_manager.currency_changed.connect(_on_currency_changed)
+		# Initialize timer durations immediately
+		_update_timer_durations()
 
 func _setup_timers():
 	"""Setup timers for click and idle progress tracking"""
