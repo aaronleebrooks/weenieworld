@@ -29,16 +29,15 @@ func _update_responsive_layout():
 	var viewport_size = get_viewport().get_visible_rect().size
 	print("Game: Viewport size = ", viewport_size)
 	
-	# Calculate responsive font size based on viewport
-	var base_font_size = 24
-	var responsive_font_size = max(base_font_size, int(viewport_size.x * 0.015))  # 1.5% of viewport width
-	responsive_font_size = min(responsive_font_size, 48)  # Cap at 48px
+	# Use percentage-based sizing (like CSS vw/vh units)
+	var font_size_percent = viewport_size.x * 0.025  # 2.5% of viewport width
+	var button_height_percent = viewport_size.y * 0.08  # 8% of viewport height
 	
-	# Calculate responsive button size
-	var button_height = max(50, int(viewport_size.y * 0.04))  # 4% of viewport height
-	button_height = min(button_height, 80)  # Cap at 80px
+	# Set reasonable bounds
+	var responsive_font_size = max(16, min(font_size_percent, 64))  # 16px to 64px
+	var button_height = max(40, min(button_height_percent, 120))  # 40px to 120px
 	
-	print("Game: Responsive font size = ", responsive_font_size, ", button height = ", button_height)
+	print("Game: Font size = ", responsive_font_size, "px (", font_size_percent, "px raw), Button height = ", button_height, "px (", button_height_percent, "px raw)")
 	
 	# Update hello world label font size
 	if hello_world_label:
@@ -48,7 +47,7 @@ func _update_responsive_layout():
 	if back_button:
 		back_button.custom_minimum_size = Vector2(0, button_height)
 		back_button.add_theme_font_size_override("font_size", responsive_font_size)
-		print("Game: Back button updated")
+		print("Game: Back button updated with percentage-based sizing")
 
 func _on_back_button_pressed():
 	print("Returning to main menu...")

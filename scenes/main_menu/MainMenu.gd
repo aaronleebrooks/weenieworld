@@ -33,48 +33,29 @@ func _update_responsive_layout():
 	var viewport_size = get_viewport().get_visible_rect().size
 	print("MainMenu: Viewport size = ", viewport_size)
 	
-	# Calculate responsive font size based on viewport
-	var base_font_size = 24
-	var responsive_font_size = max(base_font_size, int(viewport_size.x * 0.015))  # 1.5% of viewport width
-	responsive_font_size = min(responsive_font_size, 48)  # Cap at 48px
+	# Use percentage-based font sizing (like CSS vw/vh units)
+	var font_size_percent = viewport_size.x * 0.025  # 2.5% of viewport width (like CSS vw)
+	var button_height_percent = viewport_size.y * 0.08  # 8% of viewport height (like CSS vh)
 	
-	# Calculate responsive button size
-	var button_height = max(50, int(viewport_size.y * 0.04))  # 4% of viewport height
-	button_height = min(button_height, 80)  # Cap at 80px
+	# Set reasonable bounds
+	var responsive_font_size = max(16, min(font_size_percent, 64))  # 16px to 64px
+	var button_height = max(40, min(button_height_percent, 120))  # 40px to 120px
 	
-	print("MainMenu: Responsive font size = ", responsive_font_size, ", button height = ", button_height)
+	print("MainMenu: Font size = ", responsive_font_size, "px (", font_size_percent, "px raw), Button height = ", button_height, "px (", button_height_percent, "px raw)")
 	
-	# Adjust menu container size based on viewport
-	var container_width = min(viewport_size.x * 0.4, 400)  # 40% of viewport or max 400px
-	var container_height = min(viewport_size.y * 0.3, 300)  # 30% of viewport or max 300px
+	# Update button sizes and font sizes using percentage-based approach
+	for button in [new_game_button, continue_button, options_button, quit_button]:
+		button.custom_minimum_size = Vector2(0, button_height)
+		button.add_theme_font_size_override("font_size", responsive_font_size)
+		# Add some padding like CSS
+		button.add_theme_constant_override("h_separation", int(button_height * 0.1))
 	
-	# Ensure minimum size
-	container_width = max(container_width, 200)
-	container_height = max(container_height, 150)
-	
-	print("MainMenu: Container size = ", Vector2(container_width, container_height))
-	
-	if menu_container:
-		menu_container.offset_left = -container_width / 2
-		menu_container.offset_top = -container_height / 2
-		menu_container.offset_right = container_width / 2
-		menu_container.offset_bottom = container_height / 2
-		
-		# Update button sizes and font sizes
-		for button in [new_game_button, continue_button, options_button, quit_button]:
-			button.custom_minimum_size = Vector2(0, button_height)
-			button.add_theme_font_size_override("font_size", responsive_font_size)
-		
-		print("MainMenu: Menu container and buttons updated")
-	
-	# Adjust title position and font size
+	# Update title font size
 	if title:
-		var title_width = min(viewport_size.x * 0.3, 300)
-		title_width = max(title_width, 150)
-		title.offset_left = -title_width / 2
-		title.offset_right = title_width / 2
-		title.add_theme_font_size_override("font_size", responsive_font_size + 8)  # Title slightly larger
-		print("MainMenu: Title updated")
+		title.add_theme_font_size_override("font_size", responsive_font_size * 1.5)  # Title 50% larger
+		print("MainMenu: Title font size = ", responsive_font_size * 1.5)
+	
+	print("MainMenu: All elements updated with percentage-based sizing")
 
 func _on_new_game_pressed():
 	print("Starting new game...")

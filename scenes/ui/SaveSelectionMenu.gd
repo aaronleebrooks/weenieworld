@@ -35,23 +35,23 @@ func _update_modal_size():
 	var viewport_size = get_viewport().get_visible_rect().size
 	print("SaveSelectionMenu: Viewport size = ", viewport_size)
 	
-	# Calculate responsive font size based on viewport
-	var base_font_size = 20
-	var responsive_font_size = max(base_font_size, int(viewport_size.x * 0.012))  # 1.2% of viewport width
-	responsive_font_size = min(responsive_font_size, 36)  # Cap at 36px
+	# Use percentage-based sizing (like CSS vw/vh units)
+	var font_size_percent = viewport_size.x * 0.02  # 2% of viewport width
+	var button_height_percent = viewport_size.y * 0.06  # 6% of viewport height
 	
-	# Calculate responsive button size
-	var button_height = max(60, int(viewport_size.y * 0.05))  # 5% of viewport height
-	button_height = min(button_height, 100)  # Cap at 100px
+	# Set reasonable bounds
+	var responsive_font_size = max(14, min(font_size_percent, 48))  # 14px to 48px
+	var button_height = max(50, min(button_height_percent, 100))  # 50px to 100px
 	
-	print("SaveSelectionMenu: Responsive font size = ", responsive_font_size, ", button height = ", button_height)
+	print("SaveSelectionMenu: Font size = ", responsive_font_size, "px (", font_size_percent, "px raw), Button height = ", button_height, "px (", button_height_percent, "px raw)")
 	
-	var target_width = min(viewport_size.x * max_width_percent, viewport_size.x - 100)
-	var target_height = min(viewport_size.y * max_height_percent, viewport_size.y - 100)
+	# Update panel size using percentage-based approach
+	var target_width = viewport_size.x * 0.6  # 60% of viewport width
+	var target_height = viewport_size.y * 0.7  # 70% of viewport height
 	
 	# Ensure minimum size
-	target_width = max(target_width, min_width)
-	target_height = max(target_height, min_height)
+	target_width = max(target_width, 400)
+	target_height = max(target_height, 300)
 	
 	print("SaveSelectionMenu: Target size = ", Vector2(target_width, target_height))
 	
@@ -65,7 +65,7 @@ func _update_modal_size():
 		# Update title font size
 		var title = menu_panel.get_node_or_null("Title")
 		if title:
-			title.add_theme_font_size_override("font_size", responsive_font_size + 4)
+			title.add_theme_font_size_override("font_size", responsive_font_size * 1.3)  # Title 30% larger
 		
 		# Update back button font size
 		if back_button:
@@ -73,9 +73,9 @@ func _update_modal_size():
 		
 		# Update existing save buttons font sizes
 		for button in save_buttons:
-			button.add_theme_font_size_override("font_size", responsive_font_size - 2)
+			button.add_theme_font_size_override("font_size", responsive_font_size)
 		
-		print("SaveSelectionMenu: Panel offsets set to ", Vector4(menu_panel.offset_left, menu_panel.offset_top, menu_panel.offset_right, menu_panel.offset_bottom))
+		print("SaveSelectionMenu: Panel updated with percentage-based sizing")
 	else:
 		print("SaveSelectionMenu: No menu_panel found")
 
@@ -100,12 +100,13 @@ func populate_save_list():
 	print("Creating save entries for ", save_files.size(), " files")
 	no_saves_label.visible = false
 	
-	# Calculate responsive sizes for new buttons
+	# Calculate percentage-based sizes for new buttons (like CSS vw/vh)
 	var viewport_size = get_viewport().get_visible_rect().size
-	var responsive_font_size = max(20, int(viewport_size.x * 0.012))
-	responsive_font_size = min(responsive_font_size, 36)
-	var button_height = max(60, int(viewport_size.y * 0.05))
-	button_height = min(button_height, 100)
+	var font_size_percent = viewport_size.x * 0.02  # 2% of viewport width
+	var button_height_percent = viewport_size.y * 0.06  # 6% of viewport height
+	
+	var responsive_font_size = max(14, min(font_size_percent, 48))  # 14px to 48px
+	var button_height = max(50, min(button_height_percent, 100))  # 50px to 100px
 	
 	# Create containers for each save file
 	for save_info in save_files:

@@ -45,23 +45,23 @@ func _update_modal_size():
 	var viewport_size = get_viewport().get_visible_rect().size
 	print("ConfirmationDialog: Viewport size = ", viewport_size)
 	
-	# Calculate responsive font size based on viewport
-	var base_font_size = 18
-	var responsive_font_size = max(base_font_size, int(viewport_size.x * 0.01))  # 1% of viewport width
-	responsive_font_size = min(responsive_font_size, 32)  # Cap at 32px
+	# Use percentage-based sizing (like CSS vw/vh units)
+	var font_size_percent = viewport_size.x * 0.018  # 1.8% of viewport width
+	var button_height_percent = viewport_size.y * 0.05  # 5% of viewport height
 	
-	# Calculate responsive button size
-	var button_height = max(40, int(viewport_size.y * 0.035))  # 3.5% of viewport height
-	button_height = min(button_height, 70)  # Cap at 70px
+	# Set reasonable bounds
+	var responsive_font_size = max(12, min(font_size_percent, 40))  # 12px to 40px
+	var button_height = max(35, min(button_height_percent, 80))  # 35px to 80px
 	
-	print("ConfirmationDialog: Responsive font size = ", responsive_font_size, ", button height = ", button_height)
+	print("ConfirmationDialog: Font size = ", responsive_font_size, "px (", font_size_percent, "px raw), Button height = ", button_height, "px (", button_height_percent, "px raw)")
 	
-	var target_width = min(viewport_size.x * max_width_percent, viewport_size.x - 100)
-	var target_height = min(viewport_size.y * max_height_percent, viewport_size.y - 100)
+	# Update panel size using percentage-based approach
+	var target_width = viewport_size.x * 0.4  # 40% of viewport width
+	var target_height = viewport_size.y * 0.3  # 30% of viewport height
 	
 	# Ensure minimum size
-	target_width = max(target_width, min_width)
-	target_height = max(target_height, min_height)
+	target_width = max(target_width, 300)
+	target_height = max(target_height, 200)
 	
 	print("ConfirmationDialog: Target size = ", Vector2(target_width, target_height))
 	
@@ -75,12 +75,12 @@ func _update_modal_size():
 		# Update title font size
 		var title = dialog_panel.get_node_or_null("Title")
 		if title:
-			title.add_theme_font_size_override("font_size", responsive_font_size + 4)
+			title.add_theme_font_size_override("font_size", responsive_font_size * 1.2)  # Title 20% larger
 		
 		# Update message font size
 		var message = dialog_panel.get_node_or_null("Message")
 		if message:
-			message.add_theme_font_size_override("font_size", responsive_font_size - 2)
+			message.add_theme_font_size_override("font_size", responsive_font_size)
 		
 		# Update button font sizes and sizes
 		if no_button:
@@ -91,7 +91,7 @@ func _update_modal_size():
 			yes_button.custom_minimum_size = Vector2(0, button_height)
 			yes_button.add_theme_font_size_override("font_size", responsive_font_size)
 		
-		print("ConfirmationDialog: Panel offsets set to ", Vector4(dialog_panel.offset_left, dialog_panel.offset_top, dialog_panel.offset_right, dialog_panel.offset_bottom))
+		print("ConfirmationDialog: Panel updated with percentage-based sizing")
 	else:
 		print("ConfirmationDialog: No dialog_panel found")
 	
