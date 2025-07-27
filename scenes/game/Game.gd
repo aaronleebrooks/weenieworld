@@ -12,6 +12,11 @@ func _ready():
 	# Connect to viewport size changes using native event system
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
 	
+	# Connect to currency changes to update display
+	var currency_manager = get_node("/root/CurrencyManager")
+	if currency_manager:
+		currency_manager.currency_changed.connect(_on_currency_changed)
+	
 	# Initial responsive sizing
 	_update_responsive_layout()
 	
@@ -80,6 +85,10 @@ func _on_manual_save_pressed():
 		print("Manual save created successfully!")
 	else:
 		print("Failed to create manual save!")
+
+func _on_currency_changed(new_balance: int, change_amount: int):
+	"""Update display when currency changes"""
+	display_game_data()
 
 
 

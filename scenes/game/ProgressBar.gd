@@ -62,7 +62,12 @@ func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 func _on_click_completed(click_type: String, currency_gained: int):
 	"""Handle click completion"""
 	print("ProgressBar: Click completed - ", click_type, " gained ", currency_gained, " currency")
-	# Progress bar will be hidden by click_state_changed signal
+	# For hold actions, keep the progress bar visible and restart
+	if click_type == "hold":
+		# Reset progress and keep visible for continuous holding
+		current_progress = 0.0
+		_update_progress_display("hold")
+		print("ProgressBar: Restarting hold progress bar")
 
 func _update_progress_display(click_type: String):
 	"""Update the visual progress bar"""

@@ -120,7 +120,7 @@ func _input(event):
 	# Start hold action if button has been pressed for a short time
 	if is_pressed and not is_held and click_manager and not click_manager.is_action_in_progress():
 		# Use a timer to detect hold vs click
-		await get_tree().create_timer(0.1).timeout  # 100ms delay
+		await get_tree().create_timer(0.2).timeout  # 200ms delay (increased for better click reliability)
 		if is_pressed and click_manager and not click_manager.is_action_in_progress():
 			print("CurrencyGainButton: Starting hold action")
 			click_manager.start_hold_action()
@@ -139,7 +139,7 @@ func _process(delta):
 		var current_time = Time.get_ticks_msec()
 		var hold_duration = (current_time - _hold_start_time) / 1000.0
 		
-		if hold_duration >= 0.1:  # 100ms hold threshold
+		if hold_duration >= 0.2:  # 200ms hold threshold (increased for better click reliability)
 			print("CurrencyGainButton: Starting hold action (process)")
 			click_manager.start_hold_action()
 			is_held = true

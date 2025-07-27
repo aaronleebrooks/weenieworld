@@ -164,7 +164,6 @@ func _on_click_progress_complete() -> void:
 func _on_idle_progress_complete() -> void:
 	"""Handle completion of idle progress"""
 	print("ClickManager: Idle progress completed")
-	is_holding = false
 	idle_progress = 1.0
 	emit_signal("click_progress_updated", 1.0, "hold")
 	
@@ -173,6 +172,12 @@ func _on_idle_progress_complete() -> void:
 		var amount = currency_manager.currency_per_click
 		currency_manager.gain_currency(amount, "hold_action")
 		emit_signal("click_completed", "hold", amount)
+		
+		# For continuous holding, restart the timer if still holding
+		if is_holding:
+			idle_progress = 0.0
+			idle_progress_timer.start()
+			print("ClickManager: Restarting hold timer for continuous holding")
 	else:
 		print("ClickManager: CurrencyManager not found!")
 
