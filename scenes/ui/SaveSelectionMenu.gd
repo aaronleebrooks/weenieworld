@@ -86,27 +86,24 @@ func show_delete_confirmation(save_info: Dictionary):
 func _on_delete_confirmed(save_info: Dictionary):
 	print("Deleting save: ", save_info["name"])
 	var success = get_node("/root/SaveSystem").delete_save_file(save_info)
-	if success:
-		print("Save deleted successfully!")
-		
-		# Check if any saves remain
-		var has_saves = get_node("/root/SaveSystem").has_save_file()
-		print("Has saves after deletion: ", has_saves)
-		
-		if not has_saves:
-			# No saves left, close the modal and update main menu
-			print("No saves remaining, closing modal")
-			var main_menu = get_parent()
-			if main_menu.has_method("update_continue_button"):
-				main_menu.update_continue_button()
-			queue_free()
-		else:
-			# Refresh the list
-			print("Refreshing save list...")
-			populate_save_list()
-			print("Save list refreshed")
+	
+	# Always refresh the list after attempting deletion, regardless of return value
+	print("Refreshing save list after deletion attempt...")
+	populate_save_list()
+	
+	# Check if any saves remain after refresh
+	var has_saves = get_node("/root/SaveSystem").has_save_file()
+	print("Has saves after deletion and refresh: ", has_saves)
+	
+	if not has_saves:
+		# No saves left, close the modal and update main menu
+		print("No saves remaining, closing modal")
+		var main_menu = get_parent()
+		if main_menu.has_method("update_continue_button"):
+			main_menu.update_continue_button()
+		queue_free()
 	else:
-		print("Failed to delete save!")
+		print("Save list refreshed successfully")
 
 func format_timestamp(timestamp: String) -> String:
 	# Convert ISO timestamp to readable format

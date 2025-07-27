@@ -258,14 +258,10 @@ func delete_save_file(save_info: Dictionary) -> bool:
 	var result = saves_dir.remove(filename)
 	print("Delete result: ", result)
 	
-	# Verify deletion
-	if result:
-		if not FileAccess.file_exists(file_path):
-			print("File successfully deleted")
-		else:
-			print("File still exists after deletion!")
-			return false
+	# Check if file was actually deleted, regardless of the return value
+	if not FileAccess.file_exists(file_path):
+		print("File successfully deleted (verified)")
+		return true
 	else:
-		print("Delete operation failed")
-	
-	return result 
+		print("File still exists after deletion!")
+		return false 
