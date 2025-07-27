@@ -32,6 +32,11 @@ func _ready():
 		click_manager.click_completed.connect(_on_click_completed)
 		click_manager.click_started.connect(_on_click_started)
 		click_manager.click_state_changed.connect(_on_click_state_changed)
+	
+	# Connect to hot dog events
+	if hot_dog_manager:
+		hot_dog_manager.hot_dogs_produced.connect(_on_hot_dogs_produced)
+		hot_dog_manager.hot_dogs_sold.connect(_on_hot_dogs_sold)
 
 func _create_central_animation_squares():
 	"""Create the two animation squares at the bottom center of the screen"""
@@ -97,6 +102,16 @@ func _on_click_completed(click_type: String, hot_dogs_produced: int):
 	# Note: We don't call _animate_hold_complete() for hold actions
 	# because holds are continuous and we want the animation to keep looping
 	# The hold animation will be stopped when the hold action actually ends
+
+func _on_hot_dogs_produced(amount: int, source: String):
+	"""Handle hot dog production events - animate yellow square"""
+	print("AnimationManager: Hot dogs produced - animating yellow square")
+	_animate_production(animation_square_1)
+
+func _on_hot_dogs_sold(amount: int, value: int):
+	"""Handle hot dog sales events - animate orange square"""
+	print("AnimationManager: Hot dogs sold - animating orange square")
+	_animate_sale(animation_square_2)
 
 func _animate_click():
 	"""Animate squares for instant click"""
@@ -278,3 +293,73 @@ func make_squares_visible():
 	# Test hold animation after a delay
 	await get_tree().create_timer(1.0).timeout
 	_animate_hold_start() 
+
+func _animate_production(square: ColorRect):
+	"""Animate yellow square for hot dog production"""
+	if not square:
+		return
+	
+	# Kill any existing tweens for this square
+	if square.has_meta("production_tween"):
+		var existing_tween = square.get_meta("production_tween")
+		if existing_tween:
+			existing_tween.kill()
+	
+	# Reset to original state
+	square.scale = Vector2(1.0, 1.0)
+	if square == animation_square_1:
+		square.position = original_position_1
+	
+	var tween = create_tween()
+	square.set_meta("production_tween", tween)
+	
+	# Production animation: quick outward movement and scale up
+	var original_pos = square.position
+	var target_pos = original_pos + Vector2(0, -30)  # Move up
+	var target_scale = Vector2(1.0, 1.0) * 1.4  # Scale up
+	
+	# Quick outward animation
+	tween.parallel().tween_property(square, "position", target_pos, 0.2)
+	tween.parallel().tween_property(square, "scale", target_scale, 0.2)
+	
+	# Return to original state
+	tween.tween_property(square, "position", original_pos, 0.15)
+	tween.parallel().tween_property(square, "scale", Vector2(1.0, 1.0), 0.15)
+	
+	# Clean up tween reference when done
+	tween.finished.connect(func(): square.set_meta("production_tween", null))
+
+func _animate_sale(square: ColorRect):
+	"""Animate orange square for hot dog sales"""
+	if not square:
+		return
+	
+	# Kill any existing tweens for this square
+	if square.has_meta("sale_tween"):
+		var existing_tween = square.get_meta("sale_tween")
+		if existing_tween:
+			existing_tween.kill()
+	
+	# Reset to original state
+	square.scale = Vector2(1.0, 1.0)
+	if square == animation_square_2:
+		square.position = original_position_2
+	
+	var tween = create_tween()
+	square.set_meta("sale_tween", tween)
+	
+	# Sale animation: quick outward movement and scale up with different timing
+	var original_pos = square.position
+	var target_pos = original_pos + Vector2(0, -25)  # Move up slightly less
+	var target_scale = Vector2(1.0, 1.0) * 1.3  # Scale up slightly less
+	
+	# Quick outward animation
+	tween.parallel().tween_property(square, "position", target_pos, 0.25)
+	tween.parallel().tween_property(square, "scale", target_scale, 0.25)
+	
+	# Return to original state
+	tween.tween_property(square, "position", original_pos, 0.2)
+	tween.parallel().tween_property(square, "scale", Vector2(1.0, 1.0), 0.2)
+	
+	# Clean up tween reference when done
+	tween.finished.connect(func(): square.set_meta("sale_tween", null))
