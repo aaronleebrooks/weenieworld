@@ -35,8 +35,8 @@ func populate_save_list():
 	# Create containers for each save file
 	for save_info in save_files:
 		var save_container = HBoxContainer.new()
-		save_container.custom_minimum_size = Vector2(0, 70)
-		save_container.add_theme_constant_override("separation", 10)
+		save_container.custom_minimum_size = Vector2(0, 90)
+		save_container.add_theme_constant_override("separation", 15)
 		save_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		
 		# Create load button
@@ -44,7 +44,7 @@ func populate_save_list():
 		var formatted_time = format_timestamp(save_info["time"])
 		load_button.text = save_info["name"] + "\n" + formatted_time
 		load_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		load_button.custom_minimum_size = Vector2(0, 60)
+		load_button.custom_minimum_size = Vector2(0, 80)
 		load_button.pressed.connect(_on_save_selected.bind(save_info))
 		save_container.add_child(load_button)
 		save_buttons.append(load_button)
@@ -52,7 +52,7 @@ func populate_save_list():
 		# Create delete button
 		var delete_button = Button.new()
 		delete_button.text = "X"
-		delete_button.custom_minimum_size = Vector2(50, 60)
+		delete_button.custom_minimum_size = Vector2(60, 80)
 		delete_button.add_theme_color_override("font_color", Color.RED)
 		delete_button.add_theme_color_override("font_hover_color", Color.RED)
 		delete_button.pressed.connect(_on_delete_save_pressed.bind(save_info))

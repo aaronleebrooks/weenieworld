@@ -44,9 +44,9 @@ Establish the foundational structure of WeenieWorld with a working main menu, ba
 - [x] Test navigation flow
 
 ### 1.7 Testing and Validation
-- [ ] Test main menu functionality
+- [x] Test main menu functionality
 - [ ] Test save/load system
-- [ ] Test scene navigation
+- [x] Test scene navigation
 - [ ] Verify responsive design basics
 
 ## Implementation Order
