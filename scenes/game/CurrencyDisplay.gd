@@ -35,19 +35,25 @@ func _update_responsive_layout():
 
 func _on_currency_changed(new_balance: int, change_amount: int):
 	_update_display()
-	print("CurrencyDisplay: Currency changed by ", change_amount, " (new balance: ", new_balance, ")")
+	# Only log significant changes (more than 1 currency)
+	if abs(change_amount) > 1:
+		print("CurrencyDisplay: Currency changed by ", change_amount, " (new balance: ", new_balance, ")")
 
 func _on_currency_gained(amount: int, source: String):
 	_update_display()
-	print("CurrencyDisplay: Gained ", amount, " currency from ", source)
+	# Only log significant gains
+	if amount > 1:
+		print("CurrencyDisplay: Gained ", amount, " currency from ", source)
 
 func _on_currency_spent(amount: int, reason: String):
 	_update_display()
-	print("CurrencyDisplay: Spent ", amount, " currency for ", reason)
+	# Only log significant spending
+	if amount > 1:
+		print("CurrencyDisplay: Spent ", amount, " currency for ", reason)
 
 func _update_display():
 	var currency_manager = get_node("/root/CurrencyManager")
 	if currency_manager and currency_label:
 		var formatted_currency = currency_manager.get_formatted_currency()
 		currency_label.text = "Currency: " + formatted_currency
-		print("CurrencyDisplay: Updated to ", formatted_currency) 
+		# Don't log every update - too frequent 

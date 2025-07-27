@@ -52,10 +52,7 @@ func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 	is_visible = is_clicking or is_holding
 	visible = is_visible
 	
-	if is_visible:
-		print("ProgressBar: Showing progress bar")
-	else:
-		print("ProgressBar: Hiding progress bar")
+	if not is_visible:
 		current_progress = 0.0
 		_update_progress_display("none")
 
@@ -67,7 +64,7 @@ func _on_click_completed(click_type: String, currency_gained: int):
 		# Reset progress and keep visible for continuous holding
 		current_progress = 0.0
 		_update_progress_display("hold")
-		print("ProgressBar: Restarting hold progress bar")
+		# Don't log restart - it's expected behavior
 
 func _update_progress_display(click_type: String):
 	"""Update the visual progress bar"""
@@ -86,7 +83,10 @@ func _update_progress_display(click_type: String):
 		_:
 			progress_fill.color = Color(0.2, 0.2, 0.2, 1.0)  # Gray for none
 	
-	print("ProgressBar: Progress updated to %.2f%% (%s)" % [current_progress * 100, click_type])
+	# Only log significant progress changes (every 10% or completion)
+	var progress_percent = current_progress * 100
+	if progress_percent == 0.0 or progress_percent == 100.0 or int(progress_percent) % 10 == 0:
+		print("ProgressBar: Progress updated to %.0f%% (%s)" % [progress_percent, click_type])
 
 func set_progress(progress: float):
 	"""Manually set progress (0.0 to 1.0)"""

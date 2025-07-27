@@ -69,7 +69,6 @@ func _update_responsive_layout():
 
 func _on_button_pressed():
 	"""Handle button press (single click)"""
-	print("CurrencyGainButton: Button pressed")
 	if click_manager and not click_manager.is_action_in_progress():
 		# Only start click action if we're not already holding
 		if not is_held:
@@ -79,13 +78,11 @@ func _on_button_pressed():
 
 func _on_button_down():
 	"""Handle button down (start of hold)"""
-	print("CurrencyGainButton: Button down")
 	is_pressed = true
 	# Don't start hold action immediately - wait for button_up to determine if it was a click or hold
 
 func _on_button_up():
 	"""Handle button up (end of press)"""
-	print("CurrencyGainButton: Button up")
 	is_pressed = false
 	
 	# Reset hold timer
@@ -168,17 +165,14 @@ func _update_visual_state():
 			# Normal state
 			modulate = Color.WHITE
 			text = "Gain Currency"
-			print("CurrencyGainButton: Visual state - IDLE")
 		ButtonState.CLICKED:
 			# Clicked state
 			modulate = Color(0.8, 1.0, 0.8, 1.0)  # Light green
 			text = "Clicking..."
-			print("CurrencyGainButton: Visual state - CLICKED")
 		ButtonState.HELD:
 			# Held state
 			modulate = Color(1.0, 0.8, 0.6, 1.0)  # Light orange
 			text = "Holding..."
-			print("CurrencyGainButton: Visual state - HELD")
 
 func get_current_state() -> ButtonState:
 	"""Get current button state"""
