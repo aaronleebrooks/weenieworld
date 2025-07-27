@@ -1,527 +1,524 @@
-# Phase 3: UI, Polish, and Logging System - Detailed Implementation Plan
+# Phase 3: Food Truck Identity & Office System - Detailed Implementation Plan
 
 ## Overview
-Phase 3 implements comprehensive UI overhaul, logging system, audio integration, animation polish, and final quality assurance. This phase transforms the functional game mechanics into a polished, professional hot dog store idle game with robust debugging capabilities and cross-platform compatibility.
+Phase 3 implements the core identity system for "Alien Hot Dog Food Truck" including truck naming, alien cypher, office purchase, and the research laboratory system. This phase establishes the foundation for the advanced gameplay systems in later phases.
 
-## Current Progress Summary ✅ **IN PROGRESS**
+## Current Progress Summary ⏳ **IN PLANNING**
 
-**Phase 3A: Logging System Implementation** 🔧
-- [ ] Create LogManager autoload with configurable log levels
-- [ ] Implement performance monitoring (frame rates, memory usage)
-- [ ] Add event logging for player actions and analytics
-- [ ] Create log persistence with file rotation and cleanup
-- [ ] Build in-game debug console for developers
+**Planned Systems (6/6)**:
+1. ⏳ **Truck Naming System** - Player enters food truck name at game start
+2. ⏳ **Alien Cypher System** - Text transformation for alien immersion
+3. ⏳ **Office Purchase System** - Unlocks research capabilities
+4. ⏳ **Laboratory System** - Research facility with scientists
+5. ⏳ **Research Points System** - Scientists generate research points
+6. ⏳ **Basic Research Trees** - Multiple upgrade paths for different strategies
 
-**Phase 3B: Menu System Completion** 🎮
-- [ ] Create comprehensive Stats Menu with lifetime statistics
-- [ ] Implement Settings Menu with audio, graphics, and accessibility options
-- [ ] Build Achievement System with milestone tracking
-- [ ] Add Help/Tutorial system for new players
+## Phase 3A: Truck Identity System ✨
 
-**Phase 3C: Responsive Design Enhancement** 📱
-- [ ] Optimize mobile experience with touch-friendly UI
-- [ ] Enhance tablet support with medium-screen layouts
-- [ ] Improve desktop experience with keyboard shortcuts
-- [ ] Implement accessibility features (screen readers, high contrast)
-
-**Phase 3D: Audio System Implementation** 🔊
-- [ ] Create AudioManager autoload for sound management
-- [ ] Implement sound effects for UI interactions and game events
-- [ ] Add background music system with different themes
-- [ ] Build audio settings and volume controls
-
-**Phase 3E: Animation Polish** ✨
-- [ ] Enhance wireframe animations with particle effects
-- [ ] Add UI transition animations (menus, buttons)
-- [ ] Implement hot dog production particle effects
-- [ ] Create customer purchase visual feedback
-
-**Phase 3F: Quality Assurance** 🧪
-- [ ] Conduct cross-platform testing (Windows, macOS, Linux, Android)
-- [ ] Optimize performance (memory usage, frame rate stability)
-- [ ] Implement comprehensive bug fixing and edge case handling
-- [ ] Perform user experience testing and accessibility validation
-
-**Phase 3G: Documentation and Polish** 📚
-- [ ] Create comprehensive code documentation
-- [ ] Build in-game help system and tutorials
-- [ ] Develop developer documentation and API guides
-- [ ] Implement final UI consistency and visual refinement
-
-## Core Design Philosophy
-
-### Logging System Architecture
-- **Centralized Logging**: Single LogManager autoload for all logging needs
-- **Configurable Levels**: DEBUG, INFO, WARNING, ERROR with runtime control
-- **Performance Monitoring**: Real-time metrics for debugging and optimization
-- **Event Tracking**: Player actions logged for analytics and debugging
-- **File Persistence**: Logs saved to files with rotation and cleanup
-
-### Responsive Design Principles
-- **Mobile-First**: Design for mobile, enhance for larger screens
-- **Touch-Friendly**: Minimum 44px touch targets for mobile
-- **Keyboard Accessible**: Full keyboard navigation for desktop
-- **Screen Reader Support**: Proper accessibility for visually impaired users
-
-### Audio System Design
-- **Modular Audio**: Separate buses for master, SFX, and music
-- **Performance Optimized**: Efficient audio loading and playback
-- **User Control**: Individual volume controls for different audio types
-- **Contextual Music**: Different themes for different game states
-
-## Tasks
-
-### Phase 3A: Logging System Implementation 🔧
-
-#### 1.1 LogManager Autoload Creation
-- [ ] Create `scripts/autoload/LogManager.gd` with configurable log levels
-- [ ] Implement log level enum (DEBUG, INFO, WARNING, ERROR)
-- [ ] Add log file management with rotation and cleanup
-- [ ] Create performance monitoring functions
-- [ ] Implement event logging system
+### 1.1 Truck Naming Interface
+- [ ] Create `TruckNaming.tscn` scene for name input
+- [ ] Implement name validation (length, characters, uniqueness)
+- [ ] Add name preview with alien cypher transformation
+- [ ] Create save/load integration for truck name
+- [ ] Add name display throughout the game UI
+- [ ] Implement fresh start - delete all existing saves
 
 **Implementation Details**:
-```gdscript
-# LogManager.gd structure
-enum LogLevel { DEBUG, INFO, WARNING, ERROR }
-var current_log_level = LogLevel.INFO
-var log_file_path = "user://game_logs/"
-var max_log_files = 5
-var max_log_size = 1024 * 1024  # 1MB per file
+- **Name Input**: LineEdit with character limits and validation
+- **Preview System**: Real-time alien cypher preview
+- **Validation Rules**: 3-20 characters, alphanumeric + spaces
+- **Save Integration**: Store in GameData and SaveSystem
+- **UI Integration**: Display in game header, menus, and references
 
-func log(message: String, level: LogLevel = LogLevel.INFO, category: String = "GENERAL")
-func log_performance(metric: String, value: float)
-func log_event(event_type: String, data: Dictionary)
-func export_logs() -> String
-```
+### 1.2 Alien Cypher System
+- [ ] Create `AlienCypher.gd` autoload for text transformation
+- [ ] Implement character substitution mapping
+- [ ] Add cypher intensity levels (subtle to extreme)
+- [ ] Create cypher toggle for accessibility
+- [ ] Add cypher to all game text systems
 
-#### 1.2 Performance Monitoring Integration
-- [ ] Add frame rate monitoring to LogManager
-- [ ] Implement memory usage tracking
-- [ ] Create save/load time measurement
-- [ ] Add performance metrics to existing managers
-- [ ] Build performance dashboard for debug console
+**Implementation Details**:
+- **Character Mapping**: Simple substitution cipher (A→X, B→Y, etc.)
+- **Intensity Levels**: 
+  - Level 1: Vowels only (subtle)
+  - Level 2: All letters (moderate)
+  - Level 3: Letters + numbers (extreme)
+- **Toggle System**: Settings option to disable cypher
+- **Performance**: Efficient string processing for real-time updates
 
-**Performance Metrics**:
-- **Frame Rate**: Current FPS and frame time variance
-- **Memory Usage**: RAM consumption and garbage collection
-- **Load Times**: Scene transitions and save/load operations
-- **Audio Performance**: Audio buffer underruns and latency
+### 1.3 Name Integration
+- [ ] Update all UI text to reference truck name
+- [ ] Add name to save file headers
+- [ ] Create name display in main game scene
+- [ ] Add name to menu headers and tooltips
+- [ ] Implement name in event and achievement text
 
-#### 1.3 Event Logging System
-- [ ] Create event logging functions for all player actions
-- [ ] Implement hot dog production/sales logging
-- [ ] Add upgrade purchase tracking
-- [ ] Create save/load event logging
-- [ ] Build analytics data collection
+## Phase 3B: Office Purchase System 🏢
 
-**Event Types**:
-- **Hot Dog Events**: Production, sales, inventory changes
-- **Customer Events**: Purchases, arrival rates, satisfaction
-- **Upgrade Events**: Purchases, level increases, effects applied
-- **Game Events**: Save, load, scene transitions
-- **Performance Events**: Frame drops, memory spikes, errors
+### 2.1 Office Purchase Interface
+- [ ] Create `OfficeMenu.tscn` scene for office management
+- [ ] Implement office purchase with currency cost
+- [ ] Add office description and benefits display
+- [ ] Create unlock notification system
+- [ ] Add office status to main game UI
 
-#### 1.4 Log File Management
-- [ ] Implement log file rotation (max 5 files)
-- [ ] Add log file size limits (1MB per file)
-- [ ] Create log cleanup and archiving
-- [ ] Build log export functionality
-- [ ] Add log compression for storage efficiency
+**Implementation Details**:
+- **Purchase Cost**: 1000 currency (adjustable)
+- **Description**: "A place to focus. Unlock the ability to add stations to [Truck Name]"
+- **Unlock Effects**: 
+  - New menu section: "Stations"
+  - Laboratory station access
+  - Research system activation
+- **Status Display**: Office status indicator in main UI
 
-#### 1.5 Debug Console Implementation
-- [ ] Create in-game debug console UI
-- [ ] Add real-time log display
-- [ ] Implement performance metrics dashboard
-- [ ] Create log level controls
-- [ ] Add log export functionality
+### 2.2 Menu System Updates
+- [ ] Add "Stations" section to main menu
+- [ ] Create station submenu structure
+- [ ] Implement station unlock progression
+- [ ] Add station status indicators
+- [ ] Create station navigation system
 
-### Phase 3B: Menu System Completion 🎮
+**Implementation Details**:
+- **Menu Structure**: Main Menu → Stations → [Station Type]
+- **Station Types**: Laboratory, Kitchen, Marketing Office, etc.
+- **Progression**: Office → Laboratory → Other stations
+- **Status Icons**: Locked/Unlocked/Active indicators
 
-#### 2.1 Stats Menu Implementation
-- [ ] Create `scenes/ui/StatsMenu.tscn` with comprehensive statistics
-- [ ] Implement lifetime statistics tracking
-- [ ] Add session statistics display
-- [ ] Create upgrade history tracking
-- [ ] Build performance metrics display
+## Phase 3C: Laboratory System 🔬
 
-**Stats Menu Features**:
-- **Lifetime Statistics**: Total hot dogs produced, sold, currency earned, clicks, play time
-- **Session Statistics**: Current session data and progress
-- **Upgrade History**: Purchase history and cumulative effects
-- **Performance Metrics**: FPS, memory usage, save times
-- **Export Data**: Save statistics to file for analysis
+### 3.1 Laboratory Interface
+- [ ] Create `LaboratoryMenu.tscn` scene
+- [ ] Implement laboratory purchase system
+- [ ] Add scientist hiring interface
+- [ ] Create research points display
+- [ ] Add laboratory status and upgrades
 
-#### 2.2 Settings Menu Implementation
-- [ ] Create `scenes/ui/SettingsMenu.tscn` with comprehensive options
-- [ ] Implement audio settings (master, SFX, music volumes)
-- [ ] Add graphics settings (quality presets, vsync, fullscreen)
-- [ ] Create save management options (export/import, backup)
-- [ ] Build accessibility settings (high contrast, text scaling)
+**Implementation Details**:
+- **Laboratory Cost**: 500 currency (after office purchase)
+- **Scientist Hiring**: Individual scientist purchase system
+- **Research Points**: Real-time display of accumulated points
+- **Laboratory Upgrades**: Capacity, efficiency, and automation upgrades
 
-**Settings Menu Features**:
-- **Audio Settings**: Master volume, SFX volume, music volume, mute options
-- **Graphics Settings**: Quality presets, vsync, fullscreen, resolution
-- **Save Management**: Export/import saves, backup options, auto-save frequency
-- **Game Options**: Confirmation dialogs, tooltip behavior, animation settings
-- **Accessibility**: High contrast mode, text scaling, screen reader support
+### 3.2 Scientist System
+- [ ] Create `ScientistDefinition.gd` resource class
+- [ ] Implement scientist hiring with hot dog quotas
+- [ ] Add scientist research point generation
+- [ ] Create scientist management interface
+- [ ] Implement scientist quota monitoring
 
-#### 2.3 Achievement System Implementation
-- [ ] Create `scripts/autoload/AchievementManager.gd` for milestone tracking
-- [ ] Implement achievement definitions and progress tracking
-- [ ] Add achievement notification system
-- [ ] Create achievement display UI
-- [ ] Build achievement rewards system
+**Implementation Details**:
+- **Scientist Properties**:
+  - Name (alien-themed)
+  - Research rate (points per second)
+  - Hot dog quota (daily requirement)
+  - Cost (currency to hire)
+  - Specialization (research tree focus)
+- **Quota System**: 
+  - 1 hot dog per second per scientist
+  - Quota curves using Godot Curve resource
+  - Penalty for missed quotas (no research)
+  - Quota display in worker assignment interface
+- **Management Interface**:
+  - Hire/fire scientists
+  - Adjust quotas
+  - Monitor performance
+  - Assign specializations
 
-**Achievement Categories**:
-- **Hot Dog Milestones**: Produce 100, 1K, 10K, 100K hot dogs
-- **Sales Milestones**: Sell 100, 1K, 10K hot dogs
-- **Currency Milestones**: Earn 100, 1K, 10K, 100K currency
-- **Click Milestones**: Perform 100, 1K, 10K clicks
-- **Upgrade Milestones**: Purchase 5, 10, 20 upgrades
-- **Time Milestones**: Play for 1 hour, 1 day, 1 week
-- **Efficiency Milestones**: Reach specific hot dogs per second rates
+### 3.3 Research Points System
+- [ ] Create `ResearchManager.gd` autoload
+- [ ] Implement research point accumulation
+- [ ] Add research point spending system
+- [ ] Create research point display and formatting
+- [ ] Add research point bonuses and multipliers
 
-#### 2.4 Help/Tutorial System
-- [ ] Create `scenes/ui/HelpMenu.tscn` with comprehensive guidance
-- [ ] Implement interactive tutorial system
-- [ ] Add contextual help tooltips
-- [ ] Create FAQ section
-- [ ] Build video tutorial integration
+**Implementation Details**:
+- **Point Generation**: 1 research point every 10 minutes per scientist
+- **Point Spending**: Purchase research upgrades
+- **Point Display**: Formatted display (1.2K, 1.5M, etc.)
+- **Bonuses**: Multipliers from laboratory upgrades
+- **Persistence**: Save/load research point totals
+- **Debug Features**: Manual research point addition for testing
 
-### Phase 3C: Responsive Design Enhancement 📱
+## Phase 3D: Research Trees 🌳
 
-#### 3.1 Mobile Optimization
-- [ ] Implement touch-friendly UI elements (minimum 44px touch targets)
-- [ ] Add gesture support (swipe navigation, pinch zoom)
-- [ ] Create orientation handling (portrait and landscape layouts)
-- [ ] Optimize battery usage and performance
-- [ ] Add mobile-specific UI adjustments
+### 4.1 Research Definition System
+- [ ] Create `ResearchDefinition.gd` resource class
+- [ ] Implement research tree structure
+- [ ] Add research prerequisites and dependencies
+- [ ] Create research cost scaling system
+- [ ] Add research effect definitions
 
-**Mobile Enhancements**:
-- **Touch Targets**: All interactive elements minimum 44px
-- **Gesture Support**: Swipe between menus, pinch to zoom
-- **Orientation**: Automatic layout adjustment for portrait/landscape
-- **Performance**: Reduced animations, optimized rendering
-- **Battery**: Efficient update loops, reduced background processing
+**Implementation Details**:
+- **Research Properties**:
+  - ID and display name
+  - Description and effects
+  - Cost (research points)
+  - Prerequisites (other research)
+  - Research tree category
+  - Effect type and value
+- **Tree Structure**: 
+  - Multiple research trees
+  - Branching paths
+  - Convergence points
+  - End-game research
 
-#### 3.2 Tablet Support Enhancement
-- [ ] Create optimized layouts for medium screens (768px-1200px)
-- [ ] Implement side-by-side menu layouts
-- [ ] Add tablet-specific navigation patterns
-- [ ] Optimize touch interaction for larger screens
-- [ ] Create tablet-specific UI scaling
+### 4.2 Basic Research Trees
+- [ ] Implement Production Efficiency tree
+- [ ] Create Customer Attraction tree
+- [ ] Add Recipe Enhancement tree
+- [ ] Create Facility Expansion tree
+- [ ] Add Strategic Marketing tree (foundation)
 
-#### 3.3 Desktop Enhancement
-- [ ] Implement keyboard shortcuts for common actions
-- [ ] Add mouse hover effects and right-click menus
-- [ ] Create window management features (resizable, multiple monitors)
-- [ ] Add high refresh rate support and vsync options
-- [ ] Implement desktop-specific performance optimizations
+**Implementation Details**:
+- **Production Efficiency**:
+  - Hot dog production upgrades
+  - Click efficiency improvements
+  - Automation research
+- **Customer Attraction**:
+  - Customer spawn rate
+  - Customer satisfaction
+  - Customer retention
+- **Recipe Enhancement**:
+  - Ingredient quality
+  - Recipe complexity
+  - Special effects
+- **Facility Expansion**:
+  - Laboratory capacity
+  - Scientist efficiency
+  - Facility automation
+- **Strategic Marketing** (Foundation):
+  - Basic tower research
+  - Customer flow analysis
+  - Competition preparation
 
-**Keyboard Shortcuts**:
-- **Space**: Trigger hot dog production action
-- **Escape**: Close menus, return to game
-- **U**: Open upgrade menu
-- **S**: Open settings menu
-- **H**: Open help menu
-- **F11**: Toggle fullscreen
+### 4.3 Research Management
+- [ ] Create research purchase interface
+- [ ] Implement research progress tracking
+- [ ] Add research reset functionality
+- [ ] Create research save/load system
+- [ ] Add research configuration export/import
 
-#### 3.4 Accessibility Implementation
-- [ ] Add screen reader support with proper ARIA labels
-- [ ] Implement keyboard navigation for all UI elements
-- [ ] Create high contrast themes for visually impaired users
-- [ ] Add text scaling options for readability
-- [ ] Implement focus indicators and navigation aids
+**Implementation Details**:
+- **Purchase Interface**: 
+  - Research tree visualization
+  - Cost display and affordability
+  - Prerequisite checking
+  - Effect preview
+- **Progress Tracking**:
+  - Completed research
+  - Available research
+  - Locked research
+  - Research tree completion %
+- **Reset System**:
+  - Reset all research
+  - Refund research points
+  - Confirmation dialog
+- **Configuration System**:
+  - Save research state
+  - Export to clipboard
+  - Import from clipboard
+  - Share configurations
 
-### Phase 3D: Audio System Implementation 🔊
+## Phase 3E: Worker Assignment System 👥
 
-#### 4.1 AudioManager Autoload Creation
-- [ ] Create `scripts/autoload/AudioManager.gd` for centralized audio management
-- [ ] Implement audio bus management (master, SFX, music)
-- [ ] Add volume control system with persistence
-- [ ] Create audio resource management
-- [ ] Build audio performance monitoring
+### 5.1 Worker Management Interface
+- [ ] Create `WorkerManager.gd` autoload
+- [ ] Implement worker assignment system
+- [ ] Add worker quota monitoring
+- [ ] Create worker efficiency tracking
+- [ ] Add worker hiring and firing system
 
-**AudioManager Structure**:
-```gdscript
-# AudioManager.gd
-var audio_buses = {
-    "master": AudioServer.get_bus_index("Master"),
-    "sfx": AudioServer.get_bus_index("SFX"),
-    "music": AudioServer.get_bus_index("Music")
-}
-var sound_effects = {}
-var background_music = {}
-var current_music_track = null
-```
+**Implementation Details**:
+- **Worker Types**:
+  - Food Truck Workers: Auto-click make hot dog button
+  - Laboratory Workers: Convert hot dogs to research points
+  - Marketing Workers: Generate market research points
+- **Assignment System**: Drag-and-drop or button-based assignment
+- **Quota Monitoring**: Real-time hot dog consumption tracking
+- **Efficiency Tracking**: Performance metrics for each worker type
+- **Hiring System**: Currency-based worker recruitment
 
-#### 4.2 Sound Effects Implementation
-- [ ] Create sound effect library for UI interactions
-- [ ] Implement game event sound effects
-- [ ] Add notification and achievement sounds
-- [ ] Create ambient sound effects
-- [ ] Build sound effect management system
+### 5.2 Station Worker Assignment
+- [ ] Create station worker capacity system
+- [ ] Implement worker assignment interface
+- [ ] Add worker quota display
+- [ ] Create worker performance metrics
+- [ ] Add worker upgrade system
 
-**Sound Effect Categories**:
-- **UI Interactions**: Button clicks, menu navigation, tooltip sounds
-- **Game Events**: Hot dog production, customer purchases, upgrade purchases, save operations
-- **Notifications**: Achievement unlocks, error sounds, warnings
-- **Ambient Sounds**: Background atmosphere, idle sounds
+**Implementation Details**:
+- **Station Capacity**: Maximum workers per station type
+- **Assignment Interface**: Visual worker assignment system
+- **Quota Display**: Show hot dog consumption rates
+- **Performance Metrics**: Research points generated, efficiency
+- **Worker Upgrades**: Improve worker efficiency and capacity
 
-#### 4.3 Background Music System
-- [ ] Create background music tracks for different game states
-- [ ] Implement music transition system
-- [ ] Add music volume and fade controls
-- [ ] Create music loop management
-- [ ] Build music performance optimization
+## Phase 3F: Event System Foundation 🎯
 
-**Background Music Themes**:
-- **Main Menu**: Calm, welcoming theme with gentle progression
-- **Game Loop**: Engaging, loopable track with subtle variations
-- **Upgrade Menu**: Energetic, motivating music for progression
-- **Achievement**: Celebratory fanfare for milestone moments
+### 6.1 Achievement Events
+- [ ] Create `AchievementManager.gd` autoload
+- [ ] Implement achievement tracking system
+- [ ] Add achievement event triggers
+- [ ] Create achievement notification system
+- [ ] Add achievement rewards and effects
 
-#### 4.4 Audio Settings Integration
-- [ ] Integrate audio settings with Settings Menu
-- [ ] Implement volume slider controls
-- [ ] Add mute/unmute functionality
-- [ ] Create audio device management
-- [ ] Build audio performance monitoring
+**Implementation Details**:
+- **Achievement Types**:
+  - Hot dog production milestones (100, 1K, 10K, etc.)
+  - Customer service milestones
+  - Research milestones
+  - Facility milestones
+- **Event Triggers**: Automatic detection of milestone completion
+- **Notifications**: Modal popups with animations
+- **Rewards**: Currency, research points, or special unlocks
 
-### Phase 3E: Animation Polish ✨
+### 6.2 Random Events
+- [ ] Create `EventManager.gd` autoload
+- [ ] Implement random event system
+- [ ] Add event probability calculations
+- [ ] Create event effect system
+- [ ] Add event log and history
 
-#### 5.1 Enhanced Wireframe Animations
-- [ ] Improve existing square animations with smoother transitions
-- [ ] Add easing functions for more natural movement
-- [ ] Implement animation queuing system
-- [ ] Create animation performance optimization
-- [ ] Build animation configuration system
+**Implementation Details**:
+- **Event Triggers**:
+  - Hot dog production
+  - Customer purchases
+  - Research completion
+  - Time-based events
+- **Event Types**:
+  - Positive events (bonuses, rewards)
+  - Negative events (penalties, challenges)
+  - Neutral events (story, information)
+- **Probability System**: 
+  - Base probabilities
+  - Modifiers from research/upgrades
+  - Cooldown periods
+- **Event Effects**:
+  - Currency bonuses/penalties
+  - Research point gains
+  - Temporary buffs/debuffs
+  - Special unlocks
 
-**Animation Enhancements**:
-- **Smoother Transitions**: Easing functions for natural movement
-- **Performance Optimization**: Efficient animation rendering
-- **Configuration System**: Easily adjustable animation parameters
-- **Queue Management**: Proper animation sequencing
+### 6.3 Event UI System
+- [ ] Create `EventModal.tscn` scene
+- [ ] Implement event notification system
+- [ ] Add event log interface
+- [ ] Create event history tracking
+- [ ] Add event animation system
 
-#### 5.2 Particle Effects Implementation
-- [ ] Create hot dog production particle effects
-- [ ] Implement customer purchase visual feedback
-- [ ] Add achievement unlock particle effects
-- [ ] Create ambient particle systems
-- [ ] Build particle performance optimization
-
-**Particle Effect Types**:
-- **Hot Dog Particles**: Floating hot dog icons with sparkle effects
-- **Customer Effects**: Expanding rings and energy bursts for purchases
-- **Achievement Particles**: Confetti and celebration effects
-- **Ambient Particles**: Subtle background effects
-
-#### 5.3 UI Animation System
-- [ ] Implement menu transition animations (slide, fade, scale)
-- [ ] Add button feedback animations (hover, press, release)
-- [ ] Create loading and progress animations
-- [ ] Build notification and toast animations
-- [ ] Implement animation performance monitoring
-
-**UI Animation Types**:
-- **Menu Transitions**: Smooth slide/fade between screens
-- **Button Feedback**: Hover effects, press animations, release feedback
-- **Loading Animations**: Progress indicators and loading screens
-- **Notifications**: Toast messages and alert animations
-
-#### 5.4 Animation Performance Optimization
-- [ ] Implement animation pooling for frequently used effects
-- [ ] Add animation culling for off-screen elements
-- [ ] Create animation LOD system for performance
-- [ ] Build animation performance monitoring
-- [ ] Optimize animation rendering pipeline
-
-### Phase 3F: Quality Assurance 🧪
-
-#### 6.1 Cross-Platform Testing
-- [ ] Test on Windows 10/11 with various hardware configurations
-- [ ] Validate macOS 10.15+ compatibility
-- [ ] Test Linux (Ubuntu 20.04+) compatibility
-- [ ] Validate Android 8+ mobile devices
-- [ ] Create automated testing scripts
-
-**Testing Matrix**:
-- **Platforms**: Windows 10/11, macOS 10.15+, Ubuntu 20.04+, Android 8+
-- **Hardware**: Low-end devices, high-end systems, various screen sizes
-- **Scenarios**: New game, loaded saves, upgrade progression, long sessions
-- **Edge Cases**: Rapid clicking, save corruption, network interruptions
-
-#### 6.2 Performance Optimization
-- [ ] Optimize memory usage and prevent memory leaks
-- [ ] Ensure stable 60 FPS on target devices
-- [ ] Optimize load times for scenes and assets
-- [ ] Implement battery optimization for mobile devices
-- [ ] Create performance benchmarking tools
-
-**Performance Targets**:
-- **Memory Usage**: < 100MB RAM on mobile, < 200MB on desktop
-- **Frame Rate**: Stable 60 FPS on target devices
-- **Load Times**: < 3 seconds startup, < 1 second scene transitions
-- **Battery Impact**: < 5% per hour on mobile devices
-
-#### 6.3 Bug Fixes and Edge Cases
-- [ ] Implement comprehensive error handling
-- [ ] Fix edge cases in save/load system
-- [ ] Resolve UI responsiveness issues
-- [ ] Fix animation timing problems
-- [ ] Create automated bug detection
-
-#### 6.4 User Experience Testing
-- [ ] Conduct usability testing with target users
-- [ ] Validate accessibility compliance
-- [ ] Test intuitive navigation and feedback
-- [ ] Perform performance testing under load
-- [ ] Create user feedback collection system
-
-### Phase 3G: Documentation and Polish 📚
-
-#### 7.1 Code Documentation
-- [ ] Create comprehensive inline documentation for all functions
-- [ ] Build API documentation for all public interfaces
-- [ ] Document architecture and system interactions
-- [ ] Create code style guidelines and examples
-- [ ] Build developer setup and contribution guides
-
-#### 7.2 User Documentation
-- [ ] Create in-game help system with contextual guidance
-- [ ] Build comprehensive tutorial system
-- [ ] Add FAQ section for common questions
-- [ ] Create video tutorial integration
-- [ ] Build user manual and quick reference guide
-
-#### 7.3 Developer Documentation
-- [ ] Create architecture diagrams and system flow charts
-- [ ] Document API reference for all managers and systems
-- [ ] Build setup instructions for development environment
-- [ ] Create contribution guidelines and code review process
-- [ ] Document testing procedures and quality assurance
-
-#### 7.4 Final Polish
-- [ ] Ensure UI consistency across all screens
-- [ ] Implement final visual refinements
-- [ ] Create cohesive color schemes and typography
-- [ ] Add final animation polish and timing
-- [ ] Implement comprehensive error handling
+**Implementation Details**:
+- **Event Modal**:
+  - Animated popup for important events
+  - Event description and effects
+  - Confirm/acknowledge button
+  - Background blur effect
+- **Event Log**:
+  - Scrollable event history
+  - Event filtering options
+  - Event search functionality
+  - Event export/import
+- **Animations**:
+  - Modal entrance/exit animations
+  - Text reveal animations
+  - Effect highlight animations
 
 ## Technical Implementation Details
 
-### LogManager Integration
+### Data Models
+
+#### Truck Identity System
 ```gdscript
-# Integration with existing managers
-HotDogManager -> LogManager.log_event("hot_dog_produced", {"amount": 1, "source": "click"})
-CustomerManager -> LogManager.log_event("hot_dog_sold", {"amount": 1, "value": 5})
-UpgradeManager -> LogManager.log_event("upgrade_purchased", {"id": "faster_production", "level": 2})
-ClickManager -> LogManager.log_performance("click_response_time", 0.016)
+# GameData.gd additions
+var truck_name: String = ""
+var alien_cypher_level: int = 2
+var alien_cypher_enabled: bool = true
+
+# AlienCypher.gd
+class_name AlienCypher
+extends Node
+
+var character_mappings: Dictionary = {
+    "a": "x", "b": "y", "c": "z", # ... etc
+}
+var intensity_levels: Dictionary = {
+    1: ["a", "e", "i", "o", "u"],  # Vowels only
+    2: ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],  # All letters
+    3: ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]  # Letters + numbers
+}
+
+func transform_text(text: String, level: int = 2) -> String:
+    # Implementation for alien cypher transformation
 ```
 
-### Responsive Design System
+#### Office & Laboratory System
 ```gdscript
-# Enhanced responsive system
-var responsive_config = {
-    "desktop": {"min_width": 1200, "font_scale": 1.0, "button_height": 60},
-    "tablet": {"min_width": 768, "font_scale": 0.9, "button_height": 50},
-    "mobile": {"min_width": 0, "font_scale": 0.8, "button_height": 44}
+# GameData.gd additions
+var office_purchased: bool = false
+var laboratory_purchased: bool = false
+var research_points: int = 0
+var scientists: Array[ScientistData] = []
+var completed_research: Array[String] = []
+
+# ScientistData.gd
+class_name ScientistData
+extends Resource
+
+@export var scientist_id: String
+@export var name: String
+@export var research_rate: float  # Points per second
+@export var hot_dog_quota: int
+@export var quota_curve: Curve
+@export var specialization: String
+@export var is_active: bool = true
+@export var hired_date: String
+```
+
+#### Research System
+```gdscript
+# ResearchDefinition.gd
+class_name ResearchDefinition
+extends Resource
+
+@export var research_id: String
+@export var display_name: String
+@export var description: String
+@export var cost: int
+@export var prerequisites: Array[String]
+@export var research_tree: String
+@export var effect_type: ResearchEffectType
+@export var effect_value: float
+@export var research_time: float  # Time to complete research
+
+enum ResearchEffectType {
+    PRODUCTION_EFFICIENCY,
+    CUSTOMER_ATTRACTION,
+    RECIPE_ENHANCEMENT,
+    FACILITY_EXPANSION,
+    STRATEGIC_MARKETING
 }
 ```
 
-### Audio System Architecture
+#### Event System
 ```gdscript
-# AudioManager structure
-var audio_buses = {
-    "master": AudioServer.get_bus_index("Master"),
-    "sfx": AudioServer.get_bus_index("SFX"),
-    "music": AudioServer.get_bus_index("Music")
+# EventDefinition.gd
+class_name EventDefinition
+extends Resource
+
+@export var event_id: String
+@export var event_name: String
+@export var description: String
+@export var event_type: EventType
+@export var trigger_type: TriggerType
+@export var trigger_value: int
+@export var probability: float
+@export var effects: Array[EventEffect]
+
+enum EventType {
+    ACHIEVEMENT,
+    RANDOM,
+    STORY
 }
-var sound_effects = {}
-var background_music = {}
+
+enum TriggerType {
+    HOT_DOGS_PRODUCED,
+    CUSTOMERS_SERVED,
+    RESEARCH_COMPLETED,
+    TIME_BASED
+}
 ```
 
-## Files to be Created
+### UI Components
 
-### Core Systems
-- `scripts/autoload/LogManager.gd` - Centralized logging system
-- `scripts/autoload/AudioManager.gd` - Audio management system
-- `scripts/autoload/AchievementManager.gd` - Achievement tracking system
-- `scripts/autoload/CustomerManager.gd` - Customer sales system
+#### Truck Naming Interface
+- **Name Input**: LineEdit with validation
+- **Preview Display**: Real-time cypher preview
+- **Validation Feedback**: Error messages and suggestions
+- **Confirm Button**: Proceed to game with chosen name
 
-### UI Scenes
-- `scenes/ui/StatsMenu.tscn` - Comprehensive statistics display
-- `scenes/ui/SettingsMenu.tscn` - Game settings and options
-- `scenes/ui/HelpMenu.tscn` - Help and tutorial system
-- `scenes/ui/AchievementMenu.tscn` - Achievement display and tracking
-- `scenes/ui/DebugConsole.tscn` - In-game debug console
+#### Office Menu
+- **Office Status**: Purchase status and benefits
+- **Facility List**: Available and locked facilities
+- **Purchase Interface**: Cost display and confirmation
+- **Progress Tracking**: Facility unlock progress
 
-### Resources
-- `assets/audio/sfx/` - Sound effects library
-- `assets/audio/music/` - Background music tracks
-- `assets/particles/` - Particle effect resources
+#### Laboratory Interface
+- **Scientist Management**: Hire, fire, and manage scientists
+- **Research Points**: Current points and generation rate
+- **Research Trees**: Visual research tree interface
+- **Laboratory Upgrades**: Capacity and efficiency upgrades
 
-### Documentation
-- `docs/API_REFERENCE.md` - Complete API documentation
-- `docs/ARCHITECTURE.md` - System architecture guide
-- `docs/SETUP_GUIDE.md` - Development environment setup
-- `docs/USER_GUIDE.md` - User manual and tutorials
+#### Event System
+- **Event Modal**: Animated popup for important events
+- **Event Log**: Scrollable history of all events
+- **Event Filters**: Filter by type, date, importance
+- **Event Effects**: Display of event outcomes and rewards
 
 ## Testing Strategy
 
 ### Unit Tests
-- Logging system functionality
-- Audio system performance
-- Achievement system logic
-- Settings persistence
+- Alien cypher text transformation
+- Research point calculations
+- Scientist quota monitoring
+- Event probability calculations
+- Achievement milestone detection
 
 ### Integration Tests
-- Cross-platform compatibility
-- Audio-visual synchronization
-- Menu navigation flow
-- Performance under load
+- Truck name persistence across saves
+- Research tree progression
+- Event system integration
+- Scientist research point generation
+- Office/laboratory unlock flow
 
 ### User Experience Tests
-- Accessibility compliance
-- Mobile usability
-- Desktop efficiency
-- Cross-device consistency
-
-## Known Challenges and Solutions
-
-### Challenge 1: Cross-Platform Audio Compatibility
-**Solution**: Use Godot's built-in audio system with fallback options
-
-### Challenge 2: Performance Monitoring Overhead
-**Solution**: Implement configurable monitoring with minimal impact
-
-### Challenge 3: Mobile Battery Optimization
-**Solution**: Efficient update loops and reduced background processing
-
-### Challenge 4: Accessibility Compliance
-**Solution**: Follow WCAG guidelines and implement comprehensive testing
+- Truck naming flow
+- Research tree navigation
+- Event modal interactions
+- Scientist management interface
+- Achievement notification system
 
 ## Success Criteria
 
-- [ ] Logging system provides comprehensive debugging and analytics
-- [ ] All menus are functional, responsive, and accessible
-- [ ] Audio system enhances user experience without performance impact
-- [ ] Animations are smooth and performant across all platforms
-- [ ] Game runs at 60 FPS on target devices
-- [ ] Cross-platform compatibility is validated
-- [ ] Documentation is complete and maintainable
-- [ ] Accessibility standards are met
-- [ ] User experience is intuitive and engaging
-- [ ] Performance targets are achieved
+### Phase 3A Success Criteria
+- [ ] Players can name their food truck
+- [ ] Alien cypher transforms all game text
+- [ ] Truck name appears throughout the game
+- [ ] Name persists across save/load cycles
 
-## Next Phase Preparation
+### Phase 3B Success Criteria
+- [ ] Office can be purchased with currency
+- [ ] Office purchase unlocks new menu sections
+- [ ] Facility system is accessible
+- [ ] Office status is displayed in main UI
 
-Phase 3 establishes a polished, professional hot dog store idle game with robust debugging capabilities and cross-platform compatibility. The logging system provides foundation for ongoing development and maintenance, while the comprehensive UI and audio systems create an engaging user experience. With Phase 3 complete, the game will be ready for Phase 4's final testing, optimization, and release preparation.
+### Phase 3C Success Criteria
+- [ ] Laboratory can be purchased after office
+- [ ] Scientists can be hired with hot dog quotas
+- [ ] Research points are generated continuously
+- [ ] Scientist management interface is functional
 
-## Timeline and Dependencies
+### Phase 3D Success Criteria
+- [ ] Research trees are implemented and functional
+- [ ] Research can be purchased with points
+- [ ] Research effects are applied to gameplay
+- [ ] Research reset and configuration system works
 
-**Phase 3 Timeline**: 2-3 weeks
+### Phase 3E Success Criteria
+- [ ] Worker assignment system functional
+- [ ] Station worker capacity working
+- [ ] Worker quota monitoring active
+- [ ] Worker performance metrics displayed
+
+### Phase 3F Success Criteria
+- [ ] Achievement events trigger correctly
+- [ ] Random events occur based on gameplay
+- [ ] Event modals display with animations
+- [ ] Event log tracks all events
+- [ ] Debug event triggering works
+
+## Timeline
+
+**Estimated Duration**: 3-4 weeks
 **Dependencies**: Phase 2 completion (✅ DONE)
-**Risk Assessment**: Low - Foundation is solid, incremental improvements
-**Priority Order**: Logging System → Menu Completion → Responsive Design → Audio → Animation → QA → Documentation 
+**Risk Assessment**: Medium - Complex systems require careful integration
+**Priority**: High - Foundation for advanced gameplay systems
+
+This implementation plan provides a comprehensive roadmap for Phase 3, establishing the core identity and research systems that will support the advanced gameplay features in later phases. 
