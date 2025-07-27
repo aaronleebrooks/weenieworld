@@ -32,6 +32,7 @@ func populate_save_list():
 		var save_container = HBoxContainer.new()
 		save_container.custom_minimum_size = Vector2(0, 70)
 		save_container.add_theme_constant_override("separation", 10)
+		save_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		
 		# Create load button
 		var load_button = Button.new()
@@ -82,15 +83,18 @@ func _on_delete_confirmed(save_info: Dictionary):
 	var success = get_node("/root/SaveSystem").delete_save_file(save_info)
 	if success:
 		print("Save deleted successfully!")
-		# Refresh the list and check if we need to show "No saves" message
-		populate_save_list()
 		
-		# If no saves left, update the main menu's continue button
+		# Check if any saves remain
 		if not get_node("/root/SaveSystem").has_save_file():
-			# Find the main menu and update its continue button
+			# No saves left, close the modal and update main menu
+			print("No saves remaining, closing modal")
 			var main_menu = get_parent()
 			if main_menu.has_method("update_continue_button"):
 				main_menu.update_continue_button()
+			queue_free()
+		else:
+			# Refresh the list
+			populate_save_list()
 	else:
 		print("Failed to delete save!")
 

@@ -16,6 +16,10 @@ func _ready():
 	no_button.add_theme_color_override("font_color", Color.WHITE)
 	yes_button.add_theme_color_override("font_color", Color.RED)
 	
+	# Add spacing between buttons
+	var button_container = $DialogPanel/ButtonContainer
+	button_container.add_theme_constant_override("separation", 20)
+	
 	# Set focus to No button (primary action)
 	no_button.grab_focus()
 
