@@ -12,7 +12,7 @@ var is_held: bool = false
 
 # Hold detection variables
 var _hold_timer_started: bool = false
-var _hold_start_time: Dictionary
+var _hold_start_time: int
 
 # Button states
 enum ButtonState {IDLE, CLICKED, HELD}
@@ -134,13 +134,10 @@ func _process(delta):
 		# Check if we've been holding for a short time
 		if not _hold_timer_started:
 			_hold_timer_started = true
-			_hold_start_time = Time.get_time_dict_from_system()
+			_hold_start_time = Time.get_ticks_msec()
 		
-		var current_time = Time.get_time_dict_from_system()
-		var hold_duration = (current_time.hour - _hold_start_time.hour) * 3600 + \
-						   (current_time.minute - _hold_start_time.minute) * 60 + \
-						   (current_time.second - _hold_start_time.second) + \
-						   (current_time.msec - _hold_start_time.msec) / 1000.0
+		var current_time = Time.get_ticks_msec()
+		var hold_duration = (current_time - _hold_start_time) / 1000.0
 		
 		if hold_duration >= 0.1:  # 100ms hold threshold
 			print("CurrencyGainButton: Starting hold action (process)")
