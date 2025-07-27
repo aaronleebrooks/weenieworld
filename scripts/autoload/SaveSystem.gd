@@ -1,5 +1,4 @@
-extends RefCounted
-class_name SaveSystem
+extends Node
 
 const SAVE_FILE_PATH = "user://weenieworld_save.json"
 const AUTO_SAVE_INTERVAL = 30.0  # seconds

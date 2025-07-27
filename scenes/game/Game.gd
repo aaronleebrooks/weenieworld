@@ -12,12 +12,12 @@ func _ready():
 
 func _on_back_button_pressed():
 	print("Returning to main menu...")
-	GameManager.return_to_main_menu()
+	get_node("/root/GameManager").return_to_main_menu()
 
 func display_game_data():
 	# Show current currency and other game data
-	var currency = GameManager.get_game_data("currency", 0)
-	var click_value = GameManager.get_game_data("click_value", 1)
+	var currency = get_node("/root/GameManager").get_game_data("currency", 0)
+	var click_value = get_node("/root/GameManager").get_game_data("click_value", 1)
 	
 	hello_world_label.text = "Hello World!\nCurrency: %d\nClick Value: %d" % [currency, click_value]
 

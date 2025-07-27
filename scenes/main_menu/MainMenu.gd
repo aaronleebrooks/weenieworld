@@ -17,11 +17,11 @@ func _ready():
 
 func _on_new_game_pressed():
 	print("Starting new game...")
-	GameManager.start_new_game()
+	get_node("/root/GameManager").start_new_game()
 
 func _on_continue_pressed():
 	print("Continuing game...")
-	GameManager.continue_game()
+	get_node("/root/GameManager").continue_game()
 
 func _on_options_pressed():
 	print("Opening options...")
@@ -31,11 +31,11 @@ func _on_options_pressed():
 
 func _on_quit_pressed():
 	print("Quitting game...")
-	GameManager.quit_game()
+	get_node("/root/GameManager").quit_game()
 
 func update_continue_button():
 	# Check if save file exists and update continue button
-	if GameManager.save_system.has_save_file():
+	if get_node("/root/SaveSystem").has_save_file():
 		continue_button.disabled = false
 		continue_button.text = "Continue"
 	else:
