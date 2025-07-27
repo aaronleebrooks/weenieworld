@@ -222,16 +222,35 @@ func create_manual_save() -> bool:
 # Delete a specific save file
 func delete_save_file(save_info: Dictionary) -> bool:
 	if not save_info.has("path"):
+		print("No path in save_info")
 		return false
 	
 	var file_path = save_info["path"]
+	print("Attempting to delete: ", file_path)
+	
 	if not FileAccess.file_exists(file_path):
+		print("File does not exist: ", file_path)
 		return false
 	
 	var dir = DirAccess.open("user://")
 	if dir == null:
+		print("Failed to open user:// directory")
 		return false
 	
 	# Extract filename from path
 	var filename = file_path.get_file()
-	return dir.remove("saves/" + filename) 
+	var relative_path = "saves/" + filename
+	print("Removing file: ", relative_path)
+	
+	var result = dir.remove(relative_path)
+	print("Delete result: ", result)
+	
+	# Verify deletion
+	if result:
+		if not FileAccess.file_exists(file_path):
+			print("File successfully deleted")
+		else:
+			print("File still exists after deletion!")
+			return false
+	
+	return result 

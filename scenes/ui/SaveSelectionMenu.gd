@@ -12,6 +12,8 @@ func _ready():
 	populate_save_list()
 
 func populate_save_list():
+	print("Populating save list...")
+	
 	# Clear existing save containers
 	for container in save_containers:
 		container.queue_free()
@@ -20,11 +22,14 @@ func populate_save_list():
 	
 	# Get available save files
 	var save_files = get_node("/root/SaveSystem").get_save_files()
+	print("Found save files: ", save_files.size())
 	
 	if save_files.is_empty():
+		print("No save files, showing 'No saves' label")
 		no_saves_label.visible = true
 		return
 	
+	print("Creating save entries for ", save_files.size(), " files")
 	no_saves_label.visible = false
 	
 	# Create containers for each save file
@@ -85,7 +90,10 @@ func _on_delete_confirmed(save_info: Dictionary):
 		print("Save deleted successfully!")
 		
 		# Check if any saves remain
-		if not get_node("/root/SaveSystem").has_save_file():
+		var has_saves = get_node("/root/SaveSystem").has_save_file()
+		print("Has saves after deletion: ", has_saves)
+		
+		if not has_saves:
 			# No saves left, close the modal and update main menu
 			print("No saves remaining, closing modal")
 			var main_menu = get_parent()
@@ -94,7 +102,9 @@ func _on_delete_confirmed(save_info: Dictionary):
 			queue_free()
 		else:
 			# Refresh the list
+			print("Refreshing save list...")
 			populate_save_list()
+			print("Save list refreshed")
 	else:
 		print("Failed to delete save!")
 
