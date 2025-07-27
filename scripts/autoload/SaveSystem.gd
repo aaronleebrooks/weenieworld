@@ -66,6 +66,11 @@ func save_game() -> bool:
 	current_save_data["last_save_time"] = Time.get_datetime_string_from_system()
 	current_save_data["save_type"] = "autosave"
 	
+	# Add currency data from CurrencyManager
+	var currency_manager = get_node_or_null("/root/CurrencyManager")
+	if currency_manager:
+		current_save_data["currency"] = currency_manager.get_save_data()["currency"]
+	
 	# Ensure save directory exists
 	ensure_save_directory()
 	

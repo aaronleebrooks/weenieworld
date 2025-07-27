@@ -19,7 +19,14 @@ func _ready():
 
 # Start a new game
 func start_new_game():
+	print("Starting new game...")
 	game_data = get_node("/root/SaveSystem").new_game()
+	
+	# Reset currency to starting values
+	var currency_manager = get_node("/root/CurrencyManager")
+	if currency_manager:
+		currency_manager.reset_currency()
+	
 	change_scene(GAME_SCENE)
 	emit_signal("game_started")
 

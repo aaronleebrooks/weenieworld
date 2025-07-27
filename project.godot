@@ -19,6 +19,7 @@ run/main_scene="res://scenes/main_menu/MainMenu.tscn"
 
 GameManager="*res://scripts/autoload/GameManager.gd"
 SaveSystem="*res://scripts/autoload/SaveSystem.gd"
+CurrencyManager="*res://scripts/autoload/CurrencyManager.gd"
 
 [display]
 

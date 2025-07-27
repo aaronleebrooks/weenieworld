@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://c8xvn8yqxqxqx"]
+[gd_scene load_steps=3 format=3 uid="uid://c8xvn8yqxqxqx"]
 
 [ext_resource type="Script" uid="uid://m4hu22y7axg6" path="res://scenes/game/Game.gd" id="1_0x0x0"]
+[ext_resource type="PackedScene" uid="uid://fxvn8yqxqxqx" path="res://scenes/game/CurrencyDisplay.tscn" id="2_0x0x0"]
 
 [node name="Game" type="Control"]
 layout_mode = 3
@@ -36,6 +37,9 @@ grow_vertical = 2
 text = "Hello World!"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="CurrencyDisplay" parent="." instance=ExtResource("2_0x0x0")]
+layout_mode = 1
 
 [node name="BackButton" type="Button" parent="."]
 layout_mode = 1

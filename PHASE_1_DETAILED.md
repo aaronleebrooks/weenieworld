@@ -59,10 +59,10 @@ Establish the foundational structure of WeenieWorld with a working main menu, ba
 7. Testing and refinement
 
 ## Success Criteria
-- [ ] Main menu loads and displays correctly
-- [ ] New Game button starts fresh game
-- [ ] Continue button loads saved game (if exists)
-- [ ] Game scene shows "Hello World"
-- [ ] Save system works (can save and load data)
-- [ ] Navigation between scenes works
-- [ ] Project structure is organized and scalable 
+- [x] Main menu loads and displays correctly
+- [x] New Game button starts fresh game
+- [x] Continue button loads saved game (if exists)
+- [x] Game scene shows "Hello World"
+- [x] Save system works (can save and load data)
+- [x] Navigation between scenes works
+- [x] Project structure is organized and scalable 
