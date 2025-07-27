@@ -3,13 +3,6 @@ extends Node
 # Animation system autoload for managing wireframe animations
 # Uses intentional naming conventions for future maintainability
 
-signal animation_started(animation_type: String)
-signal animation_completed(animation_type: String)
-
-# Animation instances tracking
-var active_animations: Array[Node] = []
-var max_concurrent_animations: int = 3
-
 # Animation configuration
 var click_animation_duration: float = 0.15  # Quicker for clicks
 var hold_animation_duration: float = 0.3   # Same as progress bar
@@ -41,7 +34,13 @@ func _ready():
 	# We'll create them when the game scene loads
 
 func _create_central_animation_squares():
-	"""Create two squares positioned relative to the HelloWorldLabel"""
+	"""
+	Create two animation squares positioned at the bottom center of the screen.
+	
+	The squares are used for visual feedback during click and hold actions.
+	They are positioned 100 pixels from the bottom edge to avoid overlapping
+	with UI elements like buttons and text.
+	"""
 	# Clear any existing squares first
 	_clear_animation_squares()
 	
@@ -51,57 +50,35 @@ func _create_central_animation_squares():
 		print("AnimationManager: Not in game scene, skipping square creation")
 		return
 	
-	# Find the HelloWorldLabel to position relative to it
+	# Find the HelloWorldLabel for reference (used for fallback positioning)
 	var hello_label = current_scene.get_node_or_null("HelloWorldLabel")
-	if not hello_label:
-		print("AnimationManager: HelloWorldLabel not found, using screen center")
-		# Fallback to screen center
-		var viewport_size = get_viewport().get_visible_rect().size
-		var screen_center = viewport_size / 2
-		
-		var square1 = ColorRect.new()
-		square1.size = Vector2(30, 30)
-		square1.position = screen_center + Vector2(-40, -15)
-		square1.color = Color.YELLOW
-		
-		var square2 = ColorRect.new()
-		square2.size = Vector2(30, 30)
-		square2.position = screen_center + Vector2(10, -15)
-		square2.color = Color.ORANGE
-		
-		animation_squares.append(square1)
-		animation_squares.append(square2)
-		
-		current_scene.add_child(square1)
-		current_scene.add_child(square2)
-		return
 	
-	# Position squares at the bottom of the screen
+	# Calculate bottom center position (100 pixels from bottom edge)
 	var viewport_size = get_viewport().get_visible_rect().size
-	var bottom_center = Vector2(viewport_size.x / 2, viewport_size.y - 100)  # 100 pixels from bottom
+	var bottom_center = Vector2(viewport_size.x / 2, viewport_size.y - 100)
 	
-	# Position squares at the bottom center
+	# Create left square (yellow)
 	var square1 = ColorRect.new()
 	square1.size = Vector2(30, 30)
-	square1.position = bottom_center + Vector2(-40, 0)  # Left square
+	square1.position = bottom_center + Vector2(-40, 0)  # 40 pixels left of center
 	square1.color = Color.YELLOW
 	
+	# Create right square (orange)
 	var square2 = ColorRect.new()
 	square2.size = Vector2(30, 30)
-	square2.position = bottom_center + Vector2(10, 0)   # Right square
+	square2.position = bottom_center + Vector2(10, 0)   # 10 pixels right of center
 	square2.color = Color.ORANGE
 	
+	# Store references and add to scene
 	animation_squares.append(square1)
 	animation_squares.append(square2)
-	
-	# Add squares to the scene
 	current_scene.add_child(square1)
 	current_scene.add_child(square2)
 	
-	# Store the reference label for future positioning
+	# Store reference for potential future use
 	animation_container = hello_label
 	
-	print("AnimationManager: Created animation squares relative to HelloWorldLabel")
+	print("AnimationManager: Created animation squares at bottom center")
 
 func _clear_animation_squares():
 	"""Clear existing animation squares"""
@@ -221,18 +198,6 @@ func _reset_squares_position():
 	tween.tween_property(square2, "position:x", reference_pos.x + 10, 0.1)
 	tween.tween_property(square1, "scale", Vector2(1.0, 1.0), 0.1)
 	tween.tween_property(square2, "scale", Vector2(1.0, 1.0), 0.1)
-
-func get_animation_count() -> int:
-	"""Get the number of currently active animations"""
-	return active_animations.size()
-
-func clear_all_animations():
-	"""Clear all active animations"""
-	for animation in active_animations:
-		if is_instance_valid(animation):
-			animation.queue_free()
-	active_animations.clear()
-	print("AnimationManager: Cleared all animations")
 
 func test_animations():
 	"""Test function to manually trigger animations"""
