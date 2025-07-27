@@ -61,6 +61,11 @@ func _ready():
 	
 	# Display current game data
 	display_game_data()
+	
+	# Create animation squares
+	var animation_manager = get_node("/root/AnimationManager")
+	if animation_manager:
+		animation_manager._create_central_animation_squares()
 
 func _create_tooltip_toggle():
 	"""Create the tooltip toggle button (caret icon)"""
@@ -481,7 +486,13 @@ func _input(event):
 			print("DEBUG: No dialogs open, handling escape key")
 			_on_exit_icon_pressed()
 		else:
-			print("DEBUG: Dialog is open, letting dialog handle escape key") 
+			print("DEBUG: Dialog is open, letting dialog handle escape key")
+	
+	# Test animations with 'T' key
+	if event.is_action_pressed("test_animations") and event.pressed:
+		var animation_manager = get_node("/root/AnimationManager")
+		if animation_manager:
+			animation_manager.test_animations() 
 
 func _debug_dialog_state(context: String):
 	"""Debug method to check current dialog state"""
