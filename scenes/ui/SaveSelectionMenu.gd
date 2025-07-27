@@ -1,4 +1,4 @@
-extends Control
+extends "res://scripts/components/ResponsiveModal.gd"
 
 @onready var save_list = $MenuPanel/SaveList/SaveListContainer
 @onready var no_saves_label = $MenuPanel/SaveList/SaveListContainer/NoSavesLabel

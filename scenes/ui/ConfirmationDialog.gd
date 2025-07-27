@@ -1,4 +1,4 @@
-extends Control
+extends "res://scripts/components/ResponsiveModal.gd"
 
 @onready var no_button = $DialogPanel/ButtonContainer/NoButton
 @onready var yes_button = $DialogPanel/ButtonContainer/YesButton
