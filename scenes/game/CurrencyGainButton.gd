@@ -108,7 +108,11 @@ func _input(event):
 
 func _process(delta):
 	"""Process hold detection without requiring mouse movement"""
-	if is_pressed and not is_held and click_manager and not click_manager.is_action_in_progress():
+	if is_pressed and not is_held and click_manager:
+		# Don't interfere if there's already an action in progress
+		if click_manager.is_action_in_progress():
+			return
+			
 		# Check if we've been holding for a short time
 		if not _hold_timer_started:
 			_hold_timer_started = true
@@ -117,10 +121,8 @@ func _process(delta):
 		var current_time = Time.get_ticks_msec()
 		var hold_duration = (current_time - _hold_start_time) / 1000.0
 		
-		if hold_duration >= 0.2:  # 200ms hold threshold (increased for better click reliability)
+		if hold_duration >= 0.15:  # Reduced to 150ms for better responsiveness
 			print("CurrencyGainButton: Starting hold action (process)")
-			# Stop any existing click action before starting hold
-			click_manager.stop_click_action()
 			click_manager.start_hold_action()
 			# State will be updated by click_state_changed signal
 			_hold_timer_started = false
