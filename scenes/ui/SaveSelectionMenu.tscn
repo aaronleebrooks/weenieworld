@@ -40,7 +40,7 @@ offset_bottom = 50.0
 text = "Load Game"
 horizontal_alignment = 1
 
-[node name="SaveList" type="VBoxContainer" parent="MenuPanel"]
+[node name="SaveList" type="ScrollContainer" parent="MenuPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -50,7 +50,10 @@ offset_top = 60.0
 offset_right = -20.0
 offset_bottom = -60.0
 
-[node name="NoSavesLabel" type="Label" parent="MenuPanel/SaveList"]
+[node name="SaveListContainer" type="VBoxContainer" parent="MenuPanel/SaveList"]
+layout_mode = 2
+
+[node name="NoSavesLabel" type="Label" parent="MenuPanel/SaveList/SaveListContainer"]
 layout_mode = 2
 text = "No save files found"
 horizontal_alignment = 1

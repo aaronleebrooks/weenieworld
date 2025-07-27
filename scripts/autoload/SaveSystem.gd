@@ -217,4 +217,21 @@ func create_manual_save() -> bool:
 	file.store_string(json_string)
 	file.close()
 	
-	return true 
+	return true
+
+# Delete a specific save file
+func delete_save_file(save_info: Dictionary) -> bool:
+	if not save_info.has("path"):
+		return false
+	
+	var file_path = save_info["path"]
+	if not FileAccess.file_exists(file_path):
+		return false
+	
+	var dir = DirAccess.open("user://")
+	if dir == null:
+		return false
+	
+	# Extract filename from path
+	var filename = file_path.get_file()
+	return dir.remove("saves/" + filename) 
