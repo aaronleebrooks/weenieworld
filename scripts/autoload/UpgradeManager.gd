@@ -14,7 +14,8 @@ var upgrade_levels: Dictionary = {}
 var total_upgrades_purchased: int = 0
 
 # References to other managers
-var currency_manager: Node
+var hot_dog_manager: Node
+var customer_manager: Node
 
 # Upgrade definitions (will be loaded from resources)
 var upgrade_definitions: Array[UpgradeDefinition] = []
@@ -23,7 +24,8 @@ func _ready():
 	print("UpgradeManager: Initialized")
 	
 	# Get references to other managers
-	currency_manager = get_node("/root/CurrencyManager")
+	hot_dog_manager = get_node("/root/HotDogManager")
+	customer_manager = get_node("/root/CustomerManager")
 	
 	# Load upgrade definitions
 	_load_upgrade_definitions()
@@ -44,70 +46,70 @@ func _load_upgrade_definitions():
 	print("UpgradeManager: Loaded %d upgrade definitions" % upgrade_definitions.size())
 
 func _create_default_upgrades():
-	"""Create the initial 5 upgrades as defined in the plan"""
+	"""Create the initial 5 upgrades for the hot dog store theme"""
 	
-	# Click Rate Upgrades (2)
-	var faster_fingers = UpgradeDefinition.new()
-	faster_fingers.upgrade_id = "faster_fingers"
-	faster_fingers.display_name = "Faster Fingers"
-	faster_fingers.description = "Reduces click rate by 0.02s"
-	faster_fingers.base_cost = 10
-	faster_fingers.cost_scaling_type = UpgradeEnums.CostScalingType.LINEAR
-	faster_fingers.cost_increase = 5
-	faster_fingers.effect_type = UpgradeEnums.EffectType.CLICK_RATE
-	faster_fingers.effect_value = -0.02
-	faster_fingers.max_level = 10
-	upgrade_definitions.append(faster_fingers)
+	# Production Rate Upgrades (2)
+	var faster_production = UpgradeDefinition.new()
+	faster_production.upgrade_id = "faster_production"
+	faster_production.display_name = "Faster Production"
+	faster_production.description = "Reduces production time by 0.02s"
+	faster_production.base_cost = 10
+	faster_production.cost_scaling_type = UpgradeEnums.CostScalingType.LINEAR
+	faster_production.cost_increase = 5
+	faster_production.effect_type = UpgradeEnums.EffectType.PRODUCTION_RATE
+	faster_production.effect_value = -0.02
+	faster_production.max_level = 10
+	upgrade_definitions.append(faster_production)
 	
-	var lightning_clicks = UpgradeDefinition.new()
-	lightning_clicks.upgrade_id = "lightning_clicks"
-	lightning_clicks.display_name = "Lightning Clicks"
-	lightning_clicks.description = "Reduces click rate by 0.05s"
-	lightning_clicks.base_cost = 50
-	lightning_clicks.cost_scaling_type = UpgradeEnums.CostScalingType.LINEAR
-	lightning_clicks.cost_increase = 25
-	lightning_clicks.effect_type = UpgradeEnums.EffectType.CLICK_RATE
-	lightning_clicks.effect_value = -0.05
-	lightning_clicks.max_level = 5
-	upgrade_definitions.append(lightning_clicks)
+	var efficient_cooking = UpgradeDefinition.new()
+	efficient_cooking.upgrade_id = "efficient_cooking"
+	efficient_cooking.display_name = "Efficient Cooking"
+	efficient_cooking.description = "Reduces continuous production time by 0.05s"
+	efficient_cooking.base_cost = 50
+	efficient_cooking.cost_scaling_type = UpgradeEnums.CostScalingType.LINEAR
+	efficient_cooking.cost_increase = 25
+	efficient_cooking.effect_type = UpgradeEnums.EffectType.IDLE_RATE
+	efficient_cooking.effect_value = -0.05
+	efficient_cooking.max_level = 5
+	upgrade_definitions.append(efficient_cooking)
 	
-	# Idle Rate Upgrades (2)
-	var patience_training = UpgradeDefinition.new()
-	patience_training.upgrade_id = "patience_training"
-	patience_training.display_name = "Patience Training"
-	patience_training.description = "Reduces idle rate by 0.05s"
-	patience_training.base_cost = 25
-	patience_training.cost_scaling_type = UpgradeEnums.CostScalingType.LINEAR
-	patience_training.cost_increase = 15
-	patience_training.effect_type = UpgradeEnums.EffectType.IDLE_RATE
-	patience_training.effect_value = -0.05
-	patience_training.max_level = 8
-	upgrade_definitions.append(patience_training)
+	# Hot Dogs Per Click Upgrade (1)
+	var better_recipe = UpgradeDefinition.new()
+	better_recipe.upgrade_id = "better_recipe"
+	better_recipe.display_name = "Better Recipe"
+	better_recipe.description = "+1 hot dog per click"
+	better_recipe.base_cost = 25
+	better_recipe.cost_scaling_type = UpgradeEnums.CostScalingType.LINEAR
+	better_recipe.cost_increase = 15
+	better_recipe.effect_type = UpgradeEnums.EffectType.HOT_DOGS_PER_CLICK
+	better_recipe.effect_value = 1
+	better_recipe.max_level = 8
+	upgrade_definitions.append(better_recipe)
 	
-	var steady_hands = UpgradeDefinition.new()
-	steady_hands.upgrade_id = "steady_hands"
-	steady_hands.display_name = "Steady Hands"
-	steady_hands.description = "Reduces idle rate by 0.1s"
-	steady_hands.base_cost = 100
-	steady_hands.cost_scaling_type = UpgradeEnums.CostScalingType.LINEAR
-	steady_hands.cost_increase = 50
-	steady_hands.effect_type = UpgradeEnums.EffectType.IDLE_RATE
-	steady_hands.effect_value = -0.1
-	steady_hands.max_level = 3
-	upgrade_definitions.append(steady_hands)
+	# Customer System Upgrades (2)
+	var customer_service = UpgradeDefinition.new()
+	customer_service.upgrade_id = "customer_service"
+	customer_service.display_name = "Customer Service"
+	customer_service.description = "Customers arrive 0.2s faster"
+	customer_service.base_cost = 75
+	customer_service.cost_scaling_type = UpgradeEnums.CostScalingType.LINEAR
+	customer_service.cost_increase = 35
+	customer_service.effect_type = UpgradeEnums.EffectType.CUSTOMER_PURCHASE_RATE
+	customer_service.effect_value = -0.2
+	customer_service.max_level = 6
+	upgrade_definitions.append(customer_service)
 	
-	# Currency Per Click Upgrade (1)
-	var better_technique = UpgradeDefinition.new()
-	better_technique.upgrade_id = "better_technique"
-	better_technique.display_name = "Better Technique"
-	better_technique.description = "+1 currency per click"
-	better_technique.base_cost = 75
-	better_technique.cost_scaling_type = UpgradeEnums.CostScalingType.EXPONENTIAL
-	better_technique.cost_multiplier = 2.0
-	better_technique.effect_type = UpgradeEnums.EffectType.CURRENCY_PER_CLICK
-	better_technique.effect_value = 1
-	better_technique.max_level = 5
-	upgrade_definitions.append(better_technique)
+	var premium_pricing = UpgradeDefinition.new()
+	premium_pricing.upgrade_id = "premium_pricing"
+	premium_pricing.display_name = "Premium Pricing"
+	premium_pricing.description = "+1 currency per hot dog sold"
+	premium_pricing.base_cost = 100
+	premium_pricing.cost_scaling_type = UpgradeEnums.CostScalingType.EXPONENTIAL
+	premium_pricing.cost_multiplier = 2.0
+	premium_pricing.effect_type = UpgradeEnums.EffectType.SALE_VALUE
+	premium_pricing.effect_value = 1
+	premium_pricing.max_level = 5
+	upgrade_definitions.append(premium_pricing)
 
 func _initialize_upgrade_levels():
 	"""Initialize upgrade levels to 0"""
@@ -144,7 +146,7 @@ func can_purchase_upgrade(upgrade_id: String) -> bool:
 	
 	# Check if player can afford the cost
 	var cost = get_upgrade_cost(upgrade_id)
-	return currency_manager.can_afford(cost)
+	return hot_dog_manager.can_afford(cost)
 
 func purchase_upgrade(upgrade_id: String) -> bool:
 	"""Purchase an upgrade and apply its effects"""
@@ -155,7 +157,7 @@ func purchase_upgrade(upgrade_id: String) -> bool:
 	var cost = get_upgrade_cost(upgrade_id)
 	
 	# Deduct currency
-	if not currency_manager.spend_currency(cost, "upgrade_purchase"):
+	if not hot_dog_manager.spend_currency(cost, "upgrade_purchase"):
 		return false
 	
 	# Increase upgrade level
@@ -203,25 +205,28 @@ func _get_upgrade_by_id(upgrade_id: String) -> UpgradeDefinition:
 func _apply_upgrade_effects(upgrade_id: String):
 	"""Apply the effects of an upgrade"""
 	var upgrade = _get_upgrade_by_id(upgrade_id)
-	if not upgrade or not currency_manager:
+	if not upgrade or not hot_dog_manager or not customer_manager:
 		return
 	
 	var level = get_upgrade_level(upgrade_id)
 	var total_effect = upgrade.effect_value * level
 	
 	match upgrade.effect_type:
-		UpgradeEnums.EffectType.CURRENCY_PER_CLICK:
-			currency_manager.currency_per_click = 1 + total_effect
-			emit_signal("upgrade_effect_applied", upgrade_id, "currency_per_click", total_effect)
-		UpgradeEnums.EffectType.CLICK_RATE:
-			currency_manager.click_rate_seconds = max(0.05, 0.1 + total_effect)
-			emit_signal("upgrade_effect_applied", upgrade_id, "click_rate", total_effect)
+		UpgradeEnums.EffectType.HOT_DOGS_PER_CLICK:
+			hot_dog_manager.hot_dogs_per_click = 1 + total_effect
+			emit_signal("upgrade_effect_applied", upgrade_id, "hot_dogs_per_click", total_effect)
+		UpgradeEnums.EffectType.PRODUCTION_RATE:
+			hot_dog_manager.production_rate_seconds = max(0.05, 0.3 + total_effect)
+			emit_signal("upgrade_effect_applied", upgrade_id, "production_rate", total_effect)
 		UpgradeEnums.EffectType.IDLE_RATE:
-			currency_manager.idle_rate_seconds = max(0.1, 0.3 + total_effect)
+			hot_dog_manager.idle_rate_seconds = max(0.1, 0.3 + total_effect)
 			emit_signal("upgrade_effect_applied", upgrade_id, "idle_rate", total_effect)
-		UpgradeEnums.EffectType.CURRENCY_MULTIPLIER:
-			# This would be applied to all currency gains
-			emit_signal("upgrade_effect_applied", upgrade_id, "currency_multiplier", total_effect)
+		UpgradeEnums.EffectType.CUSTOMER_PURCHASE_RATE:
+			customer_manager.set_purchase_rate(max(0.5, 2.0 + total_effect))
+			emit_signal("upgrade_effect_applied", upgrade_id, "customer_purchase_rate", total_effect)
+		UpgradeEnums.EffectType.SALE_VALUE:
+			hot_dog_manager.sale_value = 1 + total_effect
+			emit_signal("upgrade_effect_applied", upgrade_id, "sale_value", total_effect)
 	
 	# Force update the game display to show new values immediately
 	var game = get_node_or_null("/root/Game")
@@ -233,27 +238,26 @@ func get_all_upgrades() -> Array[UpgradeDefinition]:
 	return upgrade_definitions
 
 func get_upgrade_info(upgrade_id: String) -> Dictionary:
-	"""Get comprehensive info about an upgrade"""
+	"""Get comprehensive information about an upgrade"""
 	var upgrade = _get_upgrade_by_id(upgrade_id)
 	if not upgrade:
 		return {}
 	
 	var level = get_upgrade_level(upgrade_id)
 	var cost = get_upgrade_cost(upgrade_id)
-	var can_afford = currency_manager.can_afford(cost)
+	var can_purchase = can_purchase_upgrade(upgrade_id)
 	var is_max_level = upgrade.max_level > 0 and level >= upgrade.max_level
 	
 	return {
 		"upgrade": upgrade,
 		"level": level,
 		"cost": cost,
-		"can_afford": can_afford,
-		"is_max_level": is_max_level,
-		"can_purchase": can_afford and not is_max_level
+		"can_purchase": can_purchase,
+		"is_max_level": is_max_level
 	}
 
 func reset_upgrades():
-	"""Reset all upgrades to level 0 (for new game)"""
+	"""Reset all upgrades to level 0"""
 	upgrade_levels.clear()
 	_initialize_upgrade_levels()
 	total_upgrades_purchased = 0

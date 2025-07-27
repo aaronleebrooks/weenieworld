@@ -1,26 +1,31 @@
 extends Control
 
+# Progress bar for hot dog production hold actions
+# Uses intentional naming conventions for future maintainability
+
 @onready var progress_fill = $ProgressFill
 
+var click_manager: Node
 var current_progress: float = 0.0
-var is_visible: bool = false
 
 func _ready():
 	print("ProgressBar: Initialized")
 	
-	# Connect to click manager signals
-	var click_manager = get_node("/root/ClickManager")
-	if click_manager:
-		click_manager.click_progress_updated.connect(_on_progress_updated)
-		click_manager.click_state_changed.connect(_on_click_state_changed)
-		click_manager.click_completed.connect(_on_click_completed)
+	# Get reference to ClickManager
+	click_manager = get_node("/root/ClickManager")
 	
-	# Start hidden
-	visible = false
+	# Connect to click manager events
+	if click_manager:
+		click_manager.click_progress_updated.connect(_on_click_progress_updated)
+		click_manager.click_completed.connect(_on_click_completed)
+		click_manager.click_state_changed.connect(_on_click_state_changed)
 	
 	# Connect to viewport size changes for responsive sizing
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
 	_update_responsive_layout()
+	
+	# Start hidden
+	visible = false
 
 func _on_viewport_size_changed():
 	_update_responsive_layout()
@@ -28,70 +33,54 @@ func _on_viewport_size_changed():
 func _update_responsive_layout():
 	var viewport_size = get_viewport().get_visible_rect().size
 	
-	# Calculate responsive size (like CSS vw/vh units)
-	var width_percent = viewport_size.x * 0.4  # 40% of viewport width
-	var height_percent = viewport_size.y * 0.03  # 3% of viewport height
+	# Calculate responsive size
+	var width_percent = viewport_size.x * 0.3  # 30% of viewport width
+	var height_percent = viewport_size.y * 0.02  # 2% of viewport height
 	
-	var responsive_width = max(200, min(width_percent, 400))  # 200px to 400px
-	var responsive_height = max(15, min(height_percent, 30))  # 15px to 30px
+	var responsive_width = max(200, min(width_percent, 600))  # 200px to 600px
+	var responsive_height = max(8, min(height_percent, 20))   # 8px to 20px
 	
-	offset_left = -responsive_width / 2
-	offset_right = responsive_width / 2
-	offset_top = -responsive_height / 2
-	offset_bottom = responsive_height / 2
+	custom_minimum_size = Vector2(responsive_width, responsive_height)
 	
-	print("ProgressBar: Size updated to ", Vector2(responsive_width, responsive_height))
+	print("ProgressBar: Size updated to ", custom_minimum_size)
 
-func _on_progress_updated(progress: float, click_type: String):
+func _on_click_progress_updated(progress: float, click_type: String):
 	"""Update progress bar based on click progress"""
-	current_progress = progress
-	_update_progress_display(click_type)
+	if click_type == "hold":
+		current_progress = progress
+		_update_progress_display()
+		visible = true
+		print("ProgressBar: Progress updated to %.1f%%" % (progress * 100))
+
+func _on_click_completed(click_type: String, hot_dogs_produced: int):
+	"""Handle click completion"""
+	print("ProgressBar: Click completed - ", click_type, " produced ", hot_dogs_produced, " hot dogs")
+	
+	# Hide progress bar when click is complete
+	visible = false
+	current_progress = 0.0
+	_update_progress_display()
 
 func _on_click_state_changed(is_clicking: bool, is_holding: bool):
-	"""Show/hide progress bar based on click state"""
-	# Only show progress bar for hold actions, not clicks
-	is_visible = is_holding
-	visible = is_visible
-	
-	if not is_visible:
+	"""Handle click state changes"""
+	if is_holding:
+		# Show progress bar for hold actions
+		visible = true
 		current_progress = 0.0
-		_update_progress_display("none")
-
-func _on_click_completed(click_type: String, currency_gained: int):
-	"""Handle click completion"""
-	print("ProgressBar: Click completed - ", click_type, " gained ", currency_gained, " currency")
-	# For hold actions, keep the progress bar visible and restart
-	if click_type == "hold":
-		# Reset progress and keep visible for continuous holding
+		_update_progress_display()
+		print("ProgressBar: Hold started, showing progress bar")
+	elif not is_clicking and not is_holding:
+		# Hide progress bar when no action is in progress
+		visible = false
 		current_progress = 0.0
-		_update_progress_display("hold")
-		# Don't log restart - it's expected behavior
+		_update_progress_display()
+		print("ProgressBar: No action in progress, hiding progress bar")
 
-func _update_progress_display(click_type: String):
+func _update_progress_display():
 	"""Update the visual progress bar"""
-	if not progress_fill:
-		return
-	
-	# Update progress fill width
-	progress_fill.anchor_right = current_progress
-	
-	# Only show orange for hold actions, no green for clicks
-	match click_type:
-		"hold":
-			progress_fill.color = Color(0.8, 0.6, 0.2, 1.0)  # Orange for hold
-		_:
-			progress_fill.color = Color(0.2, 0.2, 0.2, 1.0)  # Gray for none/click
-	
-	# Only log significant progress changes (every 10% or completion)
-	var progress_percent = current_progress * 100
-	if progress_percent == 0.0 or progress_percent == 100.0 or int(progress_percent) % 10 == 0:
-		print("ProgressBar: Progress updated to %.0f%% (%s)" % [progress_percent, click_type])
-
-func set_progress(progress: float):
-	"""Manually set progress (0.0 to 1.0)"""
-	current_progress = clamp(progress, 0.0, 1.0)
-	_update_progress_display("manual")
-
-func get_progress() -> float:
-	"""Get current progress value"""
-	return current_progress 
+	if progress_fill:
+		# Update progress fill width
+		progress_fill.anchor_right = current_progress
+		
+		# Set color based on progress type
+		progress_fill.color = Color(0.8, 0.6, 0.2, 1.0)  # Orange for hot dog production 

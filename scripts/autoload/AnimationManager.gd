@@ -1,205 +1,280 @@
 extends Node
 
-# Animation system autoload for managing wireframe animations
+# Animation system for hot dog store idle game
 # Uses intentional naming conventions for future maintainability
 
-# Animation configuration
-var click_animation_duration: float = 0.15  # Quicker for clicks
-var hold_animation_duration: float = 0.3   # Same as progress bar
+# Animation squares for visual feedback
+var animation_square_1: ColorRect
+var animation_square_2: ColorRect
 
-# References to other managers
-var currency_manager: Node
+# Store original positions to prevent drift
+var original_position_1: Vector2
+var original_position_2: Vector2
+
+# Animation properties
+var animation_duration: float = 0.15
+var animation_scale: float = 1.5
+var animation_distance: float = 50.0
+
+# References to managers
+var hot_dog_manager: Node
 var click_manager: Node
-
-# Central animation squares
-var animation_squares: Array[ColorRect] = []
-var animation_container: Control
 
 func _ready():
 	print("AnimationManager: Initialized")
 	
-	# Get references to other managers
-	currency_manager = get_node("/root/CurrencyManager")
+	# Get references to managers
+	hot_dog_manager = get_node("/root/HotDogManager")
 	click_manager = get_node("/root/ClickManager")
 	
-	# Connect to currency events for automatic animations
-	if currency_manager:
-		currency_manager.currency_gained.connect(_on_currency_gained)
-	
-	# Connect to click manager for hold progress
+	# Connect to click events
 	if click_manager:
-		click_manager.click_progress_updated.connect(_on_click_progress_updated)
-	
-	# Wait for the game scene to be ready before creating squares
-	# We'll create them when the game scene loads
+		click_manager.click_completed.connect(_on_click_completed)
+		click_manager.click_started.connect(_on_click_started)
+		click_manager.click_state_changed.connect(_on_click_state_changed)
 
 func _create_central_animation_squares():
-	"""
-	Create two animation squares positioned at the bottom center of the screen.
+	"""Create the two animation squares at the bottom center of the screen"""
+	print("AnimationManager: Creating animation squares")
 	
-	The squares are used for visual feedback during click and hold actions.
-	They are positioned 100 pixels from the bottom edge to avoid overlapping
-	with UI elements like buttons and text.
-	"""
-	# Clear any existing squares first
-	_clear_animation_squares()
-	
-	# Only create squares if we're in the game scene
+	# Get the current scene to add squares to
 	var current_scene = get_tree().current_scene
-	if not current_scene or current_scene.name != "Game":
-		print("AnimationManager: Not in game scene, skipping square creation")
+	if not current_scene:
+		print("AnimationManager: No current scene found")
 		return
 	
-	# Find the HelloWorldLabel for reference (used for fallback positioning)
-	var hello_label = current_scene.get_node_or_null("HelloWorldLabel")
-	
-	# Calculate bottom center position (100 pixels from bottom edge)
+	# Get viewport size
 	var viewport_size = get_viewport().get_visible_rect().size
-	var bottom_center = Vector2(viewport_size.x / 2, viewport_size.y - 100)
+	print("AnimationManager: Viewport size: ", viewport_size)
 	
-	# Create left square (yellow)
-	var square1 = ColorRect.new()
-	square1.size = Vector2(30, 30)
-	square1.position = bottom_center + Vector2(-40, 0)  # 40 pixels left of center
-	square1.color = Color.YELLOW
+	# Create first square (yellow)
+	animation_square_1 = ColorRect.new()
+	animation_square_1.color = Color(1.0, 1.0, 0.0, 1.0)  # Solid yellow
+	animation_square_1.size = Vector2(50, 50)
+	animation_square_1.position = Vector2(
+		viewport_size.x / 2 - 60,  # Center, slightly left
+		viewport_size.y - 120      # Near bottom
+	)
+	animation_square_1.visible = true  # Make sure it's visible
+	animation_square_1.z_index = 100  # Make sure it's on top
+	animation_square_1.pivot_offset = Vector2(25, 25)  # Center the pivot for proper scaling
+	current_scene.add_child(animation_square_1)  # Add to current scene instead
+	original_position_1 = animation_square_1.position  # Store original position
+	print("AnimationManager: Created yellow square at position: ", animation_square_1.position)
 	
-	# Create right square (orange)
-	var square2 = ColorRect.new()
-	square2.size = Vector2(30, 30)
-	square2.position = bottom_center + Vector2(10, 0)   # 10 pixels right of center
-	square2.color = Color.ORANGE
+	# Create second square (orange)
+	animation_square_2 = ColorRect.new()
+	animation_square_2.color = Color(1.0, 0.5, 0.0, 1.0)  # Solid orange
+	animation_square_2.size = Vector2(50, 50)
+	animation_square_2.position = Vector2(
+		viewport_size.x / 2 + 10,  # Center, slightly right
+		viewport_size.y - 120      # Near bottom
+	)
+	animation_square_2.visible = true  # Make sure it's visible
+	animation_square_2.z_index = 100  # Make sure it's on top
+	animation_square_2.pivot_offset = Vector2(25, 25)  # Center the pivot for proper scaling
+	current_scene.add_child(animation_square_2)  # Add to current scene instead
+	original_position_2 = animation_square_2.position  # Store original position
+	print("AnimationManager: Created orange square at position: ", animation_square_2.position)
 	
-	# Store references and add to scene
-	animation_squares.append(square1)
-	animation_squares.append(square2)
-	current_scene.add_child(square1)
-	current_scene.add_child(square2)
-	
-	# Store reference for potential future use
-	animation_container = hello_label
-	
-	print("AnimationManager: Created animation squares at bottom center")
+	print("AnimationManager: Animation squares created at bottom center")
 
-func _clear_animation_squares():
-	"""Clear existing animation squares"""
-	if animation_container and is_instance_valid(animation_container):
-		animation_container.queue_free()
-	animation_container = null
-	animation_squares.clear()
+func _on_click_state_changed(is_clicking: bool, is_holding: bool):
+	"""Handle click state changes"""
+	# If we were holding and now we're not, stop the hold animation
+	if not is_holding and (animation_square_1.has_meta("hold_tween") or animation_square_2.has_meta("hold_tween")):
+		_animate_hold_complete()
 
-func _on_currency_gained(amount: int, source: String):
-	"""Trigger animation when currency is earned"""
-	if source == "click":
-		_animate_squares_click()
-	elif source == "hold":
-		# Hold animations are handled by progress updates
-		pass
+func _on_click_started(click_type: String):
+	"""Handle click start events"""
+	if click_type == "hold":
+		_animate_hold_start()
 
-func _on_click_progress_updated(progress: float, click_type: String):
-	"""Handle click progress updates for hold animations"""
-	if click_type == "hold" and progress > 0:
-		_animate_squares_hold(progress)
+func _on_click_completed(click_type: String, hot_dogs_produced: int):
+	"""Handle click completion events"""
+	if click_type == "click":
+		_animate_click()  # Animate on click completion since clicks are instant
+	# Note: We don't call _animate_hold_complete() for hold actions
+	# because holds are continuous and we want the animation to keep looping
+	# The hold animation will be stopped when the hold action actually ends
 
-func _animate_squares_click():
-	"""Animate squares quickly for click actions"""
-	if animation_squares.size() < 2:
+func _animate_click():
+	"""Animate squares for instant click"""
+	if not animation_square_1 or not animation_square_2:
+		print("AnimationManager: Cannot animate - squares not found")
 		return
 	
-	var square1 = animation_squares[0]
-	var square2 = animation_squares[1]
+	print("AnimationManager: Animating click - squares at positions: ", animation_square_1.position, ", ", animation_square_2.position)
 	
-	# Safety check for freed objects
-	if not is_instance_valid(square1) or not is_instance_valid(square2):
-		print("AnimationManager: Squares are not valid, recreating...")
-		_create_central_animation_squares()
-		return
-	
-	# Create quick animation
-	var tween = create_tween()
-	tween.set_parallel(true)
-	
-	# Get reference position from bottom center
-	var viewport_size = get_viewport().get_visible_rect().size
-	var reference_pos = Vector2(viewport_size.x / 2, viewport_size.y - 100)  # Bottom center
-	
-	# Move squares outward quickly (more dramatic movement)
-	tween.tween_property(square1, "position:x", reference_pos.x - 80, click_animation_duration)
-	tween.tween_property(square2, "position:x", reference_pos.x + 50, click_animation_duration)
-	
-	# Scale up more noticeably
-	tween.tween_property(square1, "scale", Vector2(1.5, 1.5), click_animation_duration)
-	tween.tween_property(square2, "scale", Vector2(1.5, 1.5), click_animation_duration)
-	
-	# Return to original position
-	tween.tween_property(square1, "position:x", reference_pos.x - 40, click_animation_duration)
-	tween.tween_property(square2, "position:x", reference_pos.x + 10, click_animation_duration)
-	tween.tween_property(square1, "scale", Vector2(1.0, 1.0), click_animation_duration)
-	tween.tween_property(square2, "scale", Vector2(1.0, 1.0), click_animation_duration)
-	
-	print("AnimationManager: Click animation triggered")
+	# Quick pulse animation for instant clicks (shorter duration, smaller movement)
+	_animate_square_pulse(animation_square_1, 0.1)  # Very quick pulse
+	_animate_square_pulse(animation_square_2, 0.1)  # Very quick pulse
 
-func _animate_squares_hold(progress: float):
-	"""Animate squares based on hold progress"""
-	if animation_squares.size() < 2:
+func _animate_hold_start():
+	"""Start hold animation"""
+	if not animation_square_1 or not animation_square_2:
 		return
 	
-	var square1 = animation_squares[0]
-	var square2 = animation_squares[1]
+	print("AnimationManager: Starting hold animation")
 	
-	# Safety check for freed objects
-	if not is_instance_valid(square1) or not is_instance_valid(square2):
-		print("AnimationManager: Squares are not valid, recreating...")
-		_create_central_animation_squares()
-		return
-	
-	# Get reference position from bottom center
-	var viewport_size = get_viewport().get_visible_rect().size
-	var reference_pos = Vector2(viewport_size.x / 2, viewport_size.y - 100)  # Bottom center
-	
-	# Calculate movement based on progress (0.0 to 1.0)
-	var max_movement = 50.0
-	var current_movement = max_movement * progress
-	
-	# Move squares outward based on progress
-	square1.position.x = reference_pos.x - 40 - current_movement
-	square2.position.x = reference_pos.x + 10 + current_movement
-	
-	# Scale based on progress
-	var scale_factor = 1.0 + (0.3 * progress)
-	square1.scale = Vector2(scale_factor, scale_factor)
-	square2.scale = Vector2(scale_factor, scale_factor)
-	
-	# Reset when progress is complete
-	if progress >= 1.0:
-		_reset_squares_position()
+	# Start continuous hold animations
+	_start_continuous_hold_animation(animation_square_1, Vector2(-animation_distance * 0.3, 0))
+	_start_continuous_hold_animation(animation_square_2, Vector2(animation_distance * 0.3, 0))
 
-func _reset_squares_position():
-	"""Reset squares to their original position"""
-	if animation_squares.size() < 2:
+func _animate_hold_complete():
+	"""Complete hold animation"""
+	print("AnimationManager: Hold animation complete")
+	
+	# Stop continuous hold animations
+	if animation_square_1:
+		_stop_continuous_hold_animation(animation_square_1)
+	if animation_square_2:
+		_stop_continuous_hold_animation(animation_square_2)
+
+func _start_continuous_hold_animation(square: ColorRect, target_offset: Vector2):
+	"""Start a continuous hold animation that repeats"""
+	if not square:
 		return
 	
-	var square1 = animation_squares[0]
-	var square2 = animation_squares[1]
+	# Kill any existing hold tweens
+	if square.has_meta("hold_tween"):
+		var existing_tween = square.get_meta("hold_tween")
+		if existing_tween:
+			existing_tween.kill()
 	
-	# Safety check for freed objects
-	if not is_instance_valid(square1) or not is_instance_valid(square2):
-		print("AnimationManager: Squares are not valid, recreating...")
-		_create_central_animation_squares()
-		return
+	# Kill any existing pulse tweens
+	if square.has_meta("pulse_tween"):
+		var existing_pulse_tween = square.get_meta("pulse_tween")
+		if existing_pulse_tween:
+			existing_pulse_tween.kill()
+		square.set_meta("pulse_tween", null)
 	
-	# Get reference position from bottom center
-	var viewport_size = get_viewport().get_visible_rect().size
-	var reference_pos = Vector2(viewport_size.x / 2, viewport_size.y - 100)  # Bottom center
+	# Force reset to original state immediately
+	square.scale = Vector2(1.0, 1.0)
+	
+	# Reset to stored original position
+	if square == animation_square_1:
+		square.position = original_position_1
+	elif square == animation_square_2:
+		square.position = original_position_2
 	
 	var tween = create_tween()
-	tween.set_parallel(true)
+	square.set_meta("hold_tween", tween)
 	
-	tween.tween_property(square1, "position:x", reference_pos.x - 40, 0.1)
-	tween.tween_property(square2, "position:x", reference_pos.x + 10, 0.1)
-	tween.tween_property(square1, "scale", Vector2(1.0, 1.0), 0.1)
-	tween.tween_property(square2, "scale", Vector2(1.0, 1.0), 0.1)
+	# Use stored original position, not current position
+	var original_pos = square.position
+	var original_scale = Vector2(1.0, 1.0)
+	var target_pos = original_pos + target_offset
+	var target_scale = original_scale * animation_scale
+	
+	# Create a looping animation
+	tween.set_loops()  # Infinite loops
+	
+	# Animate outward
+	tween.tween_property(square, "position", target_pos, animation_duration * 2)
+	tween.parallel().tween_property(square, "scale", target_scale, animation_duration * 2)
+	
+	# Animate back
+	tween.tween_property(square, "position", original_pos, animation_duration * 2)
+	tween.parallel().tween_property(square, "scale", original_scale, animation_duration * 2)
+
+func _stop_continuous_hold_animation(square: ColorRect):
+	"""Stop continuous hold animation and return to original state"""
+	if not square:
+		return
+	
+	# Kill the tween
+	if square.has_meta("hold_tween"):
+		var existing_tween = square.get_meta("hold_tween")
+		if existing_tween:
+			existing_tween.kill()
+		square.set_meta("hold_tween", null)
+	
+	# Return to original state
+	square.scale = Vector2(1.0, 1.0)
+	
+	# Return to stored original position
+	if square == animation_square_1:
+		square.position = original_position_1
+	elif square == animation_square_2:
+		square.position = original_position_2
+
+func _animate_square(square: ColorRect, target_offset: Vector2, duration: float):
+	"""Animate a square with movement and scaling"""
+	if not square:
+		return
+	
+	# Kill any existing tweens for this square to prevent conflicts
+	if square.has_meta("hold_tween"):
+		var existing_tween = square.get_meta("hold_tween")
+		if existing_tween:
+			existing_tween.kill()
+	
+	var tween = create_tween()
+	square.set_meta("hold_tween", tween)  # Store reference to this tween
+	
+	var original_pos = square.position  # Store original position
+	var original_scale = Vector2(1.0, 1.0)  # Always return to original scale
+	var target_pos = original_pos + target_offset
+	var target_scale = original_scale * animation_scale
+	
+	# Animate position and scale outward
+	tween.parallel().tween_property(square, "position", target_pos, duration)
+	tween.parallel().tween_property(square, "scale", target_scale, duration)
+	
+	# Return to original state
+	tween.tween_property(square, "position", original_pos, duration * 0.5)
+	tween.parallel().tween_property(square, "scale", original_scale, duration * 0.5)
+	
+	# Clean up tween reference when done
+	tween.finished.connect(func(): square.set_meta("hold_tween", null))
+
+func _animate_square_pulse(square: ColorRect, duration: float):
+	"""Animate a square with a quick pulse (scale only, no movement)"""
+	if not square:
+		return
+	
+	# Reset to original state immediately to prevent drift
+	square.scale = Vector2(1.0, 1.0)
+	
+	# Kill any existing tweens for this square to prevent conflicts
+	if square.has_meta("pulse_tween"):
+		var existing_tween = square.get_meta("pulse_tween")
+		if existing_tween:
+			existing_tween.kill()
+	
+	var tween = create_tween()
+	square.set_meta("pulse_tween", tween)  # Store reference to this tween
+	
+	var original_scale = Vector2(1.0, 1.0)  # Always return to original scale
+	var target_scale = original_scale * 1.3  # Scale up from original
+	
+	# Quick scale up and down
+	tween.tween_property(square, "scale", target_scale, duration * 0.5)
+	tween.tween_property(square, "scale", original_scale, duration * 0.5)
+	
+	# Clean up tween reference when done
+	tween.finished.connect(func(): square.set_meta("pulse_tween", null))
 
 func test_animations():
-	"""Test function to manually trigger animations"""
-	print("AnimationManager: Testing animations...")
-	_animate_squares_click() 
+	"""Test animation system"""
+	print("AnimationManager: Testing animations")
+	_animate_click()
+
+func make_squares_visible():
+	"""Make sure squares are visible and add some debug info"""
+	if animation_square_1:
+		animation_square_1.visible = true
+		animation_square_1.color = Color(1.0, 1.0, 0.0, 1.0)  # Solid yellow
+		animation_square_1.z_index = 100  # Make sure it's on top
+		print("AnimationManager: Made yellow square visible at position: ", animation_square_1.position, " z_index: ", animation_square_1.z_index)
+	
+	if animation_square_2:
+		animation_square_2.visible = true
+		animation_square_2.color = Color(1.0, 0.5, 0.0, 1.0)  # Solid orange
+		animation_square_2.z_index = 100  # Make sure it's on top
+		print("AnimationManager: Made orange square visible at position: ", animation_square_2.position, " z_index: ", animation_square_2.z_index)
+	
+	# Test hold animation after a delay
+	await get_tree().create_timer(1.0).timeout
+	_animate_hold_start() 

@@ -4,7 +4,7 @@ extends Node
 # Uses intentional naming conventions for future maintainability
 
 signal click_started(click_type: String)
-signal click_completed(click_type: String, currency_gained: int)
+signal click_completed(click_type: String, hot_dogs_produced: int)
 signal click_progress_updated(progress: float, click_type: String)
 signal click_state_changed(is_clicking: bool, is_holding: bool)
 
@@ -29,20 +29,20 @@ var idle_progress_timer: Timer
 var progress_update_timer: Timer
 
 # References to managers
-var currency_manager: Node
+var hot_dog_manager: Node
 
 func _ready():
 	print("ClickManager: Initialized")
 	
 	# Get references to other managers
-	currency_manager = get_node("/root/CurrencyManager")
+	hot_dog_manager = get_node("/root/HotDogManager")
 	
 	# Create timers for progress tracking
 	_setup_timers()
 	
-	# Connect to currency manager for timing updates
-	if currency_manager:
-		currency_manager.currency_changed.connect(_on_currency_changed)
+	# Connect to hot dog manager for timing updates
+	if hot_dog_manager:
+		hot_dog_manager.hot_dogs_changed.connect(_on_hot_dogs_changed)
 		# Initialize timer durations immediately
 		_update_timer_durations()
 
@@ -63,18 +63,18 @@ func _setup_timers():
 	
 	print("ClickManager: Timers initialized")
 
-func _on_currency_changed(new_balance: int, change_amount: int):
-	"""Update timer durations when currency values change"""
+func _on_hot_dogs_changed(new_inventory: int, change_amount: int):
+	"""Update timer durations when hot dog values change"""
 	_update_timer_durations()
 
 func _update_timer_durations():
-	"""Update timer durations based on current currency manager values"""
-	if currency_manager:
-		idle_progress_timer.wait_time = currency_manager.idle_rate_seconds
+	"""Update timer durations based on current hot dog manager values"""
+	if hot_dog_manager:
+		idle_progress_timer.wait_time = hot_dog_manager.idle_rate_seconds
 		print("ClickManager: Timer durations updated - Click: instant, Idle: %.2fs" % [idle_progress_timer.wait_time])
 
 func start_click_action() -> void:
-	"""Start a single-click currency gain action (instant)"""
+	"""Start a single-click hot dog production action (instant)"""
 	if is_clicking:
 		return  # Already clicking
 	
@@ -85,81 +85,70 @@ func start_click_action() -> void:
 	is_clicking = true
 	click_progress = 1.0  # Instant completion
 	
-	# Award currency immediately
-	if currency_manager:
-		var amount = currency_manager.currency_per_click
-		currency_manager.gain_currency(amount, "click_action")
+	# Produce hot dogs immediately
+	if hot_dog_manager:
+		var amount = hot_dog_manager.hot_dogs_per_click
+		hot_dog_manager.produce_hot_dogs(amount, "click_action")
 		emit_signal("click_completed", "click", amount)
 	else:
-		print("ClickManager: CurrencyManager not found!")
+		print("ClickManager: HotDogManager not found!")
 	
 	# Reset click state immediately (no progress update needed for instant clicks)
 	is_clicking = false
 
 func start_hold_action() -> void:
-	"""Start a hold-to-click currency gain action"""
-	if is_clicking or is_holding:
-		return  # Already in progress
+	"""Start a hold-to-click hot dog production action (timed)"""
+	if is_holding:
+		return  # Already holding
 	
-	print("ClickManager: Starting hold action")
+	# If we're clicking, stop the click and start hold instead
+	if is_clicking:
+		stop_click_action()
+	
 	is_holding = true
 	idle_progress = 0.0
 	
 	# Start the idle progress timer
-	idle_progress_timer.start()
-	emit_signal("click_started", "hold")
+	if idle_progress_timer:
+		idle_progress_timer.start()
 	
 	# Start progress updates
-	_start_progress_updates("hold")
+	if progress_update_timer:
+		progress_update_timer.start()
+	
+	emit_signal("click_started", "hold")
+	print("ClickManager: Started hold action")
 
 func stop_click_action() -> void:
 	"""Stop any ongoing click action"""
 	if is_clicking:
-		print("ClickManager: Stopping click action")
 		is_clicking = false
 		click_progress = 0.0
-		# No progress update needed for instant clicks
-	
-	if is_holding:
-		print("ClickManager: Stopping hold action")
-		is_holding = false
-		idle_progress_timer.stop()
-		idle_progress = 0.0
-		emit_signal("click_progress_updated", 0.0, "hold")
-	
-	# Stop progress update timer if no actions are in progress
-	if not is_clicking and not is_holding:
-		progress_update_timer.stop()
+		emit_signal("click_state_changed", is_clicking, is_holding)
+		print("ClickManager: Stopped click action")
 
-func _start_progress_updates(click_type: String) -> void:
-	"""Start updating progress for the specified click type"""
-	# Start the progress update timer if not already running
-	if not progress_update_timer.is_stopped():
-		progress_update_timer.stop()
-	progress_update_timer.start()
+func stop_hold_action() -> void:
+	"""Stop any ongoing hold action"""
+	if is_holding:
+		is_holding = false
+		idle_progress = 0.0
+		
+		# Stop timers
+		if idle_progress_timer:
+			idle_progress_timer.stop()
+		if progress_update_timer:
+			progress_update_timer.stop()
+		
+		emit_signal("click_state_changed", is_clicking, is_holding)
+		print("ClickManager: Stopped hold action")
 
 func _on_progress_update() -> void:
-	"""Update progress for the current action"""
-	if is_clicking:
-		_update_click_progress()
-	elif is_holding:
-		_update_hold_progress()
-
-func _update_click_progress() -> void:
-	"""Update progress for click action (instant)"""
-	# Clicks are now instant, so no progress updates needed
-	pass
-
-func _update_hold_progress() -> void:
-	"""Update progress for hold action"""
-	if idle_progress_timer and idle_progress_timer.time_left > 0:
-		var elapsed = idle_progress_timer.wait_time - idle_progress_timer.time_left
-		var new_progress = elapsed / idle_progress_timer.wait_time
-		idle_progress = new_progress
-		emit_signal("click_progress_updated", new_progress, "hold")
-
-
-
+	"""Update progress bar during hold actions"""
+	if is_holding and idle_progress_timer:
+		var time_left = idle_progress_timer.time_left
+		var total_time = idle_progress_timer.wait_time
+		idle_progress = 1.0 - (time_left / total_time)
+		emit_signal("click_progress_updated", idle_progress, "hold")
 
 func _on_idle_progress_complete() -> void:
 	"""Handle completion of idle progress"""
@@ -167,10 +156,10 @@ func _on_idle_progress_complete() -> void:
 	idle_progress = 1.0
 	emit_signal("click_progress_updated", 1.0, "hold")
 	
-	# Award currency
-	if currency_manager:
-		var amount = currency_manager.currency_per_click
-		currency_manager.gain_currency(amount, "hold_action")
+	# Produce hot dogs
+	if hot_dog_manager:
+		var amount = hot_dog_manager.hot_dogs_per_click
+		hot_dog_manager.produce_hot_dogs(amount, "hold_action")
 		emit_signal("click_completed", "hold", amount)
 		
 		# For continuous holding, restart the timer if still holding
@@ -184,7 +173,7 @@ func _on_idle_progress_complete() -> void:
 			progress_update_timer.stop()
 			emit_signal("click_state_changed", is_clicking, is_holding)
 	else:
-		print("ClickManager: CurrencyManager not found!")
+		print("ClickManager: HotDogManager not found!")
 
 func get_click_progress() -> float:
 	"""Get current click progress (0.0 to 1.0)"""

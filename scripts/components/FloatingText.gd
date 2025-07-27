@@ -1,12 +1,12 @@
 extends Control
 
-# Floating text component for showing currency gains
+# Floating text component for showing hot dog gains and currency gains
 # Uses intentional naming conventions for future maintainability
 
 @onready var label = $Label
 
-var fade_duration: float = 1.0
-var move_distance: float = 50.0
+var fade_duration: float = 2.0
+var move_distance: float = 80.0
 var fade_timer: Timer
 
 func _ready():
@@ -19,10 +19,31 @@ func _ready():
 	# Start hidden
 	visible = false
 
+func show_hot_dog_gain(amount: int, position: Vector2):
+	"""Show floating text for hot dog gain"""
+	print("FloatingText: Showing hot dog gain +%d at position %s" % [amount, position])
+	
+	# Set text and color
+	label.text = "+%d" % amount
+	label.modulate = Color(0.8, 0.6, 0.2, 1.0)  # Orange for hot dogs
+	
+	# Position the text
+	global_position = position
+	
+	# Reset appearance
+	modulate = Color.WHITE
+	visible = true
+	
+	# Start fade animation
+	_start_fade_animation()
+
 func show_currency_gain(amount: int, position: Vector2):
 	"""Show floating text for currency gain"""
-	# Set text
-	label.text = "+%d" % amount
+	print("FloatingText: Showing currency gain +$%d at position %s" % [amount, position])
+	
+	# Set text and color
+	label.text = "+$%d" % amount
+	label.modulate = Color(0.2, 0.8, 0.2, 1.0)  # Green for currency
 	
 	# Position the text
 	global_position = position
@@ -49,7 +70,15 @@ func _start_fade_animation():
 	
 	# Start timer to hide when done
 	fade_timer.start(fade_duration)
+	
+	# Connect tween completion to hide
+	tween.finished.connect(_on_fade_complete)
 
 func _on_fade_complete():
 	"""Hide the floating text when fade is complete"""
-	visible = false 
+	visible = false
+	
+	# Return to pool if we have a reference to the manager
+	var floating_text_manager = get_node_or_null("/root/FloatingTextManager")
+	if floating_text_manager:
+		floating_text_manager._return_floating_text(self) 

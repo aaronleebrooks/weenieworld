@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://c8xvn8yqxqxqx"]
+[gd_scene load_steps=7 format=3 uid="uid://c8xvn8yqxqxqx"]
 
 [ext_resource type="Script" uid="uid://m4hu22y7axg6" path="res://scenes/game/Game.gd" id="1_0x0x0"]
-[ext_resource type="PackedScene" path="res://scenes/game/CurrencyDisplay.tscn" id="2_0x0x0"]
-[ext_resource type="PackedScene" path="res://scenes/game/ProgressBar.tscn" id="3_0x0x0"]
-[ext_resource type="PackedScene" path="res://scenes/game/CurrencyGainButton.tscn" id="4_0x0x0"]
+[ext_resource type="PackedScene" uid="uid://fxvn8yqxqxqx" path="res://scenes/game/CurrencyDisplay.tscn" id="2_0x0x0"]
+[ext_resource type="PackedScene" uid="uid://gxvn8yqxqxqx" path="res://scenes/game/ProgressBar.tscn" id="3_0x0x0"]
+[ext_resource type="PackedScene" uid="uid://hxvn8yqxqxqx" path="res://scenes/game/CurrencyGainButton.tscn" id="4_0x0x0"]
 [ext_resource type="PackedScene" path="res://scenes/ui/UpgradePanel.tscn" id="5_upgrade"]
+[ext_resource type="PackedScene" uid="uid://ixvn8yqxqxqx" path="res://scenes/game/HotDogDisplay.tscn" id="6_0x0x0"]
 
 [node name="Game" type="Control"]
 layout_mode = 3
@@ -24,24 +25,10 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.1, 0.2, 1)
 
-[node name="HelloWorldLabel" type="Label" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = -300.0
-offset_right = 200.0
-offset_bottom = -200.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Hello World!"
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="CurrencyDisplay" parent="." instance=ExtResource("2_0x0x0")]
+layout_mode = 1
+
+[node name="HotDogDisplay" parent="." instance=ExtResource("6_0x0x0")]
 layout_mode = 1
 
 [node name="ProgressBar" parent="." instance=ExtResource("3_0x0x0")]

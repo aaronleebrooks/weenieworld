@@ -62,13 +62,8 @@ func _on_new_game_pressed():
 	get_node("/root/GameManager").start_new_game()
 
 func _on_continue_pressed():
-	print("Opening save selection menu...")
-	open_save_selection_menu()
-
-func open_save_selection_menu():
-	var save_menu_scene = preload("res://scenes/ui/SaveSelectionMenu.tscn")
-	var save_menu = save_menu_scene.instantiate()
-	add_child(save_menu)
+	print("Continuing existing game...")
+	get_node("/root/GameManager").continue_game()
 
 func _on_options_pressed():
 	print("Opening options...")
@@ -81,15 +76,26 @@ func _on_quit_pressed():
 	get_node("/root/GameManager").quit_game()
 
 func update_continue_button():
-	# Check if save file exists and update continue button
-	var has_save = get_node("/root/SaveSystem").has_save_file()
-	print("Save file exists: ", has_save)
+	"""Check if save files exist and update continue button"""
+	var save_system = get_node("/root/SaveSystem")
+	if not save_system:
+		print("MainMenu: SaveSystem not found")
+		_handle_no_save()
+		return
+	
+	var save_list = save_system.get_save_list()
+	var has_save = save_list.size() > 0
+	print("MainMenu: Save files found: ", save_list.size())
 	
 	if has_save:
 		continue_button.disabled = false
-		continue_button.text = "Load Game"
+		continue_button.text = "Continue Game"
 		continue_button.modulate = Color.WHITE
 	else:
-		continue_button.disabled = true
-		continue_button.text = "No Save Data"
-		continue_button.modulate = Color.GRAY 
+		_handle_no_save()
+
+func _handle_no_save():
+	"""Handle case when no save files exist"""
+	continue_button.disabled = true
+	continue_button.text = "No Save Data"
+	continue_button.modulate = Color.GRAY 

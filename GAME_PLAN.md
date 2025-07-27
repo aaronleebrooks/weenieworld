@@ -1,22 +1,28 @@
-# WeenieWorld - Idle Game Development Plan
+# WeenieWorld - Hot Dog Store Idle Game Development Plan
 
 ## Project Overview
-WeenieWorld is a simple idle game built in Godot 4.4 with responsive design for both desktop and mobile platforms. The game features a click-based currency system with upgrades and a persistent save system.
+WeenieWorld is a hot dog store idle game built in Godot 4.4 with responsive design for both desktop and mobile platforms. The game features a hot dog production system with customer sales, upgrades, and a persistent save system.
 
 ## Core Gameplay Mechanics
 
-### Currency System
-- **Primary Currency**: Main game currency earned through clicking
+### Hot Dog Production System
+- **Primary Resource**: Hot dogs produced through clicking and holding
 - **Click Mechanics**: 
-  - Single click = +1 currency
-  - Hold click = +1 currency every 1 second (auto-clicker)
+  - Single click = +1 hot dog (instant production)
+  - Hold click = +1 hot dog every 0.3 seconds (continuous production)
 - **Upgradeable Values**:
-  - Click value multiplier (how much currency per click)
-  - Auto-clicker speed (how fast currency accrues when holding)
+  - Hot dogs per click (how many hot dogs produced per click)
+  - Production speed (how fast hot dogs are produced when holding)
+
+### Customer Sales System
+- **Customer Purchases**: Customers automatically purchase hot dogs at regular intervals
+- **Purchase Rate**: Upgradeable time rate for customer purchases
+- **Sale Value**: Upgradeable amount of currency earned per hot dog sold
+- **Inventory Management**: Hot dogs are stored until customers purchase them
 
 ### Progression System
-- Currency can be spent on upgrades
-- Upgrades increase earning potential
+- Currency earned from hot dog sales can be spent on upgrades
+- Upgrades increase production capacity and sales efficiency
 - Persistent save system to maintain progress
 
 ## Technical Architecture
@@ -54,6 +60,8 @@ weenieworld/
 └── scripts/
     ├── autoload/
     │   ├── GameManager.gd
+    │   ├── HotDogManager.gd
+    │   ├── CustomerManager.gd
     │   └── AudioManager.gd
     └── components/
         ├── ClickableButton.gd
@@ -126,20 +134,25 @@ Game (Control)
 - **Quit**: Exits application
 
 ### Main Game Screen
-- **Background Animation**: Looping animated background
+- **Background Animation**: Looping animated background (hot dog store environment)
 - **Foreground Animation**: Workers and customers at bottom
-- **Click Button**: Large, prominent button for currency earning
-- **Currency Display**: Shows current currency amount
+- **Production Button**: Large, prominent button for hot dog production
+- **Hot Dog Display**: Shows current hot dog inventory
+- **Currency Display**: Shows current currency from sales
 - **UI Buttons**: Upgrades, Stats, Settings
 
 ### Upgrades Menu
-- **Click Value Upgrade**: Increases currency per click
-- **Auto-Clicker Speed Upgrade**: Increases hold-click speed
+- **Hot Dogs Per Click Upgrade**: Increases hot dogs produced per click
+- **Production Speed Upgrade**: Increases hold-production speed
+- **Customer Purchase Rate Upgrade**: Increases how often customers buy
+- **Sale Value Upgrade**: Increases currency earned per hot dog sold
 - **Cost Display**: Shows upgrade costs
 - **Back Button**: Returns to main game
 
 ### Stats Menu
-- **Total Currency Earned**: Lifetime earnings
+- **Total Hot Dogs Produced**: Lifetime production count
+- **Total Hot Dogs Sold**: Lifetime sales count
+- **Total Currency Earned**: Lifetime earnings from sales
 - **Total Clicks**: Click count
 - **Play Time**: Session and total time
 - **Upgrades Purchased**: Upgrade history
@@ -159,9 +172,14 @@ Game (Control)
   ```gdscript
   {
     "currency": 0,
-    "click_value": 1,
-    "auto_clicker_speed": 1.0,
-    "total_earned": 0,
+    "hot_dogs_inventory": 0,
+    "hot_dogs_per_click": 1,
+    "production_speed": 0.3,
+    "customer_purchase_rate": 2.0,
+    "sale_value": 1,
+    "total_hot_dogs_produced": 0,
+    "total_hot_dogs_sold": 0,
+    "total_currency_earned": 0,
     "total_clicks": 0,
     "play_time": 0,
     "upgrades_purchased": [],
@@ -258,33 +276,33 @@ Game (Control)
 **Status**: All core mechanics implemented and tested, animation system functional
 
 **Completed Systems**:
-1. **Currency System** ✅ **COMPLETED**: Global currency management with persistence
+1. **Hot Dog Production System** ✅ **COMPLETED**: Global hot dog management with persistence
 2. **Click Mechanics** ✅ **COMPLETED**: Instant clicks + hold-to-click with progress bars
 3. **Progress Bar System** ✅ **COMPLETED**: Orange progress bar for hold actions only
 4. **Floating Text System** ✅ **COMPLETED**: "+1" notifications that fade out
 5. **Button State Management** ✅ **COMPLETED**: "Clicked!" text + cooldown system
-6. **Currency Display Improvements** ✅ **COMPLETED**: Dynamic currency values in tooltips and labels
+6. **Hot Dog Display Improvements** ✅ **COMPLETED**: Dynamic hot dog values in tooltips and labels
 7. **Upgrade System Foundation** ✅ **COMPLETED**: 5-upgrade system with configurable scaling
-8. **Upgrade Panel UI** ✅ **COMPLETED**: Functional upgrade interface with currency display
+8. **Upgrade Panel UI** ✅ **COMPLETED**: Functional upgrade interface with hot dog display
 9. **Animation System** ✅ **COMPLETED**: Wireframe animations synchronized with game timing
 
 **Key Features Implemented**:
-- **Instant Clicks**: No progress bar, immediate currency gain
-- **Hold Actions**: 0.3s progress bar with continuous currency gain
-- **Currency Per Click**: Starts at 1, upgradeable through Better Technique
-- **Visual Feedback**: Button text changes + floating currency notifications
+- **Instant Clicks**: No progress bar, immediate hot dog production
+- **Hold Actions**: 0.3s progress bar with continuous hot dog production
+- **Hot Dogs Per Click**: Starts at 1, upgradeable through Better Technique
+- **Visual Feedback**: Button text changes + floating hot dog notifications
 - **Click Cooldown**: 200ms cooldown after holding to prevent accidental clicks
 - **Responsive UI**: All elements scale with viewport size
-- **Dynamic Currency Display**: Currency values show in tooltips and labels instead of static text
+- **Dynamic Hot Dog Display**: Hot dog values show in tooltips and labels instead of static text
 - **Upgrade System**: 5 upgrades with linear/exponential cost scaling
 - **Upgrade Panel**: Functional interface showing upgrade costs and availability
 - **Wireframe Animations**: Two squares at bottom of screen that animate on clicks and holds
 
 **Recent Improvements**:
-- **Currency Icon Tooltips**: Now show actual currency value instead of "Currency"
-- **Currency Icon Labels**: Display current currency when labels are visible
-- **Upgrade Panel Currency**: Shows current currency in top-right corner
-- **Real-time Updates**: All currency displays update automatically when currency changes
+- **Hot Dog Icon Tooltips**: Now show actual hot dog value instead of "Hot Dogs"
+- **Hot Dog Icon Labels**: Display current hot dog inventory when labels are visible
+- **Upgrade Panel Hot Dogs**: Shows current hot dog inventory in top-right corner
+- **Real-time Updates**: All hot dog displays update automatically when inventory changes
 - **Animation System**: Two colored squares (yellow/orange) positioned at bottom of screen
 - **Click Animations**: Quick outward movement and scaling when clicking
 - **Hold Animations**: Gradual outward movement synchronized with progress bar
@@ -292,12 +310,12 @@ Game (Control)
 
 **Technical Implementation**:
 - **ClickManager**: Handles instant clicks vs timed holds
-- **CurrencyManager**: Global currency with proper persistence and formatting
-- **FloatingText**: Object-pooled currency gain notifications
+- **HotDogManager**: Global hot dog management with proper persistence and formatting
+- **FloatingText**: Object-pooled hot dog gain notifications
 - **ProgressBar**: Only shows for hold actions (orange)
 - **CurrencyGainButton**: Smart state management with cooldown
 - **UpgradeManager**: Complete upgrade system with 5 configurable upgrades
-- **UpgradePanel**: Functional UI with currency display and upgrade buttons
+- **UpgradePanel**: Functional UI with hot dog display and upgrade buttons
 - **AnimationManager**: Wireframe animation system with bottom-screen positioning
 - **Signal-driven architecture**: Clean communication between systems
 
@@ -309,14 +327,14 @@ Game (Control)
 - **UI Integration**: Positioned to avoid overlapping with game text and buttons
 
 **Naming Conventions Used**:
-- `currency_balance` (not "currency")
-- `click_rate_seconds` and `idle_rate_seconds` (explicit units)
-- `currency_per_click` (not "value")
+- `hot_dogs_inventory` (not "hot_dogs")
+- `production_rate_seconds` and `idle_rate_seconds` (explicit units)
+- `hot_dogs_per_click` (not "value")
 - `is_clicking` and `is_holding` (clear state tracking)
 - `click_progress_timer` and `idle_progress_timer` (descriptive)
 
 **Phase 2 Status**: ✅ **FULLY COMPLETED**
-All planned features have been implemented and tested. The game now has a complete foundation with currency management, click mechanics, upgrade system, and visual feedback including animations.
+All planned features have been implemented and tested. The game now has a complete foundation with hot dog production, click mechanics, upgrade system, and visual feedback including animations.
 
 ### Phase 3: UI, Polish, and Logging System ✅ **IN PROGRESS**
 **Status**: Comprehensive UI overhaul, logging system implementation, and final polish
@@ -328,7 +346,7 @@ All planned features have been implemented and tested. The game now has a comple
 1. **Centralized Logging System**: Replace all print statements with proper logging
 2. **Configurable Log Levels**: DEBUG, INFO, WARNING, ERROR with runtime control
 3. **Performance Monitoring**: Track frame rates, memory usage, save/load times
-4. **Event Logging**: Player actions, upgrade purchases, currency changes
+4. **Event Logging**: Player actions, upgrade purchases, hot dog production/sales
 5. **Log Persistence**: Save logs to file for debugging and analytics
 
 **Implementation Plan**:
@@ -363,7 +381,7 @@ func export_logs() -> String
 4. **Help/Tutorial**: In-game guidance for new players
 
 **Stats Menu Features**:
-- **Lifetime Statistics**: Total currency earned, clicks, play time
+- **Lifetime Statistics**: Total hot dogs produced, sold, currency earned, clicks, play time
 - **Session Statistics**: Current session data
 - **Upgrade History**: Purchase history and effects
 - **Performance Metrics**: FPS, memory usage, save times
@@ -408,7 +426,7 @@ func export_logs() -> String
 
 **Sound Effects**:
 - **UI Interactions**: Button clicks, menu navigation
-- **Game Events**: Currency gain, upgrade purchases
+- **Game Events**: Hot dog production, customer purchases, upgrade purchases
 - **Notifications**: Achievement unlocks, error sounds
 - **Ambient Sounds**: Background atmosphere
 
@@ -423,13 +441,13 @@ func export_logs() -> String
 
 **Objectives**:
 1. **Enhanced Animations**: Smoother transitions and effects
-2. **Particle Effects**: Currency gain particles, upgrade effects
+2. **Particle Effects**: Hot dog production particles, customer purchase effects
 3. **UI Animations**: Menu transitions, button feedback
 4. **Performance**: Optimized animation rendering
 
 **Animation Enhancements**:
-- **Currency Particles**: Floating numbers with particle effects
-- **Upgrade Effects**: Visual feedback for purchases
+- **Hot Dog Particles**: Floating hot dog icons with sparkle effects
+- **Customer Effects**: Visual feedback for purchases
 - **Menu Transitions**: Smooth slide/fade animations
 - **Button Feedback**: Hover, press, and release animations
 
@@ -468,8 +486,9 @@ func export_logs() -> String
 **LogManager Integration**:
 ```gdscript
 # Integration with existing managers
-CurrencyManager -> LogManager.log_event("currency_gained", {"amount": 10, "source": "click"})
-UpgradeManager -> LogManager.log_event("upgrade_purchased", {"id": "faster_fingers", "level": 2})
+HotDogManager -> LogManager.log_event("hot_dog_produced", {"amount": 1, "source": "click"})
+CustomerManager -> LogManager.log_event("hot_dog_sold", {"amount": 1, "value": 5})
+UpgradeManager -> LogManager.log_event("upgrade_purchased", {"id": "faster_production", "level": 2})
 ClickManager -> LogManager.log_performance("click_response_time", 0.016)
 ```
 
@@ -657,4 +676,4 @@ var background_music = {}
 - **Performance**: Optimized textures and animations
 - **Accessibility**: High contrast, readable text
 
-This plan provides a comprehensive roadmap for developing WeenieWorld as a successful idle game with responsive design and engaging gameplay mechanics. 
+This plan provides a comprehensive roadmap for developing WeenieWorld as a successful hot dog store idle game with responsive design and engaging gameplay mechanics. 

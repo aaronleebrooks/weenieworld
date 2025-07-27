@@ -1,7 +1,7 @@
 # Phase 3: UI, Polish, and Logging System - Detailed Implementation Plan
 
 ## Overview
-Phase 3 implements comprehensive UI overhaul, logging system, audio integration, animation polish, and final quality assurance. This phase transforms the functional game mechanics into a polished, professional idle game with robust debugging capabilities and cross-platform compatibility.
+Phase 3 implements comprehensive UI overhaul, logging system, audio integration, animation polish, and final quality assurance. This phase transforms the functional game mechanics into a polished, professional hot dog store idle game with robust debugging capabilities and cross-platform compatibility.
 
 ## Current Progress Summary ✅ **IN PROGRESS**
 
@@ -33,8 +33,8 @@ Phase 3 implements comprehensive UI overhaul, logging system, audio integration,
 **Phase 3E: Animation Polish** ✨
 - [ ] Enhance wireframe animations with particle effects
 - [ ] Add UI transition animations (menus, buttons)
-- [ ] Implement currency gain particle effects
-- [ ] Create upgrade purchase visual feedback
+- [ ] Implement hot dog production particle effects
+- [ ] Create customer purchase visual feedback
 
 **Phase 3F: Quality Assurance** 🧪
 - [ ] Conduct cross-platform testing (Windows, macOS, Linux, Android)
@@ -110,13 +110,14 @@ func export_logs() -> String
 
 #### 1.3 Event Logging System
 - [ ] Create event logging functions for all player actions
-- [ ] Implement currency gain/purchase logging
+- [ ] Implement hot dog production/sales logging
 - [ ] Add upgrade purchase tracking
 - [ ] Create save/load event logging
 - [ ] Build analytics data collection
 
 **Event Types**:
-- **Currency Events**: Gain, spend, balance changes
+- **Hot Dog Events**: Production, sales, inventory changes
+- **Customer Events**: Purchases, arrival rates, satisfaction
 - **Upgrade Events**: Purchases, level increases, effects applied
 - **Game Events**: Save, load, scene transitions
 - **Performance Events**: Frame drops, memory spikes, errors
@@ -145,7 +146,7 @@ func export_logs() -> String
 - [ ] Build performance metrics display
 
 **Stats Menu Features**:
-- **Lifetime Statistics**: Total currency earned, clicks, play time
+- **Lifetime Statistics**: Total hot dogs produced, sold, currency earned, clicks, play time
 - **Session Statistics**: Current session data and progress
 - **Upgrade History**: Purchase history and cumulative effects
 - **Performance Metrics**: FPS, memory usage, save times
@@ -173,11 +174,13 @@ func export_logs() -> String
 - [ ] Build achievement rewards system
 
 **Achievement Categories**:
-- **Currency Milestones**: Reach 100, 1K, 10K, 100K currency
+- **Hot Dog Milestones**: Produce 100, 1K, 10K, 100K hot dogs
+- **Sales Milestones**: Sell 100, 1K, 10K hot dogs
+- **Currency Milestones**: Earn 100, 1K, 10K, 100K currency
 - **Click Milestones**: Perform 100, 1K, 10K clicks
 - **Upgrade Milestones**: Purchase 5, 10, 20 upgrades
 - **Time Milestones**: Play for 1 hour, 1 day, 1 week
-- **Efficiency Milestones**: Reach specific currency per second rates
+- **Efficiency Milestones**: Reach specific hot dogs per second rates
 
 #### 2.4 Help/Tutorial System
 - [ ] Create `scenes/ui/HelpMenu.tscn` with comprehensive guidance
@@ -217,7 +220,7 @@ func export_logs() -> String
 - [ ] Implement desktop-specific performance optimizations
 
 **Keyboard Shortcuts**:
-- **Space**: Trigger currency gain action
+- **Space**: Trigger hot dog production action
 - **Escape**: Close menus, return to game
 - **U**: Open upgrade menu
 - **S**: Open settings menu
@@ -262,7 +265,7 @@ var current_music_track = null
 
 **Sound Effect Categories**:
 - **UI Interactions**: Button clicks, menu navigation, tooltip sounds
-- **Game Events**: Currency gain, upgrade purchases, save operations
+- **Game Events**: Hot dog production, customer purchases, upgrade purchases, save operations
 - **Notifications**: Achievement unlocks, error sounds, warnings
 - **Ambient Sounds**: Background atmosphere, idle sounds
 
@@ -302,15 +305,15 @@ var current_music_track = null
 - **Queue Management**: Proper animation sequencing
 
 #### 5.2 Particle Effects Implementation
-- [ ] Create currency gain particle effects
-- [ ] Implement upgrade purchase visual feedback
+- [ ] Create hot dog production particle effects
+- [ ] Implement customer purchase visual feedback
 - [ ] Add achievement unlock particle effects
 - [ ] Create ambient particle systems
 - [ ] Build particle performance optimization
 
 **Particle Effect Types**:
-- **Currency Particles**: Floating numbers with sparkle effects
-- **Upgrade Effects**: Expanding rings and energy bursts
+- **Hot Dog Particles**: Floating hot dog icons with sparkle effects
+- **Customer Effects**: Expanding rings and energy bursts for purchases
 - **Achievement Particles**: Confetti and celebration effects
 - **Ambient Particles**: Subtle background effects
 
@@ -411,8 +414,9 @@ var current_music_track = null
 ### LogManager Integration
 ```gdscript
 # Integration with existing managers
-CurrencyManager -> LogManager.log_event("currency_gained", {"amount": 10, "source": "click"})
-UpgradeManager -> LogManager.log_event("upgrade_purchased", {"id": "faster_fingers", "level": 2})
+HotDogManager -> LogManager.log_event("hot_dog_produced", {"amount": 1, "source": "click"})
+CustomerManager -> LogManager.log_event("hot_dog_sold", {"amount": 1, "value": 5})
+UpgradeManager -> LogManager.log_event("upgrade_purchased", {"id": "faster_production", "level": 2})
 ClickManager -> LogManager.log_performance("click_response_time", 0.016)
 ```
 
@@ -444,6 +448,7 @@ var background_music = {}
 - `scripts/autoload/LogManager.gd` - Centralized logging system
 - `scripts/autoload/AudioManager.gd` - Audio management system
 - `scripts/autoload/AchievementManager.gd` - Achievement tracking system
+- `scripts/autoload/CustomerManager.gd` - Customer sales system
 
 ### UI Scenes
 - `scenes/ui/StatsMenu.tscn` - Comprehensive statistics display
@@ -512,7 +517,7 @@ var background_music = {}
 
 ## Next Phase Preparation
 
-Phase 3 establishes a polished, professional idle game with robust debugging capabilities and cross-platform compatibility. The logging system provides foundation for ongoing development and maintenance, while the comprehensive UI and audio systems create an engaging user experience. With Phase 3 complete, the game will be ready for Phase 4's final testing, optimization, and release preparation.
+Phase 3 establishes a polished, professional hot dog store idle game with robust debugging capabilities and cross-platform compatibility. The logging system provides foundation for ongoing development and maintenance, while the comprehensive UI and audio systems create an engaging user experience. With Phase 3 complete, the game will be ready for Phase 4's final testing, optimization, and release preparation.
 
 ## Timeline and Dependencies
 

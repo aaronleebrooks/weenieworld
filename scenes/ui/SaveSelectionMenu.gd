@@ -1,157 +1,133 @@
 extends Control
 
-@onready var save_list = $MenuPanel/SaveList/SaveListContainer
-@onready var no_saves_label = $MenuPanel/SaveList/SaveListContainer/NoSavesLabel
-@onready var back_button = $MenuPanel/ButtonContainer/BackButton
-@onready var menu_panel = $MenuPanel
+@onready var save_list = $SaveList
+@onready var back_button = $BackButton
+@onready var title = $Title
 
-var save_buttons = []
-var save_containers = []
-var main_menu = null
-
-# Dialog management
+var save_buttons: Array[Button] = []
+var save_containers: Array[Control] = []
 var delete_dialog_open: bool = false
 
-# Responsive modal properties
-var min_width: float = 400.0
-var min_height: float = 300.0
-var max_width_percent: float = 0.8
-var max_height_percent: float = 0.8
-
 func _ready():
-	print("SaveSelectionMenu: _ready() called")
+	print("SaveSelectionMenu: Initialized")
+	
+	# Connect button signals
 	back_button.pressed.connect(_on_back_button_pressed)
 	
-	# Connect to viewport size changes using native event system
+	# Connect to viewport size changes for responsive sizing
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
 	
-	# Initial size update
-	_update_modal_size()
+	# Initial responsive sizing
+	_update_responsive_layout()
 	
+	# Populate save list
 	populate_save_list()
 
 func _on_viewport_size_changed():
-	print("SaveSelectionMenu: Viewport size changed")
-	_update_modal_size()
+	_update_responsive_layout()
 
-func _update_modal_size():
+func _update_responsive_layout():
 	var viewport_size = get_viewport().get_visible_rect().size
-	print("SaveSelectionMenu: Viewport size = ", viewport_size)
 	
-	# Use percentage-based sizing (like CSS vw/vh units)
+	# Calculate responsive font size
 	var font_size_percent = viewport_size.x * 0.02  # 2% of viewport width
-	var button_height_percent = viewport_size.y * 0.06  # 6% of viewport height
+	var responsive_font_size = max(14, min(font_size_percent, 32))  # 14px to 32px
 	
-	# Set reasonable bounds
-	var responsive_font_size = max(14, min(font_size_percent, 48))  # 14px to 48px
-	var button_height = max(50, min(button_height_percent, 100))  # 50px to 100px
+	# Update title font size
+	if title:
+		title.add_theme_font_size_override("font_size", responsive_font_size * 1.2)
 	
-	print("SaveSelectionMenu: Font size = ", responsive_font_size, "px (", font_size_percent, "px raw), Button height = ", button_height, "px (", button_height_percent, "px raw)")
+	# Update back button font size
+	if back_button:
+		back_button.add_theme_font_size_override("font_size", responsive_font_size)
 	
-	# Update panel size using percentage-based approach
-	var target_width = viewport_size.x * 0.6  # 60% of viewport width
-	var target_height = viewport_size.y * 0.7  # 70% of viewport height
-	
-	# Ensure minimum size
-	target_width = max(target_width, 400)
-	target_height = max(target_height, 300)
-	
-	print("SaveSelectionMenu: Target size = ", Vector2(target_width, target_height))
-	
-	if menu_panel:
-		print("SaveSelectionMenu: Updating panel size")
-		menu_panel.offset_left = -target_width / 2
-		menu_panel.offset_top = -target_height / 2
-		menu_panel.offset_right = target_width / 2
-		menu_panel.offset_bottom = target_height / 2
-		
-		# Update title font size
-		var title = menu_panel.get_node_or_null("Title")
-		if title:
-			title.add_theme_font_size_override("font_size", responsive_font_size * 1.3)  # Title 30% larger
-		
-		# Update back button font size
-		if back_button:
-			back_button.add_theme_font_size_override("font_size", responsive_font_size)
-		
-		# Update existing save buttons font sizes
-		for button in save_buttons:
-			button.add_theme_font_size_override("font_size", responsive_font_size)
-		
-		print("SaveSelectionMenu: Panel updated with percentage-based sizing")
-	else:
-		print("SaveSelectionMenu: No menu_panel found")
+	print("SaveSelectionMenu: Font sizes updated to ", responsive_font_size)
 
 func populate_save_list():
-	print("Populating save list...")
+	"""Populate the save list with available saves"""
+	print("SaveSelectionMenu: Populating save list")
 	
-	# Clear existing save containers
+	# Clear existing save buttons
 	for container in save_containers:
-		container.queue_free()
+		if is_instance_valid(container):
+			container.queue_free()
 	save_containers.clear()
 	save_buttons.clear()
 	
-	# Get available save files
-	var save_files = get_node("/root/SaveSystem").get_save_files()
-	print("Found save files: ", save_files.size())
-	
-	if save_files.is_empty():
-		print("No save files, showing 'No saves' label")
-		no_saves_label.visible = true
+	# Get save list from SaveSystem
+	var save_system = get_node("/root/SaveSystem")
+	if not save_system:
+		print("SaveSelectionMenu: SaveSystem not found")
 		return
 	
-	print("Creating save entries for ", save_files.size(), " files")
-	no_saves_label.visible = false
+	var saves = save_system.get_save_list()
+	print("SaveSelectionMenu: Found %d saves" % saves.size())
 	
-	# Calculate percentage-based sizes for new buttons (like CSS vw/vh)
+	if saves.is_empty():
+		_show_no_saves_message()
+		return
+	
+	# Create save buttons for each save
+	for save_info in saves:
+		_create_save_button(save_info)
+
+func _show_no_saves_message():
+	"""Show message when no saves are available"""
+	var no_saves_label = Label.new()
+	no_saves_label.text = "No save files found"
+	no_saves_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	no_saves_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	no_saves_label.add_theme_font_size_override("font_size", 18)
+	no_saves_label.add_theme_color_override("font_color", Color.GRAY)
+	no_saves_label.custom_minimum_size = Vector2(0, 100)
+	save_list.add_child(no_saves_label)
+
+func _create_save_button(save_info: Dictionary):
+	"""Create a button for a specific save"""
 	var viewport_size = get_viewport().get_visible_rect().size
-	var font_size_percent = viewport_size.x * 0.02  # 2% of viewport width
 	var button_height_percent = viewport_size.y * 0.06  # 6% of viewport height
+	var button_height = max(40, min(button_height_percent, 80))  # 40px to 80px
+	var responsive_font_size = max(14, min(viewport_size.x * 0.015, 24))  # 14px to 24px
 	
-	var responsive_font_size = max(14, min(font_size_percent, 48))  # 14px to 48px
-	var button_height = max(50, min(button_height_percent, 100))  # 50px to 100px
+	# Create container for save button and delete button
+	var save_container = HBoxContainer.new()
+	save_container.custom_minimum_size = Vector2(0, button_height + 10)
+	save_container.add_theme_constant_override("separation", 15)
+	save_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	
-	# Create containers for each save file
-	for save_info in save_files:
-		var save_container = HBoxContainer.new()
-		save_container.custom_minimum_size = Vector2(0, button_height + 10)
-		save_container.add_theme_constant_override("separation", 15)
-		save_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		
-		# Create load button
-		var load_button = Button.new()
-		var formatted_time = format_timestamp(save_info["time"])
-		load_button.text = save_info["name"] + "\n" + formatted_time
-		load_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		load_button.custom_minimum_size = Vector2(0, button_height)
-		load_button.add_theme_font_size_override("font_size", responsive_font_size - 2)
-		load_button.pressed.connect(_on_save_selected.bind(save_info))
-		save_container.add_child(load_button)
-		save_buttons.append(load_button)
-		
-		# Create delete button
-		var delete_button = Button.new()
-		delete_button.text = "X"
-		delete_button.custom_minimum_size = Vector2(button_height * 0.75, button_height)
-		delete_button.add_theme_font_size_override("font_size", responsive_font_size)
-		delete_button.add_theme_color_override("font_color", Color.RED)
-		delete_button.add_theme_color_override("font_hover_color", Color.RED)
-		delete_button.pressed.connect(_on_delete_save_pressed.bind(save_info))
-		save_container.add_child(delete_button)
-		
-		save_list.add_child(save_container)
-		save_containers.append(save_container)
+	# Create load button
+	var load_button = Button.new()
+	var formatted_time = format_timestamp(save_info["modified_time"])
+	load_button.text = save_info["name"] + "\n" + formatted_time
+	load_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	load_button.custom_minimum_size = Vector2(0, button_height)
+	load_button.add_theme_font_size_override("font_size", responsive_font_size - 2)
+	load_button.pressed.connect(_on_save_selected.bind(save_info))
+	save_container.add_child(load_button)
+	save_buttons.append(load_button)
+	
+	# Create delete button
+	var delete_button = Button.new()
+	delete_button.text = "X"
+	delete_button.custom_minimum_size = Vector2(button_height * 0.75, button_height)
+	delete_button.add_theme_font_size_override("font_size", responsive_font_size)
+	delete_button.add_theme_color_override("font_color", Color.RED)
+	delete_button.add_theme_color_override("font_hover_color", Color.RED)
+	delete_button.pressed.connect(_on_delete_save_pressed.bind(save_info))
+	save_container.add_child(delete_button)
+	
+	save_list.add_child(save_container)
+	save_containers.append(save_container)
 
 func _on_save_selected(save_info: Dictionary):
 	print("Loading save: ", save_info["name"])
 	
 	# Load the selected save
 	var game_manager = get_node("/root/GameManager")
-	game_manager.load_specific_save(save_info)
+	game_manager.load_specific_save(save_info["name"])
 	
 	# Close this menu and go to game
 	queue_free()
-	get_node("/root/GameManager").change_scene(game_manager.GAME_SCENE)
 
 func _on_delete_save_pressed(save_info: Dictionary):
 	show_delete_confirmation(save_info)
@@ -173,17 +149,21 @@ func show_delete_confirmation(save_info: Dictionary):
 func _on_delete_confirmed(save_info: Dictionary):
 	print("Deleting save: ", save_info["name"])
 	delete_dialog_open = false
-	var success = get_node("/root/SaveSystem").delete_save_file(save_info)
 	
-	# Always refresh the list after attempting deletion, regardless of return value
+	var save_system = get_node("/root/SaveSystem")
+	if save_system:
+		var success = save_system.delete_save(save_info["name"])
+		print("Delete result: ", success)
+	
+	# Always refresh the list after attempting deletion
 	print("Refreshing save list after deletion attempt...")
 	populate_save_list()
 	
 	# Check if any saves remain after refresh
-	var has_saves = get_node("/root/SaveSystem").has_save_file()
-	print("Has saves after deletion and refresh: ", has_saves)
+	var remaining_saves = save_system.get_save_list() if save_system else []
+	print("Saves remaining after deletion and refresh: ", remaining_saves.size())
 	
-	if not has_saves:
+	if remaining_saves.is_empty():
 		# No saves left, close the modal and update main menu
 		print("No saves remaining, closing modal")
 		var main_menu = get_parent()
@@ -193,19 +173,14 @@ func _on_delete_confirmed(save_info: Dictionary):
 	else:
 		print("Save list refreshed successfully")
 
-func format_timestamp(timestamp: String) -> String:
-	# Convert ISO timestamp to readable format
-	if timestamp.is_empty():
+func format_timestamp(timestamp: int) -> String:
+	"""Convert Unix timestamp to readable format"""
+	if timestamp <= 0:
 		return "Unknown time"
 	
-	# Try to parse the timestamp and format it nicely
-	var parts = timestamp.split("T")
-	if parts.size() >= 2:
-		var date_part = parts[0]
-		var time_part = parts[1].split(".")[0]  # Remove milliseconds
-		return date_part + " " + time_part
-	
-	return timestamp
+	# Convert Unix timestamp to readable format
+	var date_time = Time.get_datetime_string_from_unix_time(timestamp)
+	return date_time
 
 func _on_delete_cancelled():
 	print("Delete cancelled")

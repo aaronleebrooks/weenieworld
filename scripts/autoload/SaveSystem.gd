@@ -1,281 +1,228 @@
 extends Node
 
-const SAVE_DIR = "user://saves/"
-const AUTO_SAVE_FILE = "autosave.json"
-const MANUAL_SAVE_PREFIX = "manual_save_"
-const AUTO_SAVE_INTERVAL = 30.0  # seconds
+# Save system autoload for managing game saves
+# Uses intentional naming conventions for future maintainability
 
-var current_save_data: Dictionary
-var auto_save_timer: float = 0.0
-var has_unsaved_changes: bool = false
+signal save_data_loaded(save_data: Dictionary)
+signal save_created(save_name: String)
+signal save_deleted(save_name: String)
 
-signal save_data_loaded(data: Dictionary)
-signal save_data_saved(data: Dictionary)
+# Save configuration
+var save_directory: String = "user://saves/"
+var autosave_name: String = "autosave"
+var max_manual_saves: int = 3
 
-func _init():
-	load_save_data()
+# References to managers
+var hot_dog_manager: Node
+var customer_manager: Node
+var upgrade_manager: Node
+var game_manager: Node
 
-func _process(delta: float):
-	if has_unsaved_changes:
-		auto_save_timer += delta
-		if auto_save_timer >= AUTO_SAVE_INTERVAL:
-			save_game()
-			auto_save_timer = 0.0
-
-# Get default save data
-func get_default_save_data() -> Dictionary:
-	return {
-		"currency": 0,
-		"click_value": 1,
-		"auto_clicker_speed": 1.0,
-		"total_earned": 0,
-		"total_clicks": 0,
-		"play_time": 0,
-		"upgrades_purchased": [],
-		"upgrades": {
-			"levels": {},
-			"total_purchased": 0
-		},
-		"last_save_time": "",
-		"game_version": "1.0.0"
-	}
-
-# Load save data from file
-func load_save_data() -> Dictionary:
-	# Try to load autosave first
-	var autosave_path = SAVE_DIR + AUTO_SAVE_FILE
-	var file = FileAccess.open(autosave_path, FileAccess.READ)
-	if file == null:
-		# No save file exists, just return default data without saving
-		current_save_data = get_default_save_data()
-		return current_save_data
+func _ready():
+	print("SaveSystem: Initialized")
 	
-	var json_string = file.get_as_text()
-	file.close()
-	
-	var json = JSON.new()
-	var parse_result = json.parse(json_string)
-	
-	if parse_result != OK:
-		print("Failed to parse save file, creating new save data")
-		current_save_data = get_default_save_data()
-		return current_save_data
-	
-	current_save_data = json.data
-	emit_signal("save_data_loaded", current_save_data)
-	return current_save_data
-
-# Save current data to file (autosave)
-func save_game() -> bool:
-	current_save_data["last_save_time"] = Time.get_datetime_string_from_system()
-	current_save_data["save_type"] = "autosave"
-	
-	# Add currency data from CurrencyManager
-	var currency_manager = get_node_or_null("/root/CurrencyManager")
-	if currency_manager:
-		current_save_data["currency"] = currency_manager.get_save_data()["currency"]
-	
-	# Add upgrade data from UpgradeManager
-	var upgrade_manager = get_node_or_null("/root/UpgradeManager")
-	if upgrade_manager:
-		current_save_data["upgrades"] = upgrade_manager.get_save_data()["upgrades"]
+	# Get references to other managers
+	hot_dog_manager = get_node("/root/HotDogManager")
+	customer_manager = get_node("/root/CustomerManager")
+	upgrade_manager = get_node("/root/UpgradeManager")
+	game_manager = get_node("/root/GameManager")
 	
 	# Ensure save directory exists
-	ensure_save_directory()
+	DirAccess.make_dir_recursive_absolute(save_directory)
 	
-	var autosave_path = SAVE_DIR + AUTO_SAVE_FILE
-	var file = FileAccess.open(autosave_path, FileAccess.WRITE)
-	if file == null:
-		print("Failed to open save file for writing")
-		return false
+	# Start autosave timer
+	_start_autosave_timer()
+
+func _start_autosave_timer():
+	"""Start the autosave timer"""
+	var autosave_timer = Timer.new()
+	autosave_timer.wait_time = 30.0  # 30 seconds
+	autosave_timer.timeout.connect(_perform_autosave)
+	add_child(autosave_timer)
+	autosave_timer.start()
+	print("SaveSystem: Autosave timer started (30s interval)")
+
+func _perform_autosave():
+	"""Perform automatic save"""
+	if game_manager and game_manager.get_game_active():
+		save_game(autosave_name)
+		print("SaveSystem: Autosave completed")
+
+func save_game(save_name: String) -> bool:
+	"""Save the current game state"""
+	var save_data = _collect_save_data()
+	var file_path = save_directory + save_name + ".json"
 	
-	var json_string = JSON.stringify(current_save_data, "\t")
-	file.store_string(json_string)
-	file.close()
-	
-	has_unsaved_changes = false
-	emit_signal("save_data_saved", current_save_data)
-	return true
-
-# Create new game (reset save data)
-func new_game() -> Dictionary:
-	current_save_data = get_default_save_data()
-	save_game()
-	return current_save_data
-
-# Get current save data
-func get_save_data() -> Dictionary:
-	return current_save_data
-
-# Update save data
-func update_save_data(key: String, value) -> void:
-	current_save_data[key] = value
-	has_unsaved_changes = true
-
-# Ensure save directory exists
-func ensure_save_directory():
-	var dir = DirAccess.open("user://")
-	if not dir.dir_exists("saves"):
-		dir.make_dir("saves")
-
-# Check if any save file exists
-func has_save_file() -> bool:
-	var autosave_path = SAVE_DIR + AUTO_SAVE_FILE
-	if FileAccess.file_exists(autosave_path):
+	var file = FileAccess.open(file_path, FileAccess.WRITE)
+	if file:
+		var json_string = JSON.stringify(save_data)
+		file.store_string(json_string)
+		file.close()
+		
+		print("SaveSystem: Game saved to %s" % file_path)
+		emit_signal("save_created", save_name)
 		return true
+	else:
+		print("SaveSystem: Failed to save game to %s" % file_path)
+		return false
+
+func load_game(save_name: String) -> bool:
+	"""Load a game save"""
+	var file_path = save_directory + save_name + ".json"
 	
-	# Check for manual saves
-	var dir = DirAccess.open(SAVE_DIR)
-	if dir == null:
+	if not FileAccess.file_exists(file_path):
+		print("SaveSystem: Save file not found: %s" % file_path)
 		return false
 	
-	dir.list_dir_begin()
-	var file_name = dir.get_next()
-	while file_name != "":
-		if file_name.begins_with(MANUAL_SAVE_PREFIX) and file_name.ends_with(".json"):
+	var file = FileAccess.open(file_path, FileAccess.READ)
+	if file:
+		var json_string = file.get_as_text()
+		file.close()
+		
+		var json = JSON.new()
+		var parse_result = json.parse(json_string)
+		
+		if parse_result == OK:
+			var save_data = json.data
+			_apply_save_data(save_data)
+			print("SaveSystem: Game loaded from %s" % file_path)
+			emit_signal("save_data_loaded", save_data)
 			return true
-		file_name = dir.get_next()
-	
-	return false
-
-# Get list of available save files
-func get_save_files() -> Array:
-	var saves = []
-	print("Getting save files...")
-	
-	# Check autosave
-	var autosave_path = SAVE_DIR + AUTO_SAVE_FILE
-	print("Checking autosave path: ", autosave_path)
-	if FileAccess.file_exists(autosave_path):
-		print("Autosave exists")
-		var autosave_data = load_save_file(autosave_path)
-		if autosave_data.has("last_save_time"):
-			saves.append({
-				"name": "Autosave",
-				"path": autosave_path,
-				"time": autosave_data["last_save_time"],
-				"type": "autosave"
-			})
-			print("Added autosave to list")
+		else:
+			print("SaveSystem: Failed to parse save file: %s" % file_path)
+			return false
 	else:
-		print("Autosave does not exist")
+		print("SaveSystem: Failed to open save file: %s" % file_path)
+		return false
+
+func delete_save(save_name: String) -> bool:
+	"""Delete a save file"""
+	var file_path = save_directory + save_name + ".json"
 	
-	# Check manual saves
-	var dir = DirAccess.open(SAVE_DIR)
-	if dir != null:
-		print("Opened saves directory")
+	if FileAccess.file_exists(file_path):
+		var dir = DirAccess.open(save_directory)
+		if dir:
+			var result = dir.remove(save_name + ".json")
+			if result == OK:
+				print("SaveSystem: Save deleted: %s" % save_name)
+				emit_signal("save_deleted", save_name)
+				return true
+			else:
+				print("SaveSystem: Failed to delete save: %s" % save_name)
+				return false
+		else:
+			print("SaveSystem: Failed to access save directory")
+			return false
+	else:
+		print("SaveSystem: Save file not found: %s" % save_name)
+		return false
+
+func get_save_list() -> Array[Dictionary]:
+	"""Get list of available saves with metadata"""
+	var saves: Array[Dictionary] = []
+	var dir = DirAccess.open(save_directory)
+	
+	if dir:
 		dir.list_dir_begin()
 		var file_name = dir.get_next()
-		var manual_save_count = 0
 		
-		while file_name != "" and manual_save_count < 3:
-			print("Checking file: ", file_name)
-			if file_name.begins_with(MANUAL_SAVE_PREFIX) and file_name.ends_with(".json"):
-				var save_path = SAVE_DIR + file_name
-				print("Found manual save: ", save_path)
-				var save_data = load_save_file(save_path)
-				if save_data.has("last_save_time"):
-					saves.append({
-						"name": "Manual Save " + str(manual_save_count + 1),
-						"path": save_path,
-						"time": save_data["last_save_time"],
-						"type": "manual"
-					})
-					manual_save_count += 1
-					print("Added manual save to list")
+		while file_name != "":
+			if file_name.ends_with(".json"):
+				var save_name = file_name.get_basename()
+				var file_path = save_directory + file_name
+				var file_info = FileAccess.get_modified_time(file_path)
+				
+				saves.append({
+					"name": save_name,
+					"modified_time": file_info,
+					"is_autosave": save_name == autosave_name
+				})
+			
 			file_name = dir.get_next()
-	else:
-		print("Failed to open saves directory")
+		
+		dir.list_dir_end()
 	
-	print("Total saves found: ", saves.size())
+	# Sort by modification time (newest first)
+	saves.sort_custom(func(a, b): return a.modified_time > b.modified_time)
+	
 	return saves
 
-# Load a specific save file
-func load_save_file(file_path: String) -> Dictionary:
-	var file = FileAccess.open(file_path, FileAccess.READ)
-	if file == null:
-		return {}
+func _collect_save_data() -> Dictionary:
+	"""Collect save data from all managers"""
+	var save_data = {
+		"version": "1.0.0",
+		"timestamp": Time.get_datetime_string_from_system(),
+		"game_version": "1.0.0"
+	}
 	
-	var json_string = file.get_as_text()
-	file.close()
+	# Collect data from managers
+	if hot_dog_manager:
+		var hot_dog_data = hot_dog_manager.get_save_data()
+		save_data.merge(hot_dog_data)
 	
-	var json = JSON.new()
-	var parse_result = json.parse(json_string)
+	if customer_manager:
+		var customer_data = customer_manager.get_save_data()
+		save_data.merge(customer_data)
 	
-	if parse_result != OK:
-		return {}
+	if upgrade_manager:
+		var upgrade_data = upgrade_manager.get_save_data()
+		save_data.merge(upgrade_data)
 	
-	return json.data
+	# GameManager doesn't need to save data - it just manages scene transitions
+	# All actual game data is stored in the other managers
+	
+	return save_data
 
-# Load a specific save
-func load_specific_save(save_info: Dictionary) -> Dictionary:
-	if save_info.has("path"):
-		current_save_data = load_save_file(save_info["path"])
-		if current_save_data.is_empty():
-			current_save_data = get_default_save_data()
-		return current_save_data
-	return get_default_save_data()
+func _apply_save_data(save_data: Dictionary):
+	"""Apply save data to all managers"""
+	# Data will be applied through the save_data_loaded signal
+	# which each manager listens to
+	pass
 
-# Create manual save
-func create_manual_save() -> bool:
-	current_save_data["last_save_time"] = Time.get_datetime_string_from_system()
-	current_save_data["save_type"] = "manual"
+func create_new_game():
+	"""Create a new game by resetting all managers"""
+	print("SaveSystem: Creating new game")
 	
-	ensure_save_directory()
+	if hot_dog_manager:
+		hot_dog_manager.reset_hot_dogs()
 	
-	# Find next available slot
-	var slot_number = 1
-	while slot_number <= 3:
-		var save_path = SAVE_DIR + MANUAL_SAVE_PREFIX + str(slot_number) + ".json"
-		if not FileAccess.file_exists(save_path):
-			break
-		slot_number += 1
+	if customer_manager:
+		customer_manager.reset_customers()
 	
-	if slot_number > 3:
-		# Replace oldest manual save
-		slot_number = 1
+	if upgrade_manager:
+		upgrade_manager.reset_upgrades()
 	
-	var save_path = SAVE_DIR + MANUAL_SAVE_PREFIX + str(slot_number) + ".json"
-	var file = FileAccess.open(save_path, FileAccess.WRITE)
-	if file == null:
-		return false
+	if game_manager:
+		game_manager.reset_game()
 	
-	var json_string = JSON.stringify(current_save_data, "\t")
-	file.store_string(json_string)
-	file.close()
-	
-	return true
+	# Save the new game state
+	save_game(autosave_name)
 
-# Delete a specific save file
-func delete_save_file(save_info: Dictionary) -> bool:
-	if not save_info.has("path"):
-		print("No path in save_info")
-		return false
+func migrate_old_save_data(old_data: Dictionary) -> Dictionary:
+	"""Migrate old save data to new format"""
+	var new_data = _collect_save_data()
 	
-	var file_path = save_info["path"]
-	print("Attempting to delete: ", file_path)
+	# Migrate currency data
+	if old_data.has("currency"):
+		var currency_data = old_data["currency"]
+		if new_data.has("currency"):
+			new_data["currency"]["balance"] = currency_data.get("balance", 0)
+		if new_data.has("hot_dogs"):
+			new_data["hot_dogs"]["total_currency_earned"] = currency_data.get("total_earned", 0)
 	
-	if not FileAccess.file_exists(file_path):
-		print("File does not exist: ", file_path)
-		return false
+	# Migrate click mechanics to hot dog production
+	if old_data.has("click_value"):
+		if new_data.has("hot_dogs"):
+			new_data["hot_dogs"]["per_click"] = old_data["click_value"]
 	
-	# Try using DirAccess to the saves directory directly
-	var saves_dir = DirAccess.open("user://saves")
-	if saves_dir == null:
-		print("Failed to open saves directory")
-		return false
+	# Migrate timing data
+	if old_data.has("auto_clicker_speed"):
+		if new_data.has("hot_dogs"):
+			new_data["hot_dogs"]["production_rate"] = 0.3 / old_data["auto_clicker_speed"]
 	
-	# Extract filename from path
-	var filename = file_path.get_file()
-	print("Removing file: ", filename)
+	# Migrate upgrades (map old to new)
+	if old_data.has("upgrades_purchased"):
+		# This would need more complex mapping logic
+		pass
 	
-	var result = saves_dir.remove(filename)
-	print("Delete result: ", result)
-	
-	# Check if file was actually deleted, regardless of the return value
-	if not FileAccess.file_exists(file_path):
-		print("File successfully deleted (verified)")
-		return true
-	else:
-		print("File still exists after deletion!")
-		return false 
+	return new_data 

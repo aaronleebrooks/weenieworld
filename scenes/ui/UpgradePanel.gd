@@ -8,7 +8,7 @@ extends Control
 @onready var currency_display = $CurrencyDisplay
 
 var upgrade_manager: Node
-var currency_manager: Node
+var hot_dog_manager: Node
 var upgrade_buttons: Array[Button] = []
 
 func _ready():
@@ -16,14 +16,14 @@ func _ready():
 	
 	# Get references to managers
 	upgrade_manager = get_node("/root/UpgradeManager")
-	currency_manager = get_node("/root/CurrencyManager")
+	hot_dog_manager = get_node("/root/HotDogManager")
 	
 	# Connect signals
 	back_button.pressed.connect(_on_back_button_pressed)
 	
 	# Connect to currency changes to update button states
-	if currency_manager:
-		currency_manager.currency_changed.connect(_on_currency_changed)
+	if hot_dog_manager:
+		hot_dog_manager.currency_changed.connect(_on_currency_changed)
 	
 	# Connect to upgrade purchases
 	if upgrade_manager:
@@ -117,9 +117,9 @@ func _update_all_buttons():
 
 func _update_currency_display():
 	"""Update the currency display with current currency value"""
-	if currency_display and currency_manager:
-		var formatted_currency = currency_manager.get_formatted_currency()
-		currency_display.text = formatted_currency
+	if currency_display and hot_dog_manager:
+		var formatted_currency = hot_dog_manager.get_formatted_currency()
+		currency_display.text = "Currency: %s" % formatted_currency
 
 func _on_back_button_pressed():
 	"""Hide the upgrade panel"""

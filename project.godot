@@ -11,40 +11,39 @@ config_version=5
 [application]
 
 config/name="WeenieWorld"
+run/main_scene="res://scenes/main_menu/MainMenu.tscn"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
-run/main_scene="res://scenes/main_menu/MainMenu.tscn"
 
 [autoload]
 
 GameManager="*res://scripts/autoload/GameManager.gd"
 SaveSystem="*res://scripts/autoload/SaveSystem.gd"
-CurrencyManager="*res://scripts/autoload/CurrencyManager.gd"
+HotDogManager="*res://scripts/autoload/HotDogManager.gd"
+CustomerManager="*res://scripts/autoload/CustomerManager.gd"
 ClickManager="*res://scripts/autoload/ClickManager.gd"
 UpgradeManager="*res://scripts/autoload/UpgradeManager.gd"
 AnimationManager="*res://scripts/autoload/AnimationManager.gd"
+FloatingTextManager="*res://scripts/autoload/FloatingTextManager.gd"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
-window/size/resizable=true
 window/size/mode=2
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-window/stretch/scale=1.0
 
 [input]
 
 ui_cancel={
 "deadzone": 0.5,
-"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194305,"physical_keycode":0,"key_label":0,"unicode":0,"echo":false,"script":null)
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194305,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
 ]
 }
-
 test_animations={
 "deadzone": 0.5,
-"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":84,"physical_keycode":0,"key_label":0,"unicode":0,"echo":false,"script":null)
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":84,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
 ]
 }
 

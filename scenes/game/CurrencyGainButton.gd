@@ -1,10 +1,10 @@
 extends Button
 
-# Currency gain button with click and hold functionality
+# Hot dog production button with click and hold functionality
 # Uses intentional naming conventions for future maintainability
 
 var click_manager: Node
-var currency_manager: Node
+var hot_dog_manager: Node
 
 # Visual state tracking
 var is_pressed: bool = false
@@ -26,7 +26,7 @@ func _ready():
 	
 	# Get references to managers
 	click_manager = get_node("/root/ClickManager")
-	currency_manager = get_node("/root/CurrencyManager")
+	hot_dog_manager = get_node("/root/HotDogManager")
 	
 	# Setup hold timer
 	hold_timer = Timer.new()
@@ -111,47 +111,42 @@ func _on_button_down():
 	hold_timer.start()
 	print("DEBUG: Hold timer started")
 
-func _on_hold_timer_timeout():
-	"""Handle hold timer timeout - start hold action"""
-	print("DEBUG: Hold timer timeout")
-	# Only start hold if we're still pressed and no action is in progress
-	if is_pressed and click_manager and not click_manager.is_action_in_progress():
-		print("DEBUG: Starting hold action")
-		click_manager.start_hold_action()
-	else:
-		print("DEBUG: Cannot start hold action - is_pressed: ", is_pressed, ", click_manager: ", click_manager != null, ", action_in_progress: ", click_manager.is_action_in_progress() if click_manager else "N/A")
-
 func _on_button_up():
-	"""Handle button up (end of press)"""
+	"""Handle button up (end of hold)"""
 	print("DEBUG: Button up signal received")
 	is_pressed = false
 	
-	# Only stop hold actions when button is released
-	# Let click actions complete naturally
-	if click_manager and click_manager.is_holding:
-		print("DEBUG: Stopping hold action due to button release")
-		click_manager.stop_click_action()
-	else:
-		print("DEBUG: Button released - letting click action complete naturally")
+	# If we were holding, stop the hold action
+	if is_held:
+		print("DEBUG: Stopping hold action")
+		if click_manager:
+			click_manager.stop_hold_action()
+		is_held = false
+		hold_timer.stop()
+
+func _on_hold_timer_timeout():
+	"""Handle hold timer timeout (start holding)"""
+	print("DEBUG: Hold timer timeout - starting hold action")
+	is_held = true
+	if click_manager:
+		click_manager.start_hold_action()
 
 func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 	"""Update button state based on click manager state"""
-	print("DEBUG: Click state changed - is_clicking: ", is_clicking, ", is_holding: ", is_holding)
+	print("DEBUG: Click state changed - clicking: %s, holding: %s" % [is_clicking, is_holding])
+	
 	if is_clicking:
 		current_state = ButtonState.CLICKED
-		is_held = false
 	elif is_holding:
 		current_state = ButtonState.HELD
-		is_held = true
 	else:
 		current_state = ButtonState.IDLE
-		is_held = false
 	
 	_update_visual_state()
 
-func _on_click_completed(click_type: String, currency_gained: int):
+func _on_click_completed(click_type: String, hot_dogs_produced: int):
 	"""Handle click completion"""
-	print("DEBUG: Click completed - ", click_type, " gained ", currency_gained, " currency")
+	print("DEBUG: Click completed - ", click_type, " produced ", hot_dogs_produced, " hot dogs")
 	
 	# If this was a hold action that completed, start click cooldown
 	if click_type == "hold":
@@ -159,12 +154,12 @@ func _on_click_completed(click_type: String, currency_gained: int):
 		is_in_click_cooldown = true
 		click_cooldown_timer.start()
 	
-	# For click actions, briefly show "Clicked!" text before returning to idle
+	# For click actions, briefly show "Made!" text before returning to idle
 	if click_type == "click":
 		# Create a timer to reset the button text after a brief delay
 		var reset_timer = Timer.new()
 		reset_timer.one_shot = true
-		reset_timer.wait_time = 0.2  # Show "Clicked!" for 200ms
+		reset_timer.wait_time = 0.2  # Show "Made!" for 200ms
 		reset_timer.timeout.connect(_reset_click_text)
 		add_child(reset_timer)
 		reset_timer.start()
@@ -189,15 +184,15 @@ func _update_visual_state():
 		ButtonState.IDLE:
 			# Normal state
 			modulate = Color.WHITE
-			text = "Gain Currency"
+			text = "Make Hot Dog"
 		ButtonState.CLICKED:
 			# Clicked state (instant)
 			modulate = Color(0.8, 1.0, 0.8, 1.0)  # Light green
-			text = "Clicked!"
+			text = "Made!"
 		ButtonState.HELD:
 			# Held state
 			modulate = Color(1.0, 0.8, 0.6, 1.0)  # Light orange
-			text = "Holding..."
+			text = "Cooking..."
 
 func get_current_state() -> ButtonState:
 	"""Get current button state"""

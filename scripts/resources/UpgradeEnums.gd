@@ -9,8 +9,9 @@ enum CostScalingType {
 }
 
 enum EffectType {
-	CURRENCY_PER_CLICK,  # Increases currency per click
-	CLICK_RATE,          # Decreases click rate (faster clicks)
-	IDLE_RATE,           # Decreases idle rate (faster holds)
-	CURRENCY_MULTIPLIER  # Multiplies all currency gains
+	HOT_DOGS_PER_CLICK,    # Increases hot dogs per click
+	PRODUCTION_RATE,        # Decreases production rate (faster)
+	IDLE_RATE,             # Decreases idle rate (faster holds)
+	CUSTOMER_PURCHASE_RATE, # Increases customer purchase frequency
+	SALE_VALUE             # Increases currency per hot dog sold
 } 
