@@ -178,6 +178,10 @@ func _on_idle_progress_complete() -> void:
 			idle_progress = 0.0
 			idle_progress_timer.start()
 			print("ClickManager: Restarting hold timer for continuous holding")
+		else:
+			# If not holding anymore, reset state
+			is_holding = false
+			emit_signal("click_state_changed", is_clicking, is_holding)
 	else:
 		print("ClickManager: CurrencyManager not found!")
 

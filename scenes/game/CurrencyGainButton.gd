@@ -88,12 +88,9 @@ func _on_button_up():
 	# Reset hold timer
 	_hold_timer_started = false
 	
-	# If we were holding and button is released, stop the hold action
-	if is_held and click_manager:
+	# Stop any ongoing actions
+	if click_manager:
 		click_manager.stop_click_action()
-		is_held = false
-		current_state = ButtonState.IDLE
-		_update_visual_state()
 
 func _input(event):
 	"""Handle input for hold detection"""
@@ -139,24 +136,28 @@ func _process(delta):
 		if hold_duration >= 0.2:  # 200ms hold threshold (increased for better click reliability)
 			print("CurrencyGainButton: Starting hold action (process)")
 			click_manager.start_hold_action()
-			is_held = true
-			current_state = ButtonState.HELD
-			_update_visual_state()
+			# State will be updated by click_state_changed signal
 			_hold_timer_started = false
 
 func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 	"""Update button state based on click manager state"""
-	if not is_clicking and not is_holding:
+	if is_clicking:
+		current_state = ButtonState.CLICKED
+		is_held = false
+	elif is_holding:
+		current_state = ButtonState.HELD
+		is_held = true
+	else:
 		current_state = ButtonState.IDLE
 		is_held = false
-		_update_visual_state()
+	
+	_update_visual_state()
 
 func _on_click_completed(click_type: String, currency_gained: int):
 	"""Handle click completion"""
 	print("CurrencyGainButton: Click completed - ", click_type, " gained ", currency_gained, " currency")
-	current_state = ButtonState.IDLE
-	is_held = false
-	_update_visual_state()
+	# Don't reset state here - let click_state_changed handle it
+	# This prevents conflicts with continuous holding
 
 func _update_visual_state():
 	"""Update button appearance based on current state"""
