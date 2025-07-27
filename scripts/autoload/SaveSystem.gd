@@ -127,10 +127,13 @@ func has_save_file() -> bool:
 # Get list of available save files
 func get_save_files() -> Array:
 	var saves = []
+	print("Getting save files...")
 	
 	# Check autosave
 	var autosave_path = SAVE_DIR + AUTO_SAVE_FILE
+	print("Checking autosave path: ", autosave_path)
 	if FileAccess.file_exists(autosave_path):
+		print("Autosave exists")
 		var autosave_data = load_save_file(autosave_path)
 		if autosave_data.has("last_save_time"):
 			saves.append({
@@ -139,17 +142,23 @@ func get_save_files() -> Array:
 				"time": autosave_data["last_save_time"],
 				"type": "autosave"
 			})
+			print("Added autosave to list")
+	else:
+		print("Autosave does not exist")
 	
 	# Check manual saves
 	var dir = DirAccess.open(SAVE_DIR)
 	if dir != null:
+		print("Opened saves directory")
 		dir.list_dir_begin()
 		var file_name = dir.get_next()
 		var manual_save_count = 0
 		
 		while file_name != "" and manual_save_count < 3:
+			print("Checking file: ", file_name)
 			if file_name.begins_with(MANUAL_SAVE_PREFIX) and file_name.ends_with(".json"):
 				var save_path = SAVE_DIR + file_name
+				print("Found manual save: ", save_path)
 				var save_data = load_save_file(save_path)
 				if save_data.has("last_save_time"):
 					saves.append({
@@ -159,8 +168,12 @@ func get_save_files() -> Array:
 						"type": "manual"
 					})
 					manual_save_count += 1
+					print("Added manual save to list")
 			file_name = dir.get_next()
+	else:
+		print("Failed to open saves directory")
 	
+	print("Total saves found: ", saves.size())
 	return saves
 
 # Load a specific save file
@@ -232,17 +245,17 @@ func delete_save_file(save_info: Dictionary) -> bool:
 		print("File does not exist: ", file_path)
 		return false
 	
-	var dir = DirAccess.open("user://")
-	if dir == null:
-		print("Failed to open user:// directory")
+	# Try using DirAccess to the saves directory directly
+	var saves_dir = DirAccess.open("user://saves")
+	if saves_dir == null:
+		print("Failed to open saves directory")
 		return false
 	
 	# Extract filename from path
 	var filename = file_path.get_file()
-	var relative_path = "saves/" + filename
-	print("Removing file: ", relative_path)
+	print("Removing file: ", filename)
 	
-	var result = dir.remove(relative_path)
+	var result = saves_dir.remove(filename)
 	print("Delete result: ", result)
 	
 	# Verify deletion
@@ -252,5 +265,7 @@ func delete_save_file(save_info: Dictionary) -> bool:
 		else:
 			print("File still exists after deletion!")
 			return false
+	else:
+		print("Delete operation failed")
 	
 	return result 
