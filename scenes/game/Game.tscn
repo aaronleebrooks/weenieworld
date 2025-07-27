@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://c8xvn8yqxqxqx"]
+[gd_scene load_steps=6 format=3 uid="uid://c8xvn8yqxqxqx"]
 
 [ext_resource type="Script" uid="uid://m4hu22y7axg6" path="res://scenes/game/Game.gd" id="1_0x0x0"]
 [ext_resource type="PackedScene" path="res://scenes/game/CurrencyDisplay.tscn" id="2_0x0x0"]
 [ext_resource type="PackedScene" path="res://scenes/game/ProgressBar.tscn" id="3_0x0x0"]
 [ext_resource type="PackedScene" path="res://scenes/game/CurrencyGainButton.tscn" id="4_0x0x0"]
+[ext_resource type="PackedScene" path="res://scenes/ui/UpgradePanel.tscn" id="5_upgrade"]
 
 [node name="Game" type="Control"]
 layout_mode = 3
@@ -49,14 +50,34 @@ layout_mode = 1
 [node name="CurrencyGainButton" parent="." instance=ExtResource("4_0x0x0")]
 layout_mode = 1
 
-[node name="BackButton" type="Button" parent="."]
+[node name="UpgradePanel" parent="." instance=ExtResource("5_upgrade")]
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -150.0
-offset_top = 100.0
-offset_right = -30.0
-offset_bottom = 150.0
-grow_horizontal = 0
-text = "Back to Menu"
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopLeftMenu" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 120.0
+offset_bottom = 200.0
+
+[node name="CurrencyIcon" type="Button" parent="TopLeftMenu"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "💰"
+
+[node name="UpgradeIcon" type="Button" parent="TopLeftMenu"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "⚡"
+
+[node name="SaveIcon" type="Button" parent="TopLeftMenu"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "💾"
+
+[node name="ExitIcon" type="Button" parent="TopLeftMenu"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "🚪"

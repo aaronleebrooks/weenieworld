@@ -32,6 +32,10 @@ func get_default_save_data() -> Dictionary:
 		"total_clicks": 0,
 		"play_time": 0,
 		"upgrades_purchased": [],
+		"upgrades": {
+			"levels": {},
+			"total_purchased": 0
+		},
 		"last_save_time": "",
 		"game_version": "1.0.0"
 	}
@@ -70,6 +74,11 @@ func save_game() -> bool:
 	var currency_manager = get_node_or_null("/root/CurrencyManager")
 	if currency_manager:
 		current_save_data["currency"] = currency_manager.get_save_data()["currency"]
+	
+	# Add upgrade data from UpgradeManager
+	var upgrade_manager = get_node_or_null("/root/UpgradeManager")
+	if upgrade_manager:
+		current_save_data["upgrades"] = upgrade_manager.get_save_data()["upgrades"]
 	
 	# Ensure save directory exists
 	ensure_save_directory()

@@ -254,38 +254,43 @@ Game (Control)
 - `scenes/ui/ConfirmationDialog.tscn/.gd` - Confirmation dialogs
 - `scenes/game/Game.tscn/.gd` - Placeholder game scene
 
-### Phase 2: Game Mechanics ✅ IN PROGRESS
-**Status**: Planning and implementation phase
+### Phase 2: Game Mechanics ✅ **MAJOR PROGRESS**
+**Status**: Core mechanics implemented, upgrade system pending
 
-**Core Systems**:
+**Completed Systems**:
 1. **Currency System** ✅ **COMPLETED**: Global currency management with persistence
-2. **Click Mechanics**: Single-click and hold-to-click with progress bars
-3. **Upgrade System**: Flexible 5-upgrade system with configurable scaling
-4. **Animation System**: Wireframe animations synchronized with game timing
-5. **Event Logging**: Configurable log system for player actions
+2. **Click Mechanics** ✅ **COMPLETED**: Instant clicks + hold-to-click with progress bars
+3. **Progress Bar System** ✅ **COMPLETED**: Orange progress bar for hold actions only
+4. **Floating Text System** ✅ **COMPLETED**: "+1" notifications that fade out
+5. **Button State Management** ✅ **COMPLETED**: "Clicked!" text + cooldown system
 
-**Key Features**:
-- **Click Rate**: 0.1s single-click timing (upgradeable)
-- **Idle Rate**: 0.3s hold-click timing (upgradeable)
-- **Currency Per Click**: Starts at 1, increases with upgrades
-- **Progress Bars**: Visual feedback for click timing
-- **Wireframe Animations**: Two squares moving left-right during currency gain
-- **Flexible Upgrades**: Linear, exponential, or curved cost scaling
-- **Event Log**: Tracks upgrades, saves, and future random events
+**Key Features Implemented**:
+- **Instant Clicks**: No progress bar, immediate currency gain
+- **Hold Actions**: 0.3s progress bar with continuous currency gain
+- **Currency Per Click**: Starts at 1, ready for upgrade system
+- **Visual Feedback**: Button text changes + floating currency notifications
+- **Click Cooldown**: 200ms cooldown after holding to prevent accidental clicks
+- **Responsive UI**: All elements scale with viewport size
 
-**Technical Approach**:
-- Native Godot event system (`_input()`, `Timer`, `AnimationPlayer`)
-- Resource-based upgrade configuration
-- Signal-driven communication between systems
-- Responsive UI with percentage-based sizing
-- Comprehensive save/load integration
+**Technical Implementation**:
+- **ClickManager**: Handles instant clicks vs timed holds
+- **CurrencyManager**: Global currency with proper persistence
+- **FloatingText**: Object-pooled currency gain notifications
+- **ProgressBar**: Only shows for hold actions (orange)
+- **CurrencyGainButton**: Smart state management with cooldown
+- **Signal-driven architecture**: Clean communication between systems
 
-**Naming Conventions**:
+**Naming Conventions Used**:
 - `currency_balance` (not "currency")
 - `click_rate_seconds` and `idle_rate_seconds` (explicit units)
 - `currency_per_click` (not "value")
-- `upgrade_levels` (not "upgrades")
+- `is_clicking` and `is_holding` (clear state tracking)
 - `click_progress_timer` and `idle_progress_timer` (descriptive)
+
+**Remaining for Phase 2**:
+- **Upgrade System**: 5-upgrade system with configurable scaling
+- **Animation System**: Wireframe animations synchronized with game timing
+- **Event Logging**: Configurable log system for player actions
 
 ### Phase 3: UI and Polish
 1. Create all menu scenes

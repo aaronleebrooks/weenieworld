@@ -49,7 +49,8 @@ func _on_progress_updated(progress: float, click_type: String):
 
 func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 	"""Show/hide progress bar based on click state"""
-	is_visible = is_clicking or is_holding
+	# Only show progress bar for hold actions, not clicks
+	is_visible = is_holding
 	visible = is_visible
 	
 	if not is_visible:
@@ -74,14 +75,12 @@ func _update_progress_display(click_type: String):
 	# Update progress fill width
 	progress_fill.anchor_right = current_progress
 	
-	# Update color based on click type
+	# Only show orange for hold actions, no green for clicks
 	match click_type:
-		"click":
-			progress_fill.color = Color(0.2, 0.8, 0.2, 1.0)  # Green for click
 		"hold":
 			progress_fill.color = Color(0.8, 0.6, 0.2, 1.0)  # Orange for hold
 		_:
-			progress_fill.color = Color(0.2, 0.2, 0.2, 1.0)  # Gray for none
+			progress_fill.color = Color(0.2, 0.2, 0.2, 1.0)  # Gray for none/click
 	
 	# Only log significant progress changes (every 10% or completion)
 	var progress_percent = current_progress * 100

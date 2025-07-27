@@ -26,6 +26,7 @@ var idle_progress: float = 0.0
 # Timers for progress tracking
 var click_progress_timer: Timer
 var idle_progress_timer: Timer
+var progress_update_timer: Timer
 
 # References to managers
 var currency_manager: Node
@@ -48,17 +49,23 @@ func _ready():
 func _setup_timers():
 	"""Setup timers for click and idle progress tracking"""
 	
-	# Click progress timer (single click)
-	click_progress_timer = Timer.new()
-	click_progress_timer.one_shot = true
-	click_progress_timer.timeout.connect(_on_click_progress_complete)
-	add_child(click_progress_timer)
+	# Click progress timer (no longer needed for instant clicks)
+	# click_progress_timer = Timer.new()
+	# click_progress_timer.one_shot = true
+	# click_progress_timer.timeout.connect(_on_click_progress_complete)
+	# add_child(click_progress_timer)
 	
 	# Idle progress timer (hold to click)
 	idle_progress_timer = Timer.new()
 	idle_progress_timer.one_shot = true
 	idle_progress_timer.timeout.connect(_on_idle_progress_complete)
 	add_child(idle_progress_timer)
+	
+	# Progress update timer for smooth progress bar updates
+	progress_update_timer = Timer.new()
+	progress_update_timer.wait_time = 0.016  # ~60 FPS updates
+	progress_update_timer.timeout.connect(_on_progress_update)
+	add_child(progress_update_timer)
 	
 	print("ClickManager: Timers initialized")
 
@@ -69,12 +76,13 @@ func _on_currency_changed(new_balance: int, change_amount: int):
 func _update_timer_durations():
 	"""Update timer durations based on current currency manager values"""
 	if currency_manager:
-		click_progress_timer.wait_time = currency_manager.click_rate_seconds
+		# Click timer no longer needed for instant clicks
+		# click_progress_timer.wait_time = currency_manager.click_rate_seconds
 		idle_progress_timer.wait_time = currency_manager.idle_rate_seconds
-		print("ClickManager: Timer durations updated - Click: %.2fs, Idle: %.2fs" % [click_progress_timer.wait_time, idle_progress_timer.wait_time])
+		print("ClickManager: Timer durations updated - Click: instant, Idle: %.2fs" % [idle_progress_timer.wait_time])
 
 func start_click_action() -> void:
-	"""Start a single-click currency gain action"""
+	"""Start a single-click currency gain action (instant)"""
 	print("DEBUG: ClickManager.start_click_action() called")
 	if is_clicking:
 		print("DEBUG: Cannot start click action - already clicking")
@@ -85,16 +93,21 @@ func start_click_action() -> void:
 		print("DEBUG: Stopping hold action to start click")
 		stop_click_action()
 	
-	print("DEBUG: ClickManager: Starting click action")
+	print("DEBUG: ClickManager: Starting instant click action")
 	is_clicking = true
-	click_progress = 0.0
+	click_progress = 1.0  # Instant completion
 	
-	# Start the click progress timer
-	click_progress_timer.start()
-	emit_signal("click_started", "click")
+	# Award currency immediately
+	if currency_manager:
+		var amount = currency_manager.currency_per_click
+		currency_manager.gain_currency(amount, "click_action")
+		emit_signal("click_completed", "click", amount)
+		print("ClickManager: Awarded %d currency for instant click action" % amount)
+	else:
+		print("ClickManager: CurrencyManager not found!")
 	
-	# Start progress updates
-	_start_progress_updates("click")
+	# Reset click state immediately (no progress update needed for instant clicks)
+	is_clicking = false
 
 func start_hold_action() -> void:
 	"""Start a hold-to-click currency gain action"""
@@ -117,9 +130,8 @@ func stop_click_action() -> void:
 	if is_clicking:
 		print("ClickManager: Stopping click action")
 		is_clicking = false
-		click_progress_timer.stop()
 		click_progress = 0.0
-		emit_signal("click_progress_updated", 0.0, "click")
+		# No progress update needed for instant clicks
 	
 	if is_holding:
 		print("ClickManager: Stopping hold action")
@@ -127,46 +139,45 @@ func stop_click_action() -> void:
 		idle_progress_timer.stop()
 		idle_progress = 0.0
 		emit_signal("click_progress_updated", 0.0, "hold")
+	
+	# Stop progress update timer if no actions are in progress
+	if not is_clicking and not is_holding:
+		progress_update_timer.stop()
 
 func _start_progress_updates(click_type: String) -> void:
 	"""Start updating progress for the specified click type"""
-	# Create a timer for smooth progress updates
-	var progress_timer = Timer.new()
-	progress_timer.wait_time = 0.016  # ~60 FPS updates
-	progress_timer.timeout.connect(_update_progress.bind(click_type))
-	add_child(progress_timer)
-	progress_timer.start()
+	# Start the progress update timer if not already running
+	if not progress_update_timer.is_stopped():
+		progress_update_timer.stop()
+	progress_update_timer.start()
 
-func _update_progress(click_type: String) -> void:
-	"""Update progress for the specified click type"""
-	var target_timer = click_progress_timer if click_type == "click" else idle_progress_timer
-	var current_progress = click_progress if click_type == "click" else idle_progress
-	
-	if target_timer and target_timer.time_left > 0:
-		var elapsed = target_timer.wait_time - target_timer.time_left
-		var new_progress = elapsed / target_timer.wait_time
-		
-		if click_type == "click":
-			click_progress = new_progress
-		else:
-			idle_progress = new_progress
-		
-		emit_signal("click_progress_updated", new_progress, click_type)
+func _on_progress_update() -> void:
+	"""Update progress for the current action"""
+	if is_clicking:
+		_update_click_progress()
+	elif is_holding:
+		_update_hold_progress()
 
-func _on_click_progress_complete() -> void:
-	"""Handle completion of click progress"""
-	print("ClickManager: Click progress completed")
-	is_clicking = false
-	click_progress = 1.0
-	emit_signal("click_progress_updated", 1.0, "click")
-	
-	# Award currency
-	if currency_manager:
-		var amount = currency_manager.currency_per_click
-		currency_manager.gain_currency(amount, "click_action")
-		emit_signal("click_completed", "click", amount)
-	else:
-		print("ClickManager: CurrencyManager not found!")
+func _update_click_progress() -> void:
+	"""Update progress for click action (instant)"""
+	# Clicks are now instant, so no progress updates needed
+	pass
+
+func _update_hold_progress() -> void:
+	"""Update progress for hold action"""
+	if idle_progress_timer and idle_progress_timer.time_left > 0:
+		var elapsed = idle_progress_timer.wait_time - idle_progress_timer.time_left
+		var new_progress = elapsed / idle_progress_timer.wait_time
+		idle_progress = new_progress
+		emit_signal("click_progress_updated", new_progress, "hold")
+		# Debug: Log progress every 25%
+		if int(new_progress * 100) % 25 == 0 and new_progress > 0:
+			print("DEBUG: Hold progress: %.0f%%" % (new_progress * 100))
+
+# Click actions are now instant, so this function is no longer needed
+# func _on_click_progress_complete() -> void:
+# 	"""Handle completion of click progress"""
+# 	# Removed - clicks are now instant
 
 func _on_idle_progress_complete() -> void:
 	"""Handle completion of idle progress"""
@@ -186,8 +197,9 @@ func _on_idle_progress_complete() -> void:
 			idle_progress_timer.start()
 			print("ClickManager: Restarting hold timer for continuous holding")
 		else:
-			# If not holding anymore, reset state
+			# If not holding anymore, reset state and stop progress updates
 			is_holding = false
+			progress_update_timer.stop()
 			emit_signal("click_state_changed", is_clicking, is_holding)
 	else:
 		print("ClickManager: CurrencyManager not found!")

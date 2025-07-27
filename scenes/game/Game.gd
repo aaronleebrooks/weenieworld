@@ -1,13 +1,41 @@
 extends Control
 
-@onready var back_button = $BackButton
+@onready var top_left_menu = $TopLeftMenu
+@onready var currency_icon = $TopLeftMenu/CurrencyIcon
+@onready var upgrade_icon = $TopLeftMenu/UpgradeIcon
+@onready var save_icon = $TopLeftMenu/SaveIcon
+@onready var exit_icon = $TopLeftMenu/ExitIcon
+@onready var upgrade_panel = $UpgradePanel
 @onready var hello_world_label = $HelloWorldLabel
+
+# Floating text system
+var floating_text_scene = preload("res://scenes/ui/FloatingText.tscn")
+var floating_text_pool: Array[Node] = []
+var max_floating_texts: int = 10
+
+# Dialog management
+var exit_dialog_open: bool = false
+
+# Tooltip management
+var tooltips_always_visible: bool = false
+var tooltip_toggle_button: Button
 
 func _ready():
 	print("Game: _ready() called")
 	
+	# Create tooltip toggle button
+	_create_tooltip_toggle()
+	
 	# Connect button signals
-	back_button.pressed.connect(_on_back_button_pressed)
+	upgrade_icon.pressed.connect(_on_upgrade_icon_pressed)
+	save_icon.pressed.connect(_on_save_icon_pressed)
+	exit_icon.pressed.connect(_on_exit_icon_pressed)
+	
+	# Setup currency icon (non-clickable, blue text)
+	_setup_currency_icon()
+	
+	# Setup tooltips for icons
+	_setup_tooltips()
 	
 	# Connect to viewport size changes using native event system
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
@@ -16,15 +44,106 @@ func _ready():
 	var currency_manager = get_node("/root/CurrencyManager")
 	if currency_manager:
 		currency_manager.currency_changed.connect(_on_currency_changed)
+		currency_manager.currency_gained.connect(_on_currency_gained)
+	
+	# Connect to click manager for currency gain events
+	var click_manager = get_node("/root/ClickManager")
+	if click_manager:
+		click_manager.click_completed.connect(_on_click_completed)
 	
 	# Initial responsive sizing
 	_update_responsive_layout()
 	
 	# Display current game data
 	display_game_data()
+
+func _create_tooltip_toggle():
+	"""Create the tooltip toggle button (caret icon)"""
+	tooltip_toggle_button = Button.new()
+	tooltip_toggle_button.text = "▼"  # Down arrow (caret)
+	tooltip_toggle_button.custom_minimum_size = Vector2(30, 30)
+	tooltip_toggle_button.pressed.connect(_on_tooltip_toggle_pressed)
 	
-	# Add manual save button for testing
-	add_manual_save_button()
+	# Add to top-left menu
+	top_left_menu.add_child(tooltip_toggle_button)
+	top_left_menu.move_child(tooltip_toggle_button, 0)  # Move to top
+	
+	print("DEBUG: Tooltip toggle button created")
+
+func _setup_currency_icon():
+	"""Setup currency icon as non-clickable with blue text"""
+	currency_icon.disabled = true  # Make it non-clickable
+	currency_icon.add_theme_color_override("font_color", Color.BLUE)
+	currency_icon.add_theme_color_override("font_disabled_color", Color.BLUE)
+	print("DEBUG: Currency icon set to non-clickable with blue text")
+
+func _setup_tooltips():
+	"""Setup tooltips for all icons"""
+	_setup_icon_tooltip(currency_icon, "Currency")
+	_setup_icon_tooltip(upgrade_icon, "Upgrades")
+	_setup_icon_tooltip(save_icon, "Save Game")
+	_setup_icon_tooltip(exit_icon, "Exit Game")
+	print("DEBUG: Tooltips setup completed")
+
+func _setup_icon_tooltip(icon: Button, tooltip_text: String):
+	"""Setup tooltip for a specific icon"""
+	icon.tooltip_text = tooltip_text
+	
+	# Connect mouse enter/exit events for hover behavior
+	icon.mouse_entered.connect(_on_icon_mouse_entered.bind(icon))
+	icon.mouse_exited.connect(_on_icon_mouse_exited.bind(icon))
+	
+	# Initially hide tooltip if not always visible
+	if not tooltips_always_visible:
+		icon.tooltip_text = ""
+
+func _on_tooltip_toggle_pressed():
+	"""Toggle tooltip visibility"""
+	tooltips_always_visible = !tooltips_always_visible
+	
+	# Update toggle button appearance
+	if tooltips_always_visible:
+		tooltip_toggle_button.text = "▲"  # Up arrow
+		_show_all_tooltips()
+	else:
+		tooltip_toggle_button.text = "▼"  # Down arrow
+		_hide_all_tooltips()
+	
+	print("DEBUG: Tooltips always visible: ", tooltips_always_visible)
+
+func _show_all_tooltips():
+	"""Show tooltips for all icons"""
+	currency_icon.tooltip_text = "Currency"
+	upgrade_icon.tooltip_text = "Upgrades"
+	save_icon.tooltip_text = "Save Game"
+	exit_icon.tooltip_text = "Exit Game"
+
+func _hide_all_tooltips():
+	"""Hide tooltips for all icons"""
+	currency_icon.tooltip_text = ""
+	upgrade_icon.tooltip_text = ""
+	save_icon.tooltip_text = ""
+	exit_icon.tooltip_text = ""
+
+func _on_icon_mouse_entered(icon: Button):
+	"""Show tooltip on mouse enter if not always visible"""
+	if not tooltips_always_visible:
+		var tooltip_text = ""
+		if icon == currency_icon:
+			tooltip_text = "Currency"
+		elif icon == upgrade_icon:
+			tooltip_text = "Upgrades"
+		elif icon == save_icon:
+			tooltip_text = "Save Game"
+		elif icon == exit_icon:
+			tooltip_text = "Exit Game"
+		
+		icon.tooltip_text = tooltip_text
+
+func _on_icon_mouse_exited(icon: Button):
+	"""Hide tooltip on mouse exit if not always visible"""
+	if not tooltips_always_visible:
+		icon.tooltip_text = ""
 
 func _on_viewport_size_changed():
 	print("Game: Viewport size changed")
@@ -48,15 +167,121 @@ func _update_responsive_layout():
 	if hello_world_label:
 		hello_world_label.add_theme_font_size_override("font_size", responsive_font_size)
 	
-	# Update back button font size and size
-	if back_button:
-		back_button.custom_minimum_size = Vector2(0, button_height)
-		back_button.add_theme_font_size_override("font_size", responsive_font_size)
-		print("Game: Back button updated with percentage-based sizing")
+	# Update icon menu sizing
+	if top_left_menu:
+		var icon_size = max(30, min(viewport_size.x * 0.02, 50))  # 2% of viewport width
+		for child in top_left_menu.get_children():
+			if child is Button:
+				child.custom_minimum_size = Vector2(icon_size, icon_size)
+				child.add_theme_font_size_override("font_size", icon_size * 0.6)
+				
+				# Special handling for tooltip toggle button
+				if child == tooltip_toggle_button:
+					child.add_theme_font_size_override("font_size", icon_size * 0.4)  # Smaller font for caret
+					print("DEBUG: Tooltip toggle button sized")
+		
+		print("Game: Icon menu updated with percentage-based sizing")
 
-func _on_back_button_pressed():
-	print("Returning to main menu...")
+func _on_upgrade_icon_pressed():
+	print("Opening upgrade panel...")
+	upgrade_panel.show_panel()
+
+func _on_save_icon_pressed():
+	print("Manual save requested...")
+	var success = get_node("/root/SaveSystem").create_manual_save()
+	if success:
+		print("Manual save created successfully!")
+	else:
+		print("Failed to create manual save!")
+
+func _on_exit_icon_pressed():
+	print("Exit icon pressed - showing confirmation dialog")
+	_show_exit_confirmation()
+
+func _show_exit_confirmation():
+	"""Show confirmation dialog before returning to menu"""
+	# Debug: Check current state
+	_debug_dialog_state("Before showing exit confirmation")
+	
+	# Check for any existing dialog panels in the scene tree
+	var all_dialogs = get_tree().get_nodes_in_group("confirmation_dialogs")
+	var all_panels = get_tree().get_nodes_in_group("dialog_panels")
+	print("DEBUG: Found ", all_dialogs.size(), " dialogs in confirmation_dialogs group")
+	print("DEBUG: Found ", all_panels.size(), " panels in dialog_panels group")
+	
+	# Check for any ConfirmationDialog instances in the entire scene tree
+	var all_confirmation_dialogs = []
+	_find_confirmation_dialogs(get_tree().current_scene, all_confirmation_dialogs)
+	print("DEBUG: Found ", all_confirmation_dialogs.size(), " confirmation dialogs in scene tree")
+	
+	# Prevent multiple dialogs from being created
+	if exit_dialog_open:
+		print("DEBUG: Exit dialog already open, ignoring request")
+		return
+	
+	# Check if there are any existing ConfirmationDialog instances
+	var existing_dialogs = get_tree().get_nodes_in_group("confirmation_dialogs")
+	if existing_dialogs.size() > 0 or all_confirmation_dialogs.size() > 0:
+		print("DEBUG: Found existing confirmation dialogs, cleaning up")
+		# Force close any existing dialogs
+		for dialog in existing_dialogs:
+			if is_instance_valid(dialog):
+				dialog.queue_free()
+		for dialog in all_confirmation_dialogs:
+			if is_instance_valid(dialog):
+				dialog.queue_free()
+		exit_dialog_open = false
+		# Wait a frame to ensure cleanup
+		await get_tree().process_frame
+	
+	print("DEBUG: Creating new exit confirmation dialog")
+	exit_dialog_open = true
+	var dialog = preload("res://scenes/ui/ConfirmationDialog.tscn").instantiate()
+	
+	# Add to a group for tracking
+	dialog.add_to_group("confirmation_dialogs")
+	
+	# Set the dialog text
+	var title_node = dialog.get_node("DialogPanel/VBoxContainer/Title")
+	var message_node = dialog.get_node("DialogPanel/VBoxContainer/Message")
+	
+	if title_node:
+		title_node.text = "Exit Game"
+		print("DEBUG: Set dialog title to: Exit Game")
+	if message_node:
+		message_node.text = "Are you sure you want to return to the main menu?\nYour progress will be saved automatically."
+		print("DEBUG: Set dialog message")
+	
+	dialog.confirmed.connect(_on_exit_confirmed)
+	dialog.cancelled.connect(_on_exit_cancelled)
+	add_child(dialog)
+	print("DEBUG: Dialog added to scene tree")
+	print("DEBUG: Dialog parent = ", dialog.get_parent().name if dialog.get_parent() else "No parent")
+	print("DEBUG: Dialog scene path = ", dialog.get_path())
+	print("DEBUG: Current scene name = ", get_tree().current_scene.name if get_tree().current_scene else "No current scene")
+	
+	# Debug: Check state after creation
+	_debug_dialog_state("After showing exit confirmation")
+
+func _find_confirmation_dialogs(node: Node, dialogs: Array):
+	"""Recursively find all ConfirmationDialog instances in the scene tree"""
+	if node.get_script() and node.get_script().get_global_name() == "res://scenes/ui/ConfirmationDialog.gd":
+		dialogs.append(node)
+	
+	for child in node.get_children():
+		_find_confirmation_dialogs(child, dialogs)
+
+func _on_exit_confirmed():
+	print("DEBUG: Exit confirmed - returning to main menu...")
+	_debug_dialog_state("Before exit confirmed")
+	exit_dialog_open = false
 	get_node("/root/GameManager").return_to_main_menu()
+
+func _on_exit_cancelled():
+	print("DEBUG: Exit cancelled - staying in game")
+	_debug_dialog_state("Before exit cancelled")
+	exit_dialog_open = false
+	_debug_dialog_state("After exit cancelled")
 
 func display_game_data():
 	# Show current currency and other game data
@@ -71,28 +296,78 @@ func display_game_data():
 	else:
 		hello_world_label.text = "Hello World!\nCurrencyManager not found"
 
-func add_manual_save_button():
-	var save_button = Button.new()
-	save_button.text = "Manual Save"
-	save_button.position = Vector2(20, 100)
-	save_button.pressed.connect(_on_manual_save_pressed)
-	add_child(save_button)
-
-func _on_manual_save_pressed():
-	print("Creating manual save...")
-	var success = get_node("/root/SaveSystem").create_manual_save()
-	if success:
-		print("Manual save created successfully!")
-	else:
-		print("Failed to create manual save!")
+# Manual save functionality moved to icon menu
 
 func _on_currency_changed(new_balance: int, change_amount: int):
 	"""Update display when currency changes"""
 	display_game_data()
 
+func _on_currency_gained(amount: int, source: String):
+	"""Handle currency gain events"""
+	# Show floating text for currency gains
+	show_floating_text(amount, get_currency_gain_position())
 
+func _on_click_completed(click_type: String, currency_gained: int):
+	"""Handle click completion events"""
+	# Show floating text for click completions
+	show_floating_text(currency_gained, get_currency_gain_position())
+
+func show_floating_text(amount: int, position: Vector2):
+	"""Show floating text for currency gain"""
+	var floating_text = get_floating_text()
+	if floating_text:
+		floating_text.show_currency_gain(amount, position)
+
+func get_floating_text() -> Node:
+	"""Get a floating text instance from pool or create new one"""
+	# Try to find an available floating text
+	for text in floating_text_pool:
+		if not text.visible:
+			return text
+	
+	# Create new floating text if pool is not full
+	if floating_text_pool.size() < max_floating_texts:
+		var new_text = floating_text_scene.instantiate()
+		floating_text_pool.append(new_text)
+		add_child(new_text)
+		return new_text
+	
+	# Reuse the oldest floating text if pool is full
+	if floating_text_pool.size() > 0:
+		return floating_text_pool[0]
+	
+	return null
+
+func get_currency_gain_position() -> Vector2:
+	"""Get position for currency gain floating text"""
+	# Position near the currency gain button, but offset to avoid overlap
+	var button = get_node_or_null("CurrencyGainButton")
+	if button:
+		# Add some randomness to prevent overlap and offset from button
+		var random_offset = Vector2(randf_range(-20, 20), randf_range(-40, -20))
+		return button.global_position + random_offset
+	else:
+		# Fallback to center of screen
+		return get_viewport().get_visible_rect().size / 2
 
 func _input(event):
-	# Handle escape key to return to menu
+	# Handle escape key to return to menu only if no dialog is open
 	if event.is_action_pressed("ui_cancel"):
-		_on_back_button_pressed() 
+		# Check if there are any confirmation dialogs open
+		var existing_dialogs = get_tree().get_nodes_in_group("confirmation_dialogs")
+		if existing_dialogs.size() == 0:
+			print("DEBUG: No dialogs open, handling escape key")
+			_on_exit_icon_pressed()
+		else:
+			print("DEBUG: Dialog is open, letting dialog handle escape key") 
+
+func _debug_dialog_state(context: String):
+	"""Debug method to check current dialog state"""
+	var existing_dialogs = get_tree().get_nodes_in_group("confirmation_dialogs")
+	print("DEBUG: [", context, "] exit_dialog_open = ", exit_dialog_open, ", existing_dialogs = ", existing_dialogs.size())
+	for i in range(existing_dialogs.size()):
+		var dialog = existing_dialogs[i]
+		var is_closing = false
+		if dialog.has_method("get") and dialog.get("is_closing") != null:
+			is_closing = dialog.get("is_closing")
+		print("DEBUG: [", context, "] Dialog ", i, " valid = ", is_instance_valid(dialog), " closing = ", is_closing) 

@@ -97,6 +97,11 @@ func reset_currency() -> void:
 	click_rate_seconds = 0.1
 	idle_rate_seconds = 0.3
 	print("CurrencyManager: Reset to starting values")
+	
+	# Also reset upgrades
+	var upgrade_manager = get_node_or_null("/root/UpgradeManager")
+	if upgrade_manager:
+		upgrade_manager.reset_upgrades()
 
 # Currency formatting helper class
 class CurrencyFormatter:

@@ -21,6 +21,7 @@ GameManager="*res://scripts/autoload/GameManager.gd"
 SaveSystem="*res://scripts/autoload/SaveSystem.gd"
 CurrencyManager="*res://scripts/autoload/CurrencyManager.gd"
 ClickManager="*res://scripts/autoload/ClickManager.gd"
+UpgradeManager="*res://scripts/autoload/UpgradeManager.gd"
 
 [display]
 

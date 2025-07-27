@@ -9,6 +9,9 @@ var save_buttons = []
 var save_containers = []
 var main_menu = null
 
+# Dialog management
+var delete_dialog_open: bool = false
+
 # Responsive modal properties
 var min_width: float = 400.0
 var min_height: float = 300.0
@@ -154,6 +157,12 @@ func _on_delete_save_pressed(save_info: Dictionary):
 	show_delete_confirmation(save_info)
 
 func show_delete_confirmation(save_info: Dictionary):
+	# Prevent multiple dialogs from being created
+	if delete_dialog_open:
+		print("Delete dialog already open, ignoring request")
+		return
+	
+	delete_dialog_open = true
 	var dialog_scene = preload("res://scenes/ui/ConfirmationDialog.tscn")
 	var dialog = dialog_scene.instantiate()
 	dialog.setup(save_info)
@@ -163,6 +172,7 @@ func show_delete_confirmation(save_info: Dictionary):
 
 func _on_delete_confirmed(save_info: Dictionary):
 	print("Deleting save: ", save_info["name"])
+	delete_dialog_open = false
 	var success = get_node("/root/SaveSystem").delete_save_file(save_info)
 	
 	# Always refresh the list after attempting deletion, regardless of return value
@@ -199,6 +209,7 @@ func format_timestamp(timestamp: String) -> String:
 
 func _on_delete_cancelled():
 	print("Delete cancelled")
+	delete_dialog_open = false
 
 func _on_back_button_pressed():
 	queue_free() 

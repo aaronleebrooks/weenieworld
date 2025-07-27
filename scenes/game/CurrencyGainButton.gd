@@ -17,6 +17,10 @@ var current_state: ButtonState = ButtonState.IDLE
 # Simple hold detection
 var hold_timer: Timer
 
+# Cooldown to prevent accidental clicks after holding
+var click_cooldown_timer: Timer
+var is_in_click_cooldown: bool = false
+
 func _ready():
 	print("CurrencyGainButton: Initialized")
 	
@@ -30,6 +34,13 @@ func _ready():
 	hold_timer.wait_time = 0.1  # 100ms to distinguish click vs hold
 	hold_timer.timeout.connect(_on_hold_timer_timeout)
 	add_child(hold_timer)
+	
+	# Setup click cooldown timer
+	click_cooldown_timer = Timer.new()
+	click_cooldown_timer.one_shot = true
+	click_cooldown_timer.wait_time = 0.2  # 200ms cooldown after holding
+	click_cooldown_timer.timeout.connect(_on_click_cooldown_timeout)
+	add_child(click_cooldown_timer)
 	
 	# Connect button signals
 	pressed.connect(_on_button_pressed)
@@ -79,6 +90,12 @@ func _on_button_pressed():
 	# Cancel hold timer and start click action
 	hold_timer.stop()
 	print("DEBUG: Hold timer stopped")
+	
+	# Check if we're in click cooldown (prevent accidental clicks after holding)
+	if is_in_click_cooldown:
+		print("DEBUG: Click blocked - in cooldown after holding")
+		return
+	
 	# Always try to start click action - let ClickManager handle conflicts
 	if click_manager:
 		print("DEBUG: Starting click action")
@@ -109,12 +126,13 @@ func _on_button_up():
 	print("DEBUG: Button up signal received")
 	is_pressed = false
 	
-	# Stop any ongoing actions
-	if click_manager:
-		print("DEBUG: Stopping click actions")
+	# Only stop hold actions when button is released
+	# Let click actions complete naturally
+	if click_manager and click_manager.is_holding:
+		print("DEBUG: Stopping hold action due to button release")
 		click_manager.stop_click_action()
 	else:
-		print("DEBUG: No click_manager to stop actions")
+		print("DEBUG: Button released - letting click action complete naturally")
 
 func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 	"""Update button state based on click manager state"""
@@ -134,8 +152,36 @@ func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 func _on_click_completed(click_type: String, currency_gained: int):
 	"""Handle click completion"""
 	print("DEBUG: Click completed - ", click_type, " gained ", currency_gained, " currency")
+	
+	# If this was a hold action that completed, start click cooldown
+	if click_type == "hold":
+		print("DEBUG: Starting click cooldown after hold completion")
+		is_in_click_cooldown = true
+		click_cooldown_timer.start()
+	
+	# For click actions, briefly show "Clicked!" text before returning to idle
+	if click_type == "click":
+		# Create a timer to reset the button text after a brief delay
+		var reset_timer = Timer.new()
+		reset_timer.one_shot = true
+		reset_timer.wait_time = 0.2  # Show "Clicked!" for 200ms
+		reset_timer.timeout.connect(_reset_click_text)
+		add_child(reset_timer)
+		reset_timer.start()
+	
 	# Don't reset state here - let click_state_changed handle it
 	# This prevents conflicts with continuous holding
+
+func _reset_click_text():
+	"""Reset button text after click completion"""
+	if current_state == ButtonState.CLICKED:
+		current_state = ButtonState.IDLE
+		_update_visual_state()
+
+func _on_click_cooldown_timeout():
+	"""Handle click cooldown timeout"""
+	print("DEBUG: Click cooldown finished")
+	is_in_click_cooldown = false
 
 func _update_visual_state():
 	"""Update button appearance based on current state"""
@@ -145,9 +191,9 @@ func _update_visual_state():
 			modulate = Color.WHITE
 			text = "Gain Currency"
 		ButtonState.CLICKED:
-			# Clicked state
+			# Clicked state (instant)
 			modulate = Color(0.8, 1.0, 0.8, 1.0)  # Light green
-			text = "Clicking..."
+			text = "Clicked!"
 		ButtonState.HELD:
 			# Held state
 			modulate = Color(1.0, 0.8, 0.6, 1.0)  # Light orange
