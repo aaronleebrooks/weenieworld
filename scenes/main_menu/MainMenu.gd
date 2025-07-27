@@ -35,9 +35,14 @@ func _on_quit_pressed():
 
 func update_continue_button():
 	# Check if save file exists and update continue button
-	if get_node("/root/SaveSystem").has_save_file():
+	var has_save = get_node("/root/SaveSystem").has_save_file()
+	print("Save file exists: ", has_save)
+	
+	if has_save:
 		continue_button.disabled = false
 		continue_button.text = "Continue"
+		continue_button.modulate = Color.WHITE
 	else:
 		continue_button.disabled = true
-		continue_button.text = "No Save Data" 
+		continue_button.text = "No Save Data"
+		continue_button.modulate = Color.GRAY 

@@ -38,9 +38,8 @@ func get_default_save_data() -> Dictionary:
 func load_save_data() -> Dictionary:
 	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.READ)
 	if file == null:
-		# No save file exists, create default data
+		# No save file exists, just return default data without saving
 		current_save_data = get_default_save_data()
-		save_game()
 		return current_save_data
 	
 	var json_string = file.get_as_text()
@@ -52,7 +51,6 @@ func load_save_data() -> Dictionary:
 	if parse_result != OK:
 		print("Failed to parse save file, creating new save data")
 		current_save_data = get_default_save_data()
-		save_game()
 		return current_save_data
 	
 	current_save_data = json.data
