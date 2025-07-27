@@ -115,15 +115,14 @@ func _on_hot_dogs_sold(amount: int, value: int):
 
 func _animate_click():
 	"""Animate squares for instant click"""
-	if not animation_square_1 or not animation_square_2:
-		print("AnimationManager: Cannot animate - squares not found")
+	if not animation_square_1:
+		print("AnimationManager: Cannot animate - yellow square not found")
 		return
 	
-	print("AnimationManager: Animating click - squares at positions: ", animation_square_1.position, ", ", animation_square_2.position)
+	print("AnimationManager: Animating click - yellow square at position: ", animation_square_1.position)
 	
-	# Quick pulse animation for instant clicks (shorter duration, smaller movement)
+	# Only animate yellow square for clicks (production)
 	_animate_square_pulse(animation_square_1, 0.1)  # Very quick pulse
-	_animate_square_pulse(animation_square_2, 0.1)  # Very quick pulse
 
 func _animate_hold_start():
 	"""Start hold animation"""
