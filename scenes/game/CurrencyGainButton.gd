@@ -10,13 +10,12 @@ var currency_manager: Node
 var is_pressed: bool = false
 var is_held: bool = false
 
-# Hold detection variables
-var _hold_timer_started: bool = false
-var _hold_start_time: int
-
 # Button states
 enum ButtonState {IDLE, CLICKED, HELD}
 var current_state: ButtonState = ButtonState.IDLE
+
+# Simple hold detection
+var hold_timer: Timer
 
 func _ready():
 	print("CurrencyGainButton: Initialized")
@@ -24,6 +23,13 @@ func _ready():
 	# Get references to managers
 	click_manager = get_node("/root/ClickManager")
 	currency_manager = get_node("/root/CurrencyManager")
+	
+	# Setup hold timer
+	hold_timer = Timer.new()
+	hold_timer.one_shot = true
+	hold_timer.wait_time = 0.1  # 100ms to distinguish click vs hold
+	hold_timer.timeout.connect(_on_hold_timer_timeout)
+	add_child(hold_timer)
 	
 	# Connect button signals
 	pressed.connect(_on_button_pressed)
@@ -69,63 +75,29 @@ func _update_responsive_layout():
 
 func _on_button_pressed():
 	"""Handle button press (single click)"""
+	# Cancel hold timer and start click action
+	hold_timer.stop()
 	if click_manager and not click_manager.is_action_in_progress():
-		# Start click action immediately for single clicks
 		click_manager.start_click_action()
-		# State will be updated by click_state_changed signal
 
 func _on_button_down():
 	"""Handle button down (start of hold)"""
 	is_pressed = true
-	# Don't start hold action immediately - wait for button_up to determine if it was a click or hold
+	# Start hold timer
+	hold_timer.start()
+
+func _on_hold_timer_timeout():
+	"""Handle hold timer timeout - start hold action"""
+	if is_pressed and click_manager and not click_manager.is_action_in_progress():
+		click_manager.start_hold_action()
 
 func _on_button_up():
 	"""Handle button up (end of press)"""
 	is_pressed = false
 	
-	# Reset hold timer
-	_hold_timer_started = false
-	
 	# Stop any ongoing actions
 	if click_manager:
 		click_manager.stop_click_action()
-
-func _input(event):
-	"""Handle input for hold detection"""
-	if not is_pressed:
-		return
-	
-	# Check if mouse is still over the button
-	if event is InputEventMouseMotion:
-		var mouse_pos = get_global_mouse_position()
-		var button_rect = get_global_rect()
-		
-		# If mouse leaves button while pressed, stop any actions
-		if not button_rect.has_point(mouse_pos):
-			if click_manager:
-				click_manager.stop_click_action()
-			return
-
-func _process(delta):
-	"""Process hold detection without requiring mouse movement"""
-	if is_pressed and not is_held and click_manager:
-		# Don't interfere if there's already an action in progress
-		if click_manager.is_action_in_progress():
-			return
-			
-		# Check if we've been holding for a short time
-		if not _hold_timer_started:
-			_hold_timer_started = true
-			_hold_start_time = Time.get_ticks_msec()
-		
-		var current_time = Time.get_ticks_msec()
-		var hold_duration = (current_time - _hold_start_time) / 1000.0
-		
-		if hold_duration >= 0.15:  # Reduced to 150ms for better responsiveness
-			print("CurrencyGainButton: Starting hold action (process)")
-			click_manager.start_hold_action()
-			# State will be updated by click_state_changed signal
-			_hold_timer_started = false
 
 func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 	"""Update button state based on click manager state"""
