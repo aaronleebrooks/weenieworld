@@ -1,7 +1,6 @@
 extends Node
 
 # Game state
-var current_scene: Node
 var game_data: Dictionary
 
 # Scene paths
@@ -17,9 +16,6 @@ signal scene_changed(scene_name: String)
 func _ready():
 	# Load initial save data
 	game_data = get_node("/root/SaveSystem").get_save_data()
-	
-	# Set up scene change handling
-	get_tree().current_scene_changed.connect(_on_scene_changed)
 
 # Start a new game
 func start_new_game():
@@ -38,10 +34,6 @@ func continue_game():
 
 # Change scene
 func change_scene(scene_path: String):
-	# Save current game state if in game scene
-	if current_scene and current_scene.scene_file_path == GAME_SCENE:
-		get_node("/root/SaveSystem").save_game()
-	
 	# Change scene
 	get_tree().change_scene_to_file(scene_path)
 
@@ -52,8 +44,7 @@ func return_to_main_menu():
 # Quit game
 func quit_game():
 	# Save before quitting
-	if current_scene and current_scene.scene_file_path == GAME_SCENE:
-		get_node("/root/SaveSystem").save_game()
+	get_node("/root/SaveSystem").save_game()
 	get_tree().quit()
 
 # Update game data
@@ -64,12 +55,6 @@ func update_game_data(key: String, value):
 # Get game data
 func get_game_data(key: String, default_value = null):
 	return game_data.get(key, default_value)
-
-# Handle scene changes
-func _on_scene_changed():
-	current_scene = get_tree().current_scene
-	if current_scene:
-		emit_signal("scene_changed", current_scene.scene_file_path)
 
 # Handle save data loaded
 func _on_save_data_loaded(data: Dictionary):

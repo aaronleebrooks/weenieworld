@@ -1,12 +1,14 @@
 [gd_scene load_steps=2 format=3 uid="uid://bqxvn8yqxqxqx"]
 
-[ext_resource type="Script" path="res://scenes/main_menu/MainMenu.gd" id="1_0x0x0"]
+[ext_resource type="Script" uid="uid://o73okp7076cm" path="res://scenes/main_menu/MainMenu.gd" id="1_0x0x0"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_0x0x0")
 
 [node name="Background" type="ColorRect" parent="."]
@@ -14,6 +16,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0.2, 0.2, 0.3, 1)
 
 [node name="Title" type="Label" parent="."]
@@ -25,6 +29,7 @@ offset_left = -100.0
 offset_top = 100.0
 offset_right = 100.0
 offset_bottom = 150.0
+grow_horizontal = 2
 text = "WeenieWorld"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -40,6 +45,8 @@ offset_left = -100.0
 offset_top = -100.0
 offset_right = 100.0
 offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="NewGameButton" type="Button" parent="MenuContainer"]
 layout_mode = 2
@@ -68,6 +75,8 @@ offset_left = -100.0
 offset_top = -30.0
 offset_right = -10.0
 offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
 text = "v1.0.0"
 horizontal_alignment = 2
-vertical_alignment = 2 
+vertical_alignment = 2
