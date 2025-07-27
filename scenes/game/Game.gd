@@ -19,6 +19,8 @@ var exit_dialog_open: bool = false
 # Tooltip management
 var tooltips_always_visible: bool = false
 var tooltip_toggle_button: Button
+var icon_labels: Dictionary = {}  # Store label nodes for each icon
+var icon_containers: Dictionary = {}  # Store container references
 
 func _ready():
 	print("Game: _ready() called")
@@ -64,11 +66,17 @@ func _create_tooltip_toggle():
 	tooltip_toggle_button.custom_minimum_size = Vector2(30, 30)
 	tooltip_toggle_button.pressed.connect(_on_tooltip_toggle_pressed)
 	
+	# Add styling to make it more visible
+	tooltip_toggle_button.add_theme_color_override("font_color", Color.WHITE)
+	tooltip_toggle_button.add_theme_color_override("font_hover_color", Color.YELLOW)
+	tooltip_toggle_button.tooltip_text = "Toggle tooltips"
+	
 	# Add to top-left menu
 	top_left_menu.add_child(tooltip_toggle_button)
 	top_left_menu.move_child(tooltip_toggle_button, 0)  # Move to top
 	
 	print("DEBUG: Tooltip toggle button created")
+	print("DEBUG: Tooltip toggle button connected to signal: ", tooltip_toggle_button.pressed.get_connections().size(), " connections")
 
 func _setup_currency_icon():
 	"""Setup currency icon as non-clickable with blue text"""
@@ -87,7 +95,43 @@ func _setup_tooltips():
 
 func _setup_icon_tooltip(icon: Button, tooltip_text: String):
 	"""Setup tooltip for a specific icon"""
+	# Set tooltip to show instantly
 	icon.tooltip_text = tooltip_text
+	
+	# Set tooltip to show immediately on hover (0 delay)
+	icon.add_theme_constant_override("tooltip_delay", 0)
+	
+	# Create HBoxContainer to group icon and label
+	var container = HBoxContainer.new()
+	container.add_theme_constant_override("separation", 5)  # Small gap between icon and label
+	
+	# Create label for header name
+	var label = Label.new()
+	label.text = tooltip_text
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 12)
+	label.add_theme_color_override("font_color", Color.WHITE)
+	label.visible = false  # Initially hidden
+	label.custom_minimum_size = Vector2(80, 0)  # Fixed width for label
+	
+	# Get the icon's current position in the menu
+	var icon_index = icon.get_index()
+	
+	# Remove icon from menu temporarily
+	top_left_menu.remove_child(icon)
+	
+	# Add icon and label to container
+	container.add_child(icon)
+	container.add_child(label)
+	
+	# Add container to menu at the same position
+	top_left_menu.add_child(container)
+	top_left_menu.move_child(container, icon_index)
+	
+	# Store references
+	icon_labels[icon] = label
+	icon_containers[icon] = container
 	
 	# Connect mouse enter/exit events for hover behavior
 	icon.mouse_entered.connect(_on_icon_mouse_entered.bind(icon))
@@ -96,34 +140,64 @@ func _setup_icon_tooltip(icon: Button, tooltip_text: String):
 	# Initially hide tooltip if not always visible
 	if not tooltips_always_visible:
 		icon.tooltip_text = ""
+	
+	print("DEBUG: Created container for icon: ", tooltip_text)
 
 func _on_tooltip_toggle_pressed():
 	"""Toggle tooltip visibility"""
+	print("DEBUG: Tooltip toggle button pressed!")
 	tooltips_always_visible = !tooltips_always_visible
 	
 	# Update toggle button appearance
 	if tooltips_always_visible:
 		tooltip_toggle_button.text = "▲"  # Up arrow
-		_show_all_tooltips()
+		_show_all_labels()
+		_disable_all_tooltips()  # Disable tooltips when labels are shown
+		print("DEBUG: Labels shown, tooltips disabled")
 	else:
 		tooltip_toggle_button.text = "▼"  # Down arrow
-		_hide_all_tooltips()
+		_hide_all_labels()
+		_enable_all_tooltips()  # Enable tooltips when labels are hidden
+		print("DEBUG: Labels hidden, tooltips enabled")
 	
 	print("DEBUG: Tooltips always visible: ", tooltips_always_visible)
 
-func _show_all_tooltips():
-	"""Show tooltips for all icons"""
-	currency_icon.tooltip_text = "Currency"
-	upgrade_icon.tooltip_text = "Upgrades"
-	save_icon.tooltip_text = "Save Game"
-	exit_icon.tooltip_text = "Exit Game"
+func _show_all_labels():
+	"""Show header name labels for all icons"""
+	for icon in icon_labels:
+		var label = icon_labels[icon]
+		if label:
+			label.visible = true
+	print("DEBUG: All labels shown")
 
-func _hide_all_tooltips():
-	"""Hide tooltips for all icons"""
-	currency_icon.tooltip_text = ""
-	upgrade_icon.tooltip_text = ""
-	save_icon.tooltip_text = ""
-	exit_icon.tooltip_text = ""
+func _hide_all_labels():
+	"""Hide header name labels for all icons"""
+	for icon in icon_labels:
+		var label = icon_labels[icon]
+		if label:
+			label.visible = false
+	print("DEBUG: All labels hidden")
+
+func _disable_all_tooltips():
+	"""Disable tooltips for all icons"""
+	for icon in icon_labels:
+		icon.tooltip_text = ""
+	print("DEBUG: All tooltips disabled")
+
+func _enable_all_tooltips():
+	"""Enable tooltips for all icons"""
+	for icon in icon_labels:
+		var tooltip_text = ""
+		if icon == currency_icon:
+			tooltip_text = "Currency"
+		elif icon == upgrade_icon:
+			tooltip_text = "Upgrades"
+		elif icon == save_icon:
+			tooltip_text = "Save Game"
+		elif icon == exit_icon:
+			tooltip_text = "Exit Game"
+		icon.tooltip_text = tooltip_text
+	print("DEBUG: All tooltips enabled")
 
 func _on_icon_mouse_entered(icon: Button):
 	"""Show tooltip on mouse enter if not always visible"""
@@ -139,11 +213,13 @@ func _on_icon_mouse_entered(icon: Button):
 			tooltip_text = "Exit Game"
 		
 		icon.tooltip_text = tooltip_text
+		print("DEBUG: Tooltip shown for icon: ", tooltip_text)
 
 func _on_icon_mouse_exited(icon: Button):
 	"""Hide tooltip on mouse exit if not always visible"""
 	if not tooltips_always_visible:
 		icon.tooltip_text = ""
+		print("DEBUG: Tooltip hidden for icon")
 
 func _on_viewport_size_changed():
 	print("Game: Viewport size changed")
@@ -170,8 +246,11 @@ func _update_responsive_layout():
 	# Update icon menu sizing
 	if top_left_menu:
 		var icon_size = max(30, min(viewport_size.x * 0.02, 50))  # 2% of viewport width
+		print("DEBUG: Processing ", top_left_menu.get_child_count(), " children in top_left_menu")
+		
 		for child in top_left_menu.get_children():
 			if child is Button:
+				# Handle standalone buttons (like tooltip toggle)
 				child.custom_minimum_size = Vector2(icon_size, icon_size)
 				child.add_theme_font_size_override("font_size", icon_size * 0.6)
 				
@@ -179,6 +258,21 @@ func _update_responsive_layout():
 				if child == tooltip_toggle_button:
 					child.add_theme_font_size_override("font_size", icon_size * 0.4)  # Smaller font for caret
 					print("DEBUG: Tooltip toggle button sized")
+			elif child is HBoxContainer:
+				# Handle icon-label containers
+				print("DEBUG: Processing HBoxContainer with ", child.get_child_count(), " children")
+				for container_child in child.get_children():
+					if container_child is Button:
+						# Icon button
+						container_child.custom_minimum_size = Vector2(icon_size, icon_size)
+						container_child.add_theme_font_size_override("font_size", icon_size * 0.6)
+						print("DEBUG: Icon sized in container: ", container_child.text)
+					elif container_child is Label:
+						# Label next to icon
+						var label_font_size = max(10, min(icon_size * 0.4, 14))  # Slightly larger font for labels
+						container_child.add_theme_font_size_override("font_size", label_font_size)
+						container_child.custom_minimum_size = Vector2(80, icon_size)  # Match icon height
+						print("DEBUG: Label sized in container: ", container_child.text)
 		
 		print("Game: Icon menu updated with percentage-based sizing")
 
