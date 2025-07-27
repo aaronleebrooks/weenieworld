@@ -55,5 +55,5 @@ func _update_display():
 	var currency_manager = get_node("/root/CurrencyManager")
 	if currency_manager and currency_label:
 		var formatted_currency = currency_manager.get_formatted_currency()
-		currency_label.text = "Currency: " + formatted_currency
+		currency_label.text = formatted_currency
 		# Don't log every update - too frequent 

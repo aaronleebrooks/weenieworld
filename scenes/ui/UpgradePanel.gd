@@ -5,6 +5,7 @@ extends Control
 
 @onready var upgrade_container = $UpgradeContainer
 @onready var back_button = $BackButton
+@onready var currency_display = $CurrencyDisplay
 
 var upgrade_manager: Node
 var currency_manager: Node
@@ -33,6 +34,9 @@ func _ready():
 	
 	# Create upgrade buttons
 	_create_upgrade_buttons()
+	
+	# Initial currency display update
+	_update_currency_display()
 
 func _create_upgrade_buttons():
 	"""Create buttons for all available upgrades"""
@@ -96,6 +100,7 @@ func _on_upgrade_button_pressed(upgrade_id: String):
 func _on_currency_changed(new_balance: int, change_amount: int):
 	"""Update button states when currency changes"""
 	_update_all_buttons()
+	_update_currency_display()
 
 func _on_upgrade_purchased(upgrade_id: String, level: int, cost: int):
 	"""Update buttons when an upgrade is purchased"""
@@ -110,6 +115,12 @@ func _update_all_buttons():
 			button.text = _get_upgrade_button_text(info["upgrade"])
 			button.disabled = not info.get("can_purchase", false)
 
+func _update_currency_display():
+	"""Update the currency display with current currency value"""
+	if currency_display and currency_manager:
+		var formatted_currency = currency_manager.get_formatted_currency()
+		currency_display.text = formatted_currency
+
 func _on_back_button_pressed():
 	"""Hide the upgrade panel"""
 	visible = false
@@ -117,4 +128,5 @@ func _on_back_button_pressed():
 func show_panel():
 	"""Show the upgrade panel and update buttons"""
 	visible = true
-	_update_all_buttons() 
+	_update_all_buttons()
+	_update_currency_display() 

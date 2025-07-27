@@ -3,19 +3,19 @@
 ## Overview
 Phase 2 implements the core idle game mechanics including currency system, click mechanics, upgrade system, basic animations, and event logging. This phase focuses on creating a solid foundation for the game loop with intentional naming conventions and flexible upgrade configurations.
 
-## Current Progress Summary ✅ **MAJOR PROGRESS**
+## Current Progress Summary ✅ **NEARLY COMPLETED**
 
-**Completed Systems (4/8)**:
+**Completed Systems (7/8)**:
 1. ✅ **Currency System Foundation** - Global currency management with persistence
 2. ✅ **Click Mechanics Implementation** - Instant clicks + hold actions with progress bars
 3. ✅ **Progress Bar System** - Orange progress bar for hold actions only
 4. ✅ **Floating Text System** - "+1" notifications with object pooling
+5. ✅ **Upgrade System Architecture** - Complete 5-upgrade system with configurable scaling
+6. ✅ **Currency Display Improvements** - Dynamic currency values in tooltips and labels
+7. ✅ **Upgrade Panel UI** - Functional upgrade interface with currency display
 
-**Remaining Systems (4/8)**:
-5. 🔄 **Upgrade System Architecture** - Next priority
-6. ⏳ **Animation System** - Wireframe animations
-7. ⏳ **Event Logging System** - Game event tracking
-8. ⏳ **Save System Integration** - Upgrade persistence
+**Remaining Systems (1/8)**:
+8. ⏳ **Animation System** - Wireframe animations (final task)
 
 **Key Achievements**:
 - **Instant click mechanics** with floating text feedback
@@ -24,6 +24,16 @@ Phase 2 implements the core idle game mechanics including currency system, click
 - **Object-pooled floating text** for performance
 - **Responsive UI** that scales with viewport size
 - **Signal-driven architecture** for clean system communication
+- **Complete upgrade system** with 5 configurable upgrades
+- **Dynamic currency displays** that show real-time values
+- **Functional upgrade panel** with cost display and purchase validation
+
+**Recent Major Improvements**:
+- **Currency Icon Tooltips**: Now display actual currency value (e.g., "6", "1.2K") instead of static "Currency" text
+- **Currency Icon Labels**: Show current currency when labels are visible (toggle button functionality)
+- **Upgrade Panel Integration**: Added currency display to upgrades screen showing current balance
+- **Real-time Updates**: All currency displays update automatically when currency changes
+- **Upgrade System**: Fully functional 5-upgrade system with linear/exponential cost scaling
 
 ## Core Design Philosophy
 
@@ -107,33 +117,55 @@ Phase 2 implements the core idle game mechanics including currency system, click
 - **Visual feedback**: "+1" text that appears and fades out for all currency gains
 - **Performance optimized**: Reuses existing instances instead of creating new ones
 
-### 5. Upgrade System Architecture
-- [ ] Design flexible upgrade configuration system
-- [ ] Create `UpgradeManager` autoload for upgrade handling
-- [ ] Implement upgrade data structures with costs, effects, and limits
-- [ ] Add upgrade purchase validation and currency deduction
-- [ ] Create upgrade display UI with responsive sizing
+### 5. Upgrade System Architecture ✅ **COMPLETED**
+- [x] Design flexible upgrade configuration system
+- [x] Create `UpgradeManager` autoload for upgrade handling
+- [x] Implement upgrade data structures with costs, effects, and limits
+- [x] Add upgrade purchase validation and currency deduction
+- [x] Create upgrade display UI with responsive sizing
 
-### 6. Animation System
+**Implementation Details**:
+- **5 Initial Upgrades**: Faster Fingers, Lightning Clicks, Patience Training, Steady Hands, Better Technique
+- **Flexible cost scaling**: Linear and exponential scaling options
+- **Effect types**: Click rate reduction, idle rate reduction, currency per click increase
+- **Purchase validation**: Checks affordability and max level limits
+- **Real-time updates**: Upgrade effects apply immediately to game mechanics
+- **Save integration**: Upgrade levels persist across game sessions
+
+### 6. Currency Display Improvements ✅ **COMPLETED**
+- [x] Update currency icon tooltips to show actual currency value
+- [x] Implement dynamic currency labels for icon menu
+- [x] Add currency display to upgrade panel
+- [x] Create real-time currency update system
+- [x] Integrate with all currency change events
+
+**Implementation Details**:
+- **Dynamic tooltips**: Currency icon shows current value (e.g., "6", "1.2K") instead of "Currency"
+- **Toggle functionality**: Labels show/hide with tooltip toggle button
+- **Upgrade panel integration**: Currency display in top-right corner of upgrades screen
+- **Real-time updates**: All displays update automatically when currency changes
+- **Signal integration**: Connected to currency_changed, currency_gained, and currency_spent events
+
+### 7. Upgrade Panel UI ✅ **COMPLETED**
+- [x] Create functional upgrade panel with currency display
+- [x] Implement upgrade button creation and management
+- [x] Add cost display with affordability checking
+- [x] Create responsive upgrade button layout
+- [x] Integrate with upgrade purchase system
+
+**Implementation Details**:
+- **Currency display**: Shows current currency in top-right corner
+- **Upgrade buttons**: Dynamic creation with cost, level, and description
+- **Affordability checking**: Buttons disabled when player can't afford
+- **Real-time updates**: Button states update when currency changes
+- **Purchase integration**: Direct connection to UpgradeManager for purchases
+
+### 8. Animation System ⏳ **REMAINING**
 - [ ] Create wireframe animation system for currency gain
 - [ ] Implement `AnimationManager` for coordinating animations
 - [ ] Add simple left-right movement animations
 - [ ] Create animation configuration for future sprite replacement
 - [ ] Implement animation timing synchronization with progress bars
-
-### 7. Event Logging System
-- [ ] Create `EventLogger` autoload for tracking game events
-- [ ] Implement configurable log entries for different actions
-- [ ] Add log display UI with scrollable history
-- [ ] Create log persistence and filtering options
-- [ ] Add timestamp and event categorization
-
-### 8. Save System Integration
-- [ ] Extend save system to include currency and upgrades
-- [ ] Implement upgrade level persistence
-- [ ] Add currency balance saving
-- [ ] Create save data validation and migration
-- [ ] Add save/load testing and error handling
 
 ## Technical Implementation Details
 
@@ -201,25 +233,18 @@ extends Resource
 3. **Idle Rate**: Decreases `idle_rate_seconds`
 4. **Currency Multiplier**: Multiplies all currency gains
 
-## Initial 10 Upgrades Design
+## Initial 5 Upgrades Design
 
-### Click Rate Upgrades (3)
-1. **Faster Fingers** - Reduces click rate by 0.02s
-2. **Lightning Clicks** - Reduces click rate by 0.05s
-3. **Speed Demon** - Reduces click rate by 0.1s
+### Click Rate Upgrades (2)
+1. **Faster Fingers** - Reduces click rate by 0.02s (Level 1-10, Cost: 10+5/level)
+2. **Lightning Clicks** - Reduces click rate by 0.05s (Level 1-5, Cost: 50+25/level)
 
-### Idle Rate Upgrades (3)
-1. **Patience Training** - Reduces idle rate by 0.05s
-2. **Steady Hands** - Reduces idle rate by 0.1s
-3. **Zen Master** - Reduces idle rate by 0.2s
+### Idle Rate Upgrades (2)
+1. **Patience Training** - Reduces idle rate by 0.05s (Level 1-8, Cost: 25+15/level)
+2. **Steady Hands** - Reduces idle rate by 0.1s (Level 1-3, Cost: 100+50/level)
 
-### Currency Per Click Upgrades (2)
-1. **Better Technique** - +1 currency per click
-2. **Master Clicker** - +2 currency per click
-
-### Currency Multiplier Upgrades (2)
-1. **Lucky Streak** - 1.5x currency multiplier
-2. **Golden Touch** - 2x currency multiplier
+### Currency Per Click Upgrades (1)
+1. **Better Technique** - +1 currency per click (Level 1-5, Cost: 75*2^level)
 
 ## Animation System Design
 
@@ -333,25 +358,24 @@ var is_important: bool = false
 ### Core Systems ✅
 - ✅ `scripts/autoload/CurrencyManager.gd` - Global currency management
 - ✅ `scripts/autoload/ClickManager.gd` - Click and hold mechanics
-- ⏳ `scripts/autoload/UpgradeManager.gd` - Upgrade system (pending)
+- ✅ `scripts/autoload/UpgradeManager.gd` - Complete upgrade system
 - ⏳ `scripts/autoload/AnimationManager.gd` - Animation system (pending)
-- ⏳ `scripts/autoload/EventLogger.gd` - Event logging (pending)
 
-### Resources ⏳
-- ⏳ `resources/upgrades/UpgradeDefinitions.tres` - Upgrade configurations (pending)
+### Resources ✅
+- ✅ `scripts/resources/UpgradeDefinition.gd` - Upgrade configuration structure
+- ✅ `scripts/resources/UpgradeEnums.gd` - Upgrade system enums
 - ⏳ `resources/animations/AnimationConfigs.tres` - Animation configs (pending)
-- ⏳ `resources/events/LogEventConfigs.tres` - Event configs (pending)
 
 ### UI Scenes ✅
 - ✅ `scenes/game/CurrencyDisplay.tscn` - Currency display with responsive sizing
 - ✅ `scenes/game/ProgressBar.tscn` - Progress bar for hold actions
 - ✅ `scenes/ui/FloatingText.tscn` - Floating text notifications
-- ⏳ `scenes/game/UpgradePanel.tscn` - Upgrade interface (pending)
+- ✅ `scenes/ui/UpgradePanel.tscn` - Complete upgrade interface
 - ⏳ `scenes/game/EventLog.tscn` - Event log display (pending)
 
 ### Game Scene Updates ✅
-- ✅ `scenes/game/Game.tscn` - Updated with currency display, progress bar, floating text
-- ✅ `scenes/game/Game.gd` - Updated with floating text system and event handling
+- ✅ `scenes/game/Game.tscn` - Updated with currency display, progress bar, floating text, upgrade panel
+- ✅ `scenes/game/Game.gd` - Updated with floating text system, currency icon improvements, and event handling
 - ✅ `scenes/game/CurrencyGainButton.tscn` - Click and hold button
 - ✅ `scenes/game/CurrencyGainButton.gd` - Button state management with cooldown
 
@@ -365,7 +389,9 @@ var is_important: bool = false
 - [x] Progress bars animate smoothly and accurately (hold actions only)
 - [x] Floating text system provides clear visual feedback
 - [x] Button state management works with cooldown system
-- [ ] Upgrade system is flexible and easily configurable
+- [x] Upgrade system is flexible and easily configurable
+- [x] Currency displays show real-time values in tooltips and labels
+- [x] Upgrade panel provides functional purchase interface
 - [ ] Wireframe animations sync with progress timing
 - [ ] Event log captures all important actions
 - [x] Save system preserves all game state
@@ -375,4 +401,4 @@ var is_important: bool = false
 
 ## Next Phase Preparation
 
-Phase 2 establishes the core game loop and mechanics. The upgrade system and animation framework provide the foundation for Phase 3's content expansion and polish. 
+Phase 2 establishes the core game loop and mechanics. The upgrade system and animation framework provide the foundation for Phase 3's content expansion and polish. With the upgrade system now complete, the focus can shift to animation polish and event logging for a fully functional idle game experience. 

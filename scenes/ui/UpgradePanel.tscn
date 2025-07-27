@@ -29,6 +29,20 @@ grow_horizontal = 2
 text = "Upgrades"
 horizontal_alignment = 1
 
+[node name="CurrencyDisplay" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -100.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 60.0
+grow_horizontal = 0
+text = "0"
+horizontal_alignment = 2
+vertical_alignment = 1
+
 [node name="UpgradeContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 8

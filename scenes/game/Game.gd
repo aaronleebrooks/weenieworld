@@ -47,6 +47,9 @@ func _ready():
 	if currency_manager:
 		currency_manager.currency_changed.connect(_on_currency_changed)
 		currency_manager.currency_gained.connect(_on_currency_gained)
+		currency_manager.currency_changed.connect(_update_currency_icon_display)
+		currency_manager.currency_gained.connect(_update_currency_icon_display)
+		currency_manager.currency_spent.connect(_update_currency_icon_display)
 	
 	# Connect to click manager for currency gain events
 	var click_manager = get_node("/root/ClickManager")
@@ -85,9 +88,30 @@ func _setup_currency_icon():
 	currency_icon.add_theme_color_override("font_disabled_color", Color.BLUE)
 	print("DEBUG: Currency icon set to non-clickable with blue text")
 
+func _get_currency_display_text() -> String:
+	"""Get the current currency value as formatted text"""
+	var currency_manager = get_node("/root/CurrencyManager")
+	if currency_manager:
+		return currency_manager.get_formatted_currency()
+	return "0"
+
+func _update_currency_icon_display(param1 = 0, param2 = ""):
+	"""Update the currency icon tooltip and label with current currency value"""
+	var currency_text = _get_currency_display_text()
+	
+	# Update tooltip if tooltips are enabled
+	if not tooltips_always_visible:
+		currency_icon.tooltip_text = currency_text
+	
+	# Update label if labels are visible
+	if icon_labels.has(currency_icon):
+		var label = icon_labels[currency_icon]
+		if label and label.visible:
+			label.text = currency_text
+
 func _setup_tooltips():
 	"""Setup tooltips for all icons"""
-	_setup_icon_tooltip(currency_icon, "Currency")
+	_setup_icon_tooltip(currency_icon, _get_currency_display_text())
 	_setup_icon_tooltip(upgrade_icon, "Upgrades")
 	_setup_icon_tooltip(save_icon, "Save Game")
 	_setup_icon_tooltip(exit_icon, "Exit Game")
@@ -168,6 +192,9 @@ func _show_all_labels():
 		var label = icon_labels[icon]
 		if label:
 			label.visible = true
+			# Update currency label with current value
+			if icon == currency_icon:
+				label.text = _get_currency_display_text()
 	print("DEBUG: All labels shown")
 
 func _hide_all_labels():
@@ -189,7 +216,7 @@ func _enable_all_tooltips():
 	for icon in icon_labels:
 		var tooltip_text = ""
 		if icon == currency_icon:
-			tooltip_text = "Currency"
+			tooltip_text = _get_currency_display_text()
 		elif icon == upgrade_icon:
 			tooltip_text = "Upgrades"
 		elif icon == save_icon:
@@ -204,7 +231,7 @@ func _on_icon_mouse_entered(icon: Button):
 	if not tooltips_always_visible:
 		var tooltip_text = ""
 		if icon == currency_icon:
-			tooltip_text = "Currency"
+			tooltip_text = _get_currency_display_text()
 		elif icon == upgrade_icon:
 			tooltip_text = "Upgrades"
 		elif icon == save_icon:
@@ -403,8 +430,9 @@ func _on_currency_gained(amount: int, source: String):
 
 func _on_click_completed(click_type: String, currency_gained: int):
 	"""Handle click completion events"""
-	# Show floating text for click completions
-	show_floating_text(currency_gained, get_currency_gain_position())
+	# Note: Floating text is already shown by _on_currency_gained
+	# No need to show it again here to avoid duplicates
+	pass
 
 func show_floating_text(amount: int, position: Vector2):
 	"""Show floating text for currency gain"""

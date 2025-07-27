@@ -254,8 +254,8 @@ Game (Control)
 - `scenes/ui/ConfirmationDialog.tscn/.gd` - Confirmation dialogs
 - `scenes/game/Game.tscn/.gd` - Placeholder game scene
 
-### Phase 2: Game Mechanics ✅ **MAJOR PROGRESS**
-**Status**: Core mechanics implemented, upgrade system pending
+### Phase 2: Game Mechanics ✅ **NEARLY COMPLETED**
+**Status**: Core mechanics implemented, upgrade system functional, UI polish needed
 
 **Completed Systems**:
 1. **Currency System** ✅ **COMPLETED**: Global currency management with persistence
@@ -263,21 +263,35 @@ Game (Control)
 3. **Progress Bar System** ✅ **COMPLETED**: Orange progress bar for hold actions only
 4. **Floating Text System** ✅ **COMPLETED**: "+1" notifications that fade out
 5. **Button State Management** ✅ **COMPLETED**: "Clicked!" text + cooldown system
+6. **Currency Display Improvements** ✅ **COMPLETED**: Dynamic currency values in tooltips and labels
+7. **Upgrade System Foundation** ✅ **COMPLETED**: 5-upgrade system with configurable scaling
+8. **Upgrade Panel UI** ✅ **COMPLETED**: Functional upgrade interface with currency display
 
 **Key Features Implemented**:
 - **Instant Clicks**: No progress bar, immediate currency gain
 - **Hold Actions**: 0.3s progress bar with continuous currency gain
-- **Currency Per Click**: Starts at 1, ready for upgrade system
+- **Currency Per Click**: Starts at 1, upgradeable through Better Technique
 - **Visual Feedback**: Button text changes + floating currency notifications
 - **Click Cooldown**: 200ms cooldown after holding to prevent accidental clicks
 - **Responsive UI**: All elements scale with viewport size
+- **Dynamic Currency Display**: Currency values show in tooltips and labels instead of static text
+- **Upgrade System**: 5 upgrades with linear/exponential cost scaling
+- **Upgrade Panel**: Functional interface showing upgrade costs and availability
+
+**Recent Improvements**:
+- **Currency Icon Tooltips**: Now show actual currency value instead of "Currency"
+- **Currency Icon Labels**: Display current currency when labels are visible
+- **Upgrade Panel Currency**: Shows current currency in top-right corner
+- **Real-time Updates**: All currency displays update automatically when currency changes
 
 **Technical Implementation**:
 - **ClickManager**: Handles instant clicks vs timed holds
-- **CurrencyManager**: Global currency with proper persistence
+- **CurrencyManager**: Global currency with proper persistence and formatting
 - **FloatingText**: Object-pooled currency gain notifications
 - **ProgressBar**: Only shows for hold actions (orange)
 - **CurrencyGainButton**: Smart state management with cooldown
+- **UpgradeManager**: Complete upgrade system with 5 configurable upgrades
+- **UpgradePanel**: Functional UI with currency display and upgrade buttons
 - **Signal-driven architecture**: Clean communication between systems
 
 **Naming Conventions Used**:
@@ -288,9 +302,9 @@ Game (Control)
 - `click_progress_timer` and `idle_progress_timer` (descriptive)
 
 **Remaining for Phase 2**:
-- **Upgrade System**: 5-upgrade system with configurable scaling
 - **Animation System**: Wireframe animations synchronized with game timing
 - **Event Logging**: Configurable log system for player actions
+- **UI Polish**: Final responsive design adjustments
 
 ### Phase 3: UI and Polish
 1. Create all menu scenes
