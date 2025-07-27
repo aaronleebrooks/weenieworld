@@ -70,11 +70,9 @@ func _update_responsive_layout():
 func _on_button_pressed():
 	"""Handle button press (single click)"""
 	if click_manager and not click_manager.is_action_in_progress():
-		# Only start click action if we're not already holding
-		if not is_held:
-			click_manager.start_click_action()
-			current_state = ButtonState.CLICKED
-			_update_visual_state()
+		# Start click action immediately for single clicks
+		click_manager.start_click_action()
+		# State will be updated by click_state_changed signal
 
 func _on_button_down():
 	"""Handle button down (start of hold)"""
@@ -106,21 +104,7 @@ func _input(event):
 		if not button_rect.has_point(mouse_pos):
 			if click_manager:
 				click_manager.stop_click_action()
-			is_held = false
-			current_state = ButtonState.IDLE
-			_update_visual_state()
 			return
-	
-	# Start hold action if button has been pressed for a short time
-	if is_pressed and not is_held and click_manager and not click_manager.is_action_in_progress():
-		# Use a timer to detect hold vs click
-		await get_tree().create_timer(0.2).timeout  # 200ms delay (increased for better click reliability)
-		if is_pressed and click_manager and not click_manager.is_action_in_progress():
-			print("CurrencyGainButton: Starting hold action")
-			click_manager.start_hold_action()
-			is_held = true
-			current_state = ButtonState.HELD
-			_update_visual_state()
 
 func _process(delta):
 	"""Process hold detection without requiring mouse movement"""
@@ -135,6 +119,8 @@ func _process(delta):
 		
 		if hold_duration >= 0.2:  # 200ms hold threshold (increased for better click reliability)
 			print("CurrencyGainButton: Starting hold action (process)")
+			# Stop any existing click action before starting hold
+			click_manager.stop_click_action()
 			click_manager.start_hold_action()
 			# State will be updated by click_state_changed signal
 			_hold_timer_started = false
