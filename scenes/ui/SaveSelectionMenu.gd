@@ -1,15 +1,58 @@
-extends "res://scripts/components/ResponsiveModal.gd"
+extends Control
 
 @onready var save_list = $MenuPanel/SaveList/SaveListContainer
 @onready var no_saves_label = $MenuPanel/SaveList/SaveListContainer/NoSavesLabel
 @onready var back_button = $MenuPanel/ButtonContainer/BackButton
+@onready var menu_panel = $MenuPanel
 
 var save_buttons = []
 var save_containers = []
+var main_menu = null
+
+# Responsive modal properties
+var min_width: float = 400.0
+var min_height: float = 300.0
+var max_width_percent: float = 0.8
+var max_height_percent: float = 0.8
 
 func _ready():
+	print("SaveSelectionMenu: _ready() called")
 	back_button.pressed.connect(_on_back_button_pressed)
+	
+	# Connect to viewport size changes using native event system
+	get_viewport().size_changed.connect(_on_viewport_size_changed)
+	
+	# Initial size update
+	_update_modal_size()
+	
 	populate_save_list()
+
+func _on_viewport_size_changed():
+	print("SaveSelectionMenu: Viewport size changed")
+	_update_modal_size()
+
+func _update_modal_size():
+	var viewport_size = get_viewport().get_visible_rect().size
+	print("SaveSelectionMenu: Viewport size = ", viewport_size)
+	
+	var target_width = min(viewport_size.x * max_width_percent, viewport_size.x - 100)
+	var target_height = min(viewport_size.y * max_height_percent, viewport_size.y - 100)
+	
+	# Ensure minimum size
+	target_width = max(target_width, min_width)
+	target_height = max(target_height, min_height)
+	
+	print("SaveSelectionMenu: Target size = ", Vector2(target_width, target_height))
+	
+	if menu_panel:
+		print("SaveSelectionMenu: Updating panel size")
+		menu_panel.offset_left = -target_width / 2
+		menu_panel.offset_top = -target_height / 2
+		menu_panel.offset_right = target_width / 2
+		menu_panel.offset_bottom = target_height / 2
+		print("SaveSelectionMenu: Panel offsets set to ", Vector4(menu_panel.offset_left, menu_panel.offset_top, menu_panel.offset_right, menu_panel.offset_bottom))
+	else:
+		print("SaveSelectionMenu: No menu_panel found")
 
 func populate_save_list():
 	print("Populating save list...")
