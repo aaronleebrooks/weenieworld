@@ -72,13 +72,6 @@ func add_manual_save_button():
 	save_button.position = Vector2(20, 100)
 	save_button.pressed.connect(_on_manual_save_pressed)
 	add_child(save_button)
-	
-	# Add test currency button
-	var currency_button = Button.new()
-	currency_button.text = "Gain 10 Currency"
-	currency_button.position = Vector2(20, 140)
-	currency_button.pressed.connect(_on_test_currency_pressed)
-	add_child(currency_button)
 
 func _on_manual_save_pressed():
 	print("Creating manual save...")
@@ -88,14 +81,7 @@ func _on_manual_save_pressed():
 	else:
 		print("Failed to create manual save!")
 
-func _on_test_currency_pressed():
-	print("Testing currency gain...")
-	var currency_manager = get_node("/root/CurrencyManager")
-	if currency_manager:
-		currency_manager.gain_currency(10, "test_button")
-		display_game_data()  # Update the display
-	else:
-		print("CurrencyManager not found!")
+
 
 func _input(event):
 	# Handle escape key to return to menu

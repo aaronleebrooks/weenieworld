@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://hxvn8yqxqxqx"]
+
+[ext_resource type="Script" path="res://scenes/game/CurrencyGainButton.gd" id="1_0x0x0"]
+
+[node name="CurrencyGainButton" type="Button"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -50.0
+offset_right = 100.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Gain Currency"
+script = ExtResource("1_0x0x0") 

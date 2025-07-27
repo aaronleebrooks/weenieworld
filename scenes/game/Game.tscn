@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://c8xvn8yqxqxqx"]
+[gd_scene load_steps=5 format=3 uid="uid://c8xvn8yqxqxqx"]
 
 [ext_resource type="Script" uid="uid://m4hu22y7axg6" path="res://scenes/game/Game.gd" id="1_0x0x0"]
-[ext_resource type="PackedScene" uid="uid://fxvn8yqxqxqx" path="res://scenes/game/CurrencyDisplay.tscn" id="2_0x0x0"]
+[ext_resource type="PackedScene" path="res://scenes/game/CurrencyDisplay.tscn" id="2_0x0x0"]
+[ext_resource type="PackedScene" uid="uid://gxvn8yqxqxqx" path="res://scenes/game/ProgressBar.tscn" id="3_0x0x0"]
+[ext_resource type="PackedScene" uid="uid://hxvn8yqxqxqx" path="res://scenes/game/CurrencyGainButton.tscn" id="4_0x0x0"]
 
 [node name="Game" type="Control"]
 layout_mode = 3
@@ -39,6 +41,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="CurrencyDisplay" parent="." instance=ExtResource("2_0x0x0")]
+layout_mode = 1
+
+[node name="ProgressBar" parent="." instance=ExtResource("3_0x0x0")]
+layout_mode = 1
+
+[node name="CurrencyGainButton" parent="." instance=ExtResource("4_0x0x0")]
 layout_mode = 1
 
 [node name="BackButton" type="Button" parent="."]

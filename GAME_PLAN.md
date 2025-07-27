@@ -258,9 +258,9 @@ Game (Control)
 **Status**: Planning and implementation phase
 
 **Core Systems**:
-1. **Currency System**: Global currency management with persistence
+1. **Currency System** ✅ **COMPLETED**: Global currency management with persistence
 2. **Click Mechanics**: Single-click and hold-to-click with progress bars
-3. **Upgrade System**: Flexible 10-upgrade system with configurable scaling
+3. **Upgrade System**: Flexible 5-upgrade system with configurable scaling
 4. **Animation System**: Wireframe animations synchronized with game timing
 5. **Event Logging**: Configurable log system for player actions
 
