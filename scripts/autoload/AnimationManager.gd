@@ -87,7 +87,7 @@ func _create_central_animation_squares():
 func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 	"""Handle click state changes"""
 	# If we were holding and now we're not, stop the hold animation
-	if not is_holding and (animation_square_1.has_meta("hold_tween") or animation_square_2.has_meta("hold_tween")):
+	if not is_holding and animation_square_1.has_meta("hold_tween"):
 		_animate_hold_complete()
 
 func _on_click_started(click_type: String):
@@ -126,24 +126,21 @@ func _animate_click():
 
 func _animate_hold_start():
 	"""Start hold animation"""
-	if not animation_square_1 or not animation_square_2:
+	if not animation_square_1:
 		return
 	
 	print("AnimationManager: Starting hold animation")
 	
-	# Start continuous hold animations
+	# Only animate yellow square for holds (production)
 	_start_continuous_hold_animation(animation_square_1, Vector2(-animation_distance * 0.3, 0))
-	_start_continuous_hold_animation(animation_square_2, Vector2(animation_distance * 0.3, 0))
 
 func _animate_hold_complete():
 	"""Complete hold animation"""
 	print("AnimationManager: Hold animation complete")
 	
-	# Stop continuous hold animations
+	# Stop continuous hold animation (only yellow square)
 	if animation_square_1:
 		_stop_continuous_hold_animation(animation_square_1)
-	if animation_square_2:
-		_stop_continuous_hold_animation(animation_square_2)
 
 func _start_continuous_hold_animation(square: ColorRect, target_offset: Vector2):
 	"""Start a continuous hold animation that repeats"""
