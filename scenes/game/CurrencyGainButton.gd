@@ -75,32 +75,50 @@ func _update_responsive_layout():
 
 func _on_button_pressed():
 	"""Handle button press (single click)"""
+	print("DEBUG: Button pressed signal received")
 	# Cancel hold timer and start click action
 	hold_timer.stop()
-	if click_manager and not click_manager.is_action_in_progress():
+	print("DEBUG: Hold timer stopped")
+	# Always try to start click action - let ClickManager handle conflicts
+	if click_manager:
+		print("DEBUG: Starting click action")
 		click_manager.start_click_action()
+	else:
+		print("DEBUG: No click_manager available")
 
 func _on_button_down():
 	"""Handle button down (start of hold)"""
+	print("DEBUG: Button down signal received")
 	is_pressed = true
 	# Start hold timer
 	hold_timer.start()
+	print("DEBUG: Hold timer started")
 
 func _on_hold_timer_timeout():
 	"""Handle hold timer timeout - start hold action"""
+	print("DEBUG: Hold timer timeout")
+	# Only start hold if we're still pressed and no action is in progress
 	if is_pressed and click_manager and not click_manager.is_action_in_progress():
+		print("DEBUG: Starting hold action")
 		click_manager.start_hold_action()
+	else:
+		print("DEBUG: Cannot start hold action - is_pressed: ", is_pressed, ", click_manager: ", click_manager != null, ", action_in_progress: ", click_manager.is_action_in_progress() if click_manager else "N/A")
 
 func _on_button_up():
 	"""Handle button up (end of press)"""
+	print("DEBUG: Button up signal received")
 	is_pressed = false
 	
 	# Stop any ongoing actions
 	if click_manager:
+		print("DEBUG: Stopping click actions")
 		click_manager.stop_click_action()
+	else:
+		print("DEBUG: No click_manager to stop actions")
 
 func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 	"""Update button state based on click manager state"""
+	print("DEBUG: Click state changed - is_clicking: ", is_clicking, ", is_holding: ", is_holding)
 	if is_clicking:
 		current_state = ButtonState.CLICKED
 		is_held = false
@@ -115,7 +133,7 @@ func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 
 func _on_click_completed(click_type: String, currency_gained: int):
 	"""Handle click completion"""
-	print("CurrencyGainButton: Click completed - ", click_type, " gained ", currency_gained, " currency")
+	print("DEBUG: Click completed - ", click_type, " gained ", currency_gained, " currency")
 	# Don't reset state here - let click_state_changed handle it
 	# This prevents conflicts with continuous holding
 

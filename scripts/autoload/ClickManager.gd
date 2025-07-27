@@ -75,10 +75,17 @@ func _update_timer_durations():
 
 func start_click_action() -> void:
 	"""Start a single-click currency gain action"""
-	if is_clicking or is_holding:
-		return  # Already in progress
+	print("DEBUG: ClickManager.start_click_action() called")
+	if is_clicking:
+		print("DEBUG: Cannot start click action - already clicking")
+		return  # Already clicking
 	
-	print("ClickManager: Starting click action")
+	# If we're holding, stop the hold and start click instead
+	if is_holding:
+		print("DEBUG: Stopping hold action to start click")
+		stop_click_action()
+	
+	print("DEBUG: ClickManager: Starting click action")
 	is_clicking = true
 	click_progress = 0.0
 	
@@ -195,7 +202,9 @@ func get_idle_progress() -> float:
 
 func is_action_in_progress() -> bool:
 	"""Check if any click action is currently in progress"""
-	return is_clicking or is_holding
+	var in_progress = is_clicking or is_holding
+	print("DEBUG: ClickManager.is_action_in_progress() = ", in_progress, " (is_clicking: ", is_clicking, ", is_holding: ", is_holding, ")")
+	return in_progress
 
 func get_current_action_type() -> String:
 	"""Get the type of action currently in progress"""
