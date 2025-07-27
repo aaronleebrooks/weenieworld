@@ -20,8 +20,13 @@ func _on_new_game_pressed():
 	get_node("/root/GameManager").start_new_game()
 
 func _on_continue_pressed():
-	print("Continuing game...")
-	get_node("/root/GameManager").continue_game()
+	print("Opening save selection menu...")
+	open_save_selection_menu()
+
+func open_save_selection_menu():
+	var save_menu_scene = preload("res://scenes/ui/SaveSelectionMenu.tscn")
+	var save_menu = save_menu_scene.instantiate()
+	add_child(save_menu)
 
 func _on_options_pressed():
 	print("Opening options...")
@@ -40,7 +45,7 @@ func update_continue_button():
 	
 	if has_save:
 		continue_button.disabled = false
-		continue_button.text = "Continue"
+		continue_button.text = "Load Game"
 		continue_button.modulate = Color.WHITE
 	else:
 		continue_button.disabled = true

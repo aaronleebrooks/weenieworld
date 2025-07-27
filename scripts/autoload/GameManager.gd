@@ -56,6 +56,11 @@ func update_game_data(key: String, value):
 func get_game_data(key: String, default_value = null):
 	return game_data.get(key, default_value)
 
+# Load a specific save
+func load_specific_save(save_info: Dictionary):
+	game_data = get_node("/root/SaveSystem").load_specific_save(save_info)
+	print("Loaded specific save: ", save_info["name"])
+
 # Handle save data loaded
 func _on_save_data_loaded(data: Dictionary):
 	game_data = data

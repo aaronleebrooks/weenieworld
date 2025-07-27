@@ -1,6 +1,8 @@
 extends Node
 
-const SAVE_FILE_PATH = "user://weenieworld_save.json"
+const SAVE_DIR = "user://saves/"
+const AUTO_SAVE_FILE = "autosave.json"
+const MANUAL_SAVE_PREFIX = "manual_save_"
 const AUTO_SAVE_INTERVAL = 30.0  # seconds
 
 var current_save_data: Dictionary
@@ -36,7 +38,9 @@ func get_default_save_data() -> Dictionary:
 
 # Load save data from file
 func load_save_data() -> Dictionary:
-	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.READ)
+	# Try to load autosave first
+	var autosave_path = SAVE_DIR + AUTO_SAVE_FILE
+	var file = FileAccess.open(autosave_path, FileAccess.READ)
 	if file == null:
 		# No save file exists, just return default data without saving
 		current_save_data = get_default_save_data()
@@ -57,11 +61,16 @@ func load_save_data() -> Dictionary:
 	emit_signal("save_data_loaded", current_save_data)
 	return current_save_data
 
-# Save current data to file
+# Save current data to file (autosave)
 func save_game() -> bool:
 	current_save_data["last_save_time"] = Time.get_datetime_string_from_system()
+	current_save_data["save_type"] = "autosave"
 	
-	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.WRITE)
+	# Ensure save directory exists
+	ensure_save_directory()
+	
+	var autosave_path = SAVE_DIR + AUTO_SAVE_FILE
+	var file = FileAccess.open(autosave_path, FileAccess.WRITE)
 	if file == null:
 		print("Failed to open save file for writing")
 		return false
@@ -89,13 +98,123 @@ func update_save_data(key: String, value) -> void:
 	current_save_data[key] = value
 	has_unsaved_changes = true
 
-# Check if save file exists
-func has_save_file() -> bool:
-	return FileAccess.file_exists(SAVE_FILE_PATH)
+# Ensure save directory exists
+func ensure_save_directory():
+	var dir = DirAccess.open("user://")
+	if not dir.dir_exists("saves"):
+		dir.make_dir("saves")
 
-# Delete save file
-func delete_save_file() -> bool:
-	if has_save_file():
-		var dir = DirAccess.open("user://")
-		return dir.remove("weenieworld_save.json")
-	return false 
+# Check if any save file exists
+func has_save_file() -> bool:
+	var autosave_path = SAVE_DIR + AUTO_SAVE_FILE
+	if FileAccess.file_exists(autosave_path):
+		return true
+	
+	# Check for manual saves
+	var dir = DirAccess.open(SAVE_DIR)
+	if dir == null:
+		return false
+	
+	dir.list_dir_begin()
+	var file_name = dir.get_next()
+	while file_name != "":
+		if file_name.begins_with(MANUAL_SAVE_PREFIX) and file_name.ends_with(".json"):
+			return true
+		file_name = dir.get_next()
+	
+	return false
+
+# Get list of available save files
+func get_save_files() -> Array:
+	var saves = []
+	
+	# Check autosave
+	var autosave_path = SAVE_DIR + AUTO_SAVE_FILE
+	if FileAccess.file_exists(autosave_path):
+		var autosave_data = load_save_file(autosave_path)
+		if autosave_data.has("last_save_time"):
+			saves.append({
+				"name": "Autosave",
+				"path": autosave_path,
+				"time": autosave_data["last_save_time"],
+				"type": "autosave"
+			})
+	
+	# Check manual saves
+	var dir = DirAccess.open(SAVE_DIR)
+	if dir != null:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		var manual_save_count = 0
+		
+		while file_name != "" and manual_save_count < 3:
+			if file_name.begins_with(MANUAL_SAVE_PREFIX) and file_name.ends_with(".json"):
+				var save_path = SAVE_DIR + file_name
+				var save_data = load_save_file(save_path)
+				if save_data.has("last_save_time"):
+					saves.append({
+						"name": "Manual Save " + str(manual_save_count + 1),
+						"path": save_path,
+						"time": save_data["last_save_time"],
+						"type": "manual"
+					})
+					manual_save_count += 1
+			file_name = dir.get_next()
+	
+	return saves
+
+# Load a specific save file
+func load_save_file(file_path: String) -> Dictionary:
+	var file = FileAccess.open(file_path, FileAccess.READ)
+	if file == null:
+		return {}
+	
+	var json_string = file.get_as_text()
+	file.close()
+	
+	var json = JSON.new()
+	var parse_result = json.parse(json_string)
+	
+	if parse_result != OK:
+		return {}
+	
+	return json.data
+
+# Load a specific save
+func load_specific_save(save_info: Dictionary) -> Dictionary:
+	if save_info.has("path"):
+		current_save_data = load_save_file(save_info["path"])
+		if current_save_data.is_empty():
+			current_save_data = get_default_save_data()
+		return current_save_data
+	return get_default_save_data()
+
+# Create manual save
+func create_manual_save() -> bool:
+	current_save_data["last_save_time"] = Time.get_datetime_string_from_system()
+	current_save_data["save_type"] = "manual"
+	
+	ensure_save_directory()
+	
+	# Find next available slot
+	var slot_number = 1
+	while slot_number <= 3:
+		var save_path = SAVE_DIR + MANUAL_SAVE_PREFIX + str(slot_number) + ".json"
+		if not FileAccess.file_exists(save_path):
+			break
+		slot_number += 1
+	
+	if slot_number > 3:
+		# Replace oldest manual save
+		slot_number = 1
+	
+	var save_path = SAVE_DIR + MANUAL_SAVE_PREFIX + str(slot_number) + ".json"
+	var file = FileAccess.open(save_path, FileAccess.WRITE)
+	if file == null:
+		return false
+	
+	var json_string = JSON.stringify(current_save_data, "\t")
+	file.store_string(json_string)
+	file.close()
+	
+	return true 
