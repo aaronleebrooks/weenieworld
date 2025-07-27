@@ -33,6 +33,17 @@ func _update_responsive_layout():
 	var viewport_size = get_viewport().get_visible_rect().size
 	print("MainMenu: Viewport size = ", viewport_size)
 	
+	# Calculate responsive font size based on viewport
+	var base_font_size = 24
+	var responsive_font_size = max(base_font_size, int(viewport_size.x * 0.015))  # 1.5% of viewport width
+	responsive_font_size = min(responsive_font_size, 48)  # Cap at 48px
+	
+	# Calculate responsive button size
+	var button_height = max(50, int(viewport_size.y * 0.04))  # 4% of viewport height
+	button_height = min(button_height, 80)  # Cap at 80px
+	
+	print("MainMenu: Responsive font size = ", responsive_font_size, ", button height = ", button_height)
+	
 	# Adjust menu container size based on viewport
 	var container_width = min(viewport_size.x * 0.4, 400)  # 40% of viewport or max 400px
 	var container_height = min(viewport_size.y * 0.3, 300)  # 30% of viewport or max 300px
@@ -48,14 +59,21 @@ func _update_responsive_layout():
 		menu_container.offset_top = -container_height / 2
 		menu_container.offset_right = container_width / 2
 		menu_container.offset_bottom = container_height / 2
-		print("MainMenu: Menu container updated")
+		
+		# Update button sizes and font sizes
+		for button in [new_game_button, continue_button, options_button, quit_button]:
+			button.custom_minimum_size = Vector2(0, button_height)
+			button.add_theme_font_size_override("font_size", responsive_font_size)
+		
+		print("MainMenu: Menu container and buttons updated")
 	
-	# Adjust title position
+	# Adjust title position and font size
 	if title:
 		var title_width = min(viewport_size.x * 0.3, 300)
 		title_width = max(title_width, 150)
 		title.offset_left = -title_width / 2
 		title.offset_right = title_width / 2
+		title.add_theme_font_size_override("font_size", responsive_font_size + 8)  # Title slightly larger
 		print("MainMenu: Title updated")
 
 func _on_new_game_pressed():
