@@ -77,8 +77,6 @@ func _ready():
 	var animation_manager = get_node("/root/AnimationManager")
 	if animation_manager:
 		animation_manager._create_central_animation_squares()
-		# Make sure squares are visible
-		animation_manager.make_squares_visible()
 
 func _create_tooltip_toggle():
 	"""Create tooltip toggle button"""
