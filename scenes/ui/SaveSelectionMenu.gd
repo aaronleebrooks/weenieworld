@@ -30,12 +30,15 @@ func populate_save_list():
 	# Create containers for each save file
 	for save_info in save_files:
 		var save_container = HBoxContainer.new()
-		save_container.custom_minimum_size = Vector2(0, 60)
+		save_container.custom_minimum_size = Vector2(0, 70)
+		save_container.add_theme_constant_override("separation", 10)
 		
 		# Create load button
 		var load_button = Button.new()
-		load_button.text = save_info["name"] + "\n" + save_info["time"]
+		var formatted_time = format_timestamp(save_info["time"])
+		load_button.text = save_info["name"] + "\n" + formatted_time
 		load_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		load_button.custom_minimum_size = Vector2(0, 60)
 		load_button.pressed.connect(_on_save_selected.bind(save_info))
 		save_container.add_child(load_button)
 		save_buttons.append(load_button)
@@ -43,7 +46,9 @@ func populate_save_list():
 		# Create delete button
 		var delete_button = Button.new()
 		delete_button.text = "X"
-		delete_button.custom_minimum_size = Vector2(40, 0)
+		delete_button.custom_minimum_size = Vector2(50, 60)
+		delete_button.add_theme_color_override("font_color", Color.RED)
+		delete_button.add_theme_color_override("font_hover_color", Color.RED)
 		delete_button.pressed.connect(_on_delete_save_pressed.bind(save_info))
 		save_container.add_child(delete_button)
 		
@@ -77,9 +82,31 @@ func _on_delete_confirmed(save_info: Dictionary):
 	var success = get_node("/root/SaveSystem").delete_save_file(save_info)
 	if success:
 		print("Save deleted successfully!")
-		populate_save_list()  # Refresh the list
+		# Refresh the list and check if we need to show "No saves" message
+		populate_save_list()
+		
+		# If no saves left, update the main menu's continue button
+		if not get_node("/root/SaveSystem").has_save_file():
+			# Find the main menu and update its continue button
+			var main_menu = get_parent()
+			if main_menu.has_method("update_continue_button"):
+				main_menu.update_continue_button()
 	else:
 		print("Failed to delete save!")
+
+func format_timestamp(timestamp: String) -> String:
+	# Convert ISO timestamp to readable format
+	if timestamp.is_empty():
+		return "Unknown time"
+	
+	# Try to parse the timestamp and format it nicely
+	var parts = timestamp.split("T")
+	if parts.size() >= 2:
+		var date_part = parts[0]
+		var time_part = parts[1].split(".")[0]  # Remove milliseconds
+		return date_part + " " + time_part
+	
+	return timestamp
 
 func _on_delete_cancelled():
 	print("Delete cancelled")

@@ -12,6 +12,10 @@ func _ready():
 	no_button.pressed.connect(_on_no_pressed)
 	yes_button.pressed.connect(_on_yes_pressed)
 	
+	# Style the buttons
+	no_button.add_theme_color_override("font_color", Color.WHITE)
+	yes_button.add_theme_color_override("font_color", Color.RED)
+	
 	# Set focus to No button (primary action)
 	no_button.grab_focus()
 
