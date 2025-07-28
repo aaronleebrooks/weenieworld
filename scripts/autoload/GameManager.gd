@@ -45,6 +45,11 @@ func start_new_game():
 func start_new_game_with_name(truck_name: String):
 	print("GameManager: Starting new game with truck name: ", truck_name)
 	
+	# Reset animation system first
+	var animation_manager = get_node_or_null("/root/AnimationManager")
+	if animation_manager:
+		animation_manager.reset_animations()
+	
 	# Create new game by resetting all managers
 	if save_system:
 		save_system.create_new_game_with_name(truck_name)

@@ -128,7 +128,7 @@ func spend_currency(amount: int, reason: String = "unknown") -> bool:
 	if currency_balance >= amount:
 		currency_balance -= amount
 		emit_signal("currency_spent", amount, reason)
-		print("HotDogManager: Spent %d currency for %s (new balance: %d)" % [reason, amount, currency_balance])
+		print("HotDogManager: Spent %d currency for %s (new balance: %d)" % [amount, reason, currency_balance])
 		return true
 	else:
 		print("HotDogManager: Insufficient currency for %s (need %d, have %d)" % [reason, amount, currency_balance])

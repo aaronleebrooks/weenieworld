@@ -64,6 +64,9 @@ func _create_central_animation_squares():
 	"""Create the two animation squares at the bottom center of the screen"""
 	print("AnimationManager: Creating animation squares")
 	
+	# Clean up any existing squares first
+	_cleanup_animation_squares()
+	
 	# Get the current scene to add squares to
 	var current_scene = get_tree().current_scene
 	if not current_scene:
@@ -95,6 +98,29 @@ func _create_central_animation_squares():
 	print("AnimationManager: Created sales square at position: ", sales_square.position)
 	
 	print("AnimationManager: Animation squares created at bottom center")
+
+func _cleanup_animation_squares():
+	"""Clean up existing animation squares to prevent memory leaks"""
+	print("AnimationManager: Cleaning up animation squares")
+	
+	# Kill any active tweens
+	if production_square:
+		_kill_tween(production_square, "hold_tween")
+		_kill_tween(production_square, "pulse_tween")
+		_kill_tween(production_square, "production_tween")
+		if production_square.get_parent():
+			production_square.get_parent().remove_child(production_square)
+		production_square.queue_free()
+		production_square = null
+	
+	if sales_square:
+		_kill_tween(sales_square, "hold_tween")
+		_kill_tween(sales_square, "pulse_tween")
+		_kill_tween(sales_square, "production_tween")
+		if sales_square.get_parent():
+			sales_square.get_parent().remove_child(sales_square)
+		sales_square.queue_free()
+		sales_square = null
 
 func _create_square(color: Color, size: Vector2, position: Vector2, parent: Node) -> ColorRect:
 	"""Helper function to create a square with consistent properties"""
@@ -271,3 +297,8 @@ func _reset_square_state(square: ColorRect):
 		square.position = production_square_original_position
 	elif square == sales_square:
 		square.position = sales_square_original_position
+
+func reset_animations():
+	"""Reset animation system for new game"""
+	print("AnimationManager: Resetting animation system")
+	_cleanup_animation_squares()
