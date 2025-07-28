@@ -41,6 +41,12 @@ func _return_floating_text(floating_text: Node):
 	if active_floating_texts.has(floating_text):
 		active_floating_texts.erase(floating_text)
 		floating_text_pool.append(floating_text)
+		
+		# Reparent back to FloatingTextManager
+		if floating_text.get_parent() != self:
+			floating_text.get_parent().remove_child(floating_text)
+			add_child(floating_text)
+		
 		floating_text.visible = false
 
 func show_hot_dog_gain(amount: int, hot_dog_display: Node):
@@ -50,9 +56,11 @@ func show_hot_dog_gain(amount: int, hot_dog_display: Node):
 		print("ERROR: FloatingTextManager: Could not get floating text from pool!")
 		return
 	
-	# Add to the hot dog display's floating text container
+	# Move to the hot dog display's floating text container
 	var container = hot_dog_display.get_node_or_null("FloatingTextContainer")
 	if container:
+		# Reparent the floating text to the container
+		floating_text.get_parent().remove_child(floating_text)
 		container.add_child(floating_text)
 		# Position at center of container
 		floating_text.position = Vector2(container.size.x / 2, container.size.y / 2)
@@ -68,9 +76,11 @@ func show_currency_gain(amount: int, currency_display: Node):
 		print("ERROR: FloatingTextManager: Could not get floating text from pool!")
 		return
 	
-	# Add to the currency display's floating text container
+	# Move to the currency display's floating text container
 	var container = currency_display.get_node_or_null("FloatingTextContainer")
 	if container:
+		# Reparent the floating text to the container
+		floating_text.get_parent().remove_child(floating_text)
 		container.add_child(floating_text)
 		# Position at center of container
 		floating_text.position = Vector2(container.size.x / 2, container.size.y / 2)
