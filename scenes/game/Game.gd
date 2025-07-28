@@ -52,6 +52,10 @@ func _ready():
 	# Setup tooltips for icons
 	_setup_tooltips()
 	
+	# Set initial toggle button state
+	if toggle_labels_icon:
+		toggle_labels_icon.text = ">" if tooltips_visible else "<"
+	
 	# Connect to viewport size changes using native event system
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
 	
@@ -238,15 +242,13 @@ func _on_tooltip_toggle_pressed():
 	if toggle_labels_icon:
 		toggle_labels_icon.text = ">" if tooltips_visible else "<"
 	
-	# Update other icon visibility (only backgrounds, never show text)
-	if currency_icon:
-		currency_icon.visible = tooltips_visible
+	# Update button labels visibility
 	if upgrade_icon:
-		upgrade_icon.visible = tooltips_visible
+		upgrade_icon.text = "⚡" if tooltips_visible else ""
 	if save_icon:
-		save_icon.visible = tooltips_visible
+		save_icon.text = "💾" if tooltips_visible else ""
 	if exit_icon:
-		exit_icon.visible = tooltips_visible
+		exit_icon.text = "🚪" if tooltips_visible else ""
 	
 	print("Game: Tooltips toggled - visible: ", tooltips_visible)
 
