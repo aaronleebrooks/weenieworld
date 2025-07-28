@@ -8,6 +8,7 @@ extends Control
 @onready var upgrade_icon = $TopLeftMenu/UpgradeIcon
 @onready var save_icon = $TopLeftMenu/SaveIcon
 @onready var exit_icon = $TopLeftMenu/ExitIcon
+@onready var toggle_labels_icon = $TopLeftMenu/ToggleLabelsIcon
 @onready var hot_dog_display = $HotDogDisplay
 @onready var currency_display = $CurrencyDisplay
 @onready var upgrade_panel = $UpgradePanel
@@ -42,6 +43,7 @@ func _ready():
 	upgrade_icon.pressed.connect(_on_upgrade_icon_pressed)
 	save_icon.pressed.connect(_on_save_icon_pressed)
 	exit_icon.pressed.connect(_on_exit_icon_pressed)
+	toggle_labels_icon.pressed.connect(_on_toggle_labels_icon_pressed)
 	
 
 	
@@ -225,6 +227,8 @@ func _setup_tooltips():
 		save_icon.tooltip_text = "Save Game"
 	if exit_icon:
 		exit_icon.tooltip_text = "Exit to Menu"
+	if toggle_labels_icon:
+		toggle_labels_icon.tooltip_text = "Toggle Labels"
 
 func _on_viewport_size_changed():
 	"""Handle viewport size changes for responsive design"""
@@ -254,6 +258,8 @@ func _on_tooltip_toggle_pressed():
 		save_icon.text = "💾" if tooltips_visible else ""
 	if exit_icon:
 		exit_icon.text = "❌" if tooltips_visible else ""
+	if toggle_labels_icon:
+		toggle_labels_icon.text = "^" if tooltips_visible else ""
 	
 	print("Game: Tooltips toggled - visible: ", tooltips_visible)
 
@@ -346,6 +352,11 @@ func _on_save_icon_pressed():
 		# Add save event to event log
 		if event_log_manager:
 			event_log_manager.add_save_event("manual")
+
+func _on_toggle_labels_icon_pressed():
+	"""Handle toggle labels icon press"""
+	print("Game: Toggle labels icon pressed")
+	_on_tooltip_toggle_pressed()
 
 
 
