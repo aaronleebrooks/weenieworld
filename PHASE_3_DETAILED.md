@@ -117,25 +117,26 @@ Phase 3 implements the core identity system for "Alien Hot Dog Food Truck" inclu
 
 ## Phase 3B: Office Purchase System 🏢 **PRIORITY 2**
 
-### Strategic Questions for Priority 2 🎯
+### Strategic Questions for Priority 2 🎯 **✅ DECIDED**
 
 **Office Purchase Mechanics:**
-1. **Cost Structure**: What should the office cost? (Suggested: 1000 currency)
-2. **Prerequisites**: Should there be any requirements before office purchase? (e.g., minimum hot dogs sold, currency earned)
-3. **Purchase Location**: Where should the office purchase option appear? (Upgrade panel, new menu section, main game UI)
-4. **Visual Feedback**: How should the office purchase be presented? (Modal, dedicated scene, inline purchase)
+- **Cost**: 1000 currency (fixed amount)
+- **Prerequisites**: Appears after earning 100 currency for the first time
+- **Location**: Upgrade panel "Stations" section (inline purchase)
+- **Purchase**: Instant, no confirmation modal
+- **Feedback**: In-game event log system (needs implementation)
 
 **Menu System Integration:**
-5. **Stations Menu**: Should "Stations" be a new main menu section or a submenu?
-6. **Menu Navigation**: How should players navigate between different station types?
-7. **Unlock Progression**: Should stations unlock in a specific order or allow multiple paths?
-8. **Status Indicators**: What visual indicators should show station status? (Locked/Unlocked/Active/Upgraded)
+- **Office Button**: New main menu button (like "Upgrades")
+- **Navigation**: Arrow button on main screen + station map
+- **Worker System**: Hire workers (10, 100, 1000 currency), max 2 initially
+- **Assignments**: Kitchen (auto-clicker) or Office (auto-buyer)
 
 **Office Functionality:**
-9. **Office Benefits**: What immediate benefits does the office provide beyond unlocking stations?
-10. **Office Upgrades**: Should the office itself be upgradeable? (Capacity, efficiency, etc.)
-11. **Office Management**: Should there be an office management interface or just purchase and forget?
-12. **Integration**: How should the office integrate with existing systems? (Save system, UI updates, etc.)
+- **Benefits**: Gateway to worker system and idle progression
+- **Management**: Worker assignment interface (Magic Research game style)
+- **Upgrades**: Increase worker limit, eventually autobuy settings
+- **Integration**: Save system tracks office, workers, assignments
 
 ### 2.1 Office Purchase Interface
 - [ ] Create `OfficeMenu.tscn` scene for office management
@@ -143,15 +144,19 @@ Phase 3 implements the core identity system for "Alien Hot Dog Food Truck" inclu
 - [ ] Add office description and benefits display
 - [ ] Create unlock notification system
 - [ ] Add office status to main game UI
+- [ ] Implement in-game event log system for purchase feedback
 
 **Implementation Details**:
-- **Purchase Cost**: 1000 currency (adjustable)
+- **Purchase Cost**: 1000 currency (fixed)
+- **Prerequisites**: Appears after earning 100 currency
 - **Description**: "A place to focus. Unlock the ability to add stations to [Truck Name]"
 - **Unlock Effects**: 
   - New menu section: "Stations"
-  - Laboratory station access
-  - Research system activation
+  - Worker hiring system
+  - Auto-clicker and auto-buyer capabilities
+  - Laboratory station access (future)
 - **Status Display**: Office status indicator in main UI
+- **Event Log**: Purchase feedback in in-game event log
 
 ### 2.2 Menu System Updates
 - [ ] Add "Stations" section to main menu
@@ -159,6 +164,24 @@ Phase 3 implements the core identity system for "Alien Hot Dog Food Truck" inclu
 - [ ] Implement station unlock progression
 - [ ] Add station status indicators
 - [ ] Create station navigation system
+- [ ] Add office button to main game UI
+- [ ] Implement arrow navigation between stations
+
+### 2.3 Worker System Implementation
+- [ ] Create `WorkerManager.gd` autoload for worker management
+- [ ] Implement worker hiring system (10, 100, 1000 currency)
+- [ ] Add worker assignment interface (Kitchen/Office)
+- [ ] Create auto-clicker functionality for kitchen workers
+- [ ] Implement auto-buyer functionality for office workers
+- [ ] Add worker quota monitoring (1 hot dog per second per worker)
+- [ ] Create worker status indicators and warnings
+
+### 2.4 Event Log System
+- [ ] Create `EventLogManager.gd` autoload for event tracking
+- [ ] Implement in-game event log UI
+- [ ] Add event types (purchases, achievements, notifications)
+- [ ] Create event log display in main game UI
+- [ ] Add event persistence and save/load integration
 
 **Implementation Details**:
 - **Menu Structure**: Main Menu → Stations → [Station Type]

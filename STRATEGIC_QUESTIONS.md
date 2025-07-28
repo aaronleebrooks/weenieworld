@@ -373,3 +373,100 @@ There will also be a hex crawl element as you explore for new locations for your
 - Event frequency and balance parameters
 
 This document will be updated as decisions are made and new questions arise during development. 
+
+
+## Phase 3 Priority 2 Decisions - Office Purchase System 🏢
+
+🏢 Office Purchase Mechanics:
+1. Cost Structure & Prerequisites:
+- **Office Cost**: 1000 currency (fixed amount)
+- **Debug Requirement**: Need debug button to give 1000 currency for testing
+- **Prerequisites**: Only appears after earning 100 currency for the first time
+- **Cost Scaling**: Fixed amount, no scaling with existing upgrades
+
+2. Purchase Location & UI:
+- **Location**: In existing upgrade panel at the bottom in a "Stations" section
+- **Presentation**: Same style as other upgrades (inline purchase)
+- **Visual Style**: Consistent with existing upgrade UI
+
+3. Purchase Flow:
+- **Confirmation**: No confirmation modal needed
+- **Purchase Type**: Instant purchase
+- **Feedback**: Visible in in-game event log (needs implementation - add to phase document)
+📋 Menu System Integration:
+4. Stations Menu Structure:
+- **Office Button**: New button for office access (like "Upgrades")
+- **Navigation**: Arrow button on main screen to access office
+- **Worker System**: 
+  - Hire workers for increasing costs: 10, 100, 1000 currency
+  - Maximum 2 workers initially (upgradeable)
+  - Workers consume 1 hot dog per second each
+  - Workers can be assigned to different stations
+- **Worker Assignments**:
+  - Kitchen: Auto-clicker on slow timer (slower than manual holding)
+  - Office: Auto-buyer for lowest affordable upgrade on interval
+- **Station Navigation**: Big station map with clickable rooms
+- **Kitchen Integration**: Current game screen becomes kitchen with key rate displays
+
+5. Unlock Progression:
+- **Order**: Kitchen (start) → Office → Laboratory (3000 currency)
+- **Available After Office**: Kitchen and Office stations
+- **Milestone Requirements**: Laboratory unlocks at 3000 currency
+
+6. Visual Status Indicators:
+- **Normal State**: White outline for operational stations
+- **Warning State**: Red outline when worker needs cannot be met (hot dog quota)
+- **Notification**: Exclamation mark when affordable upgrades available
+- **Worker Status**: Workers turned off when quota cannot be met
+⚙️ Office Functionality:
+7. Office Benefits:
+Beyond unlocking stations, what immediate benefits should the office provide?
+A) Small currency bonus (e.g., +5% to all sales)
+B) Unlock new upgrade categories
+C) Provide a "management bonus" to existing systems
+D) Just be a gateway to other systems (no direct benefits)
+8. Office Management:
+Should the office itself be upgradeable? (Capacity, efficiency, etc.) Yes, you should be able the ability to hire more workers than the initial 3.
+Should there be an office management interface or just "purchase and forget"? You should be able to eventually upgrade into autobuying setting, but they are hardset in the beginning.
+Should the office have any ongoing costs or maintenance? Just the costs of any worker assigned to the office.
+9. Integration with Existing Systems:
+How should the office integrate with the save system? Office purchases should be registered in the save. Since the game will mostly be a lot of things purchased and upgradedetc, I don't think the office purchases should be unique. I think we will want ot track the upgrades, the settings, and how many workers are currently assgined there. 
+Should it affect any existing UI elements or just add new ones? New ones.
+How should it work with the truck naming system (e.g., "Office of [Truck Name]")? Nothing specifically for now.
+�� Visual Design & UX:
+10. Office Theme & Aesthetics:
+Should the office have an alien theme to match the truck naming? It should be fairly normal if not plain. This is the start of the game so things should get cooler as you go along.
+What visual style should the office interface have? It should be a guy at a desk, typing away in the background. For the settings, I am thinking of the magic Research game how you assign researchers plus a button to purchase a worker.
+Should there be any background animations or effects? Yes, there should be a sound effect played as you purchase a new worker, or as you change the worker assignments.
+11. Accessibility & Usability:
+How should the office be discoverable to new players? there should be an exclamation mark on the upgrade store showing new purchases available.
+Should there be tooltips or help text explaining the office system? Yes, there should be an info icon that shows an explanation modal for each station.
+How should it integrate with the existing game flow? It will allow the player to assign workers as autoclickers to start idle progression
+
+## ✅ Priority 2 Implementation Decisions Summary
+
+### 🏢 Office Purchase System - Final Decisions:
+- **Cost**: 1000 currency (fixed)
+- **Prerequisites**: Appears after earning 100 currency
+- **Location**: Upgrade panel "Stations" section
+- **Purchase**: Instant, no confirmation
+- **Feedback**: In-game event log
+
+### 👥 Worker System:
+- **Costs**: 10, 100, 1000 currency (increasing)
+- **Max Workers**: 2 initially (upgradeable)
+- **Consumption**: 1 hot dog per second per worker
+- **Assignments**: Kitchen (auto-clicker) or Office (auto-buyer)
+
+### 🎮 UI/UX:
+- **Office Button**: New main menu button
+- **Navigation**: Arrow button on main screen
+- **Theme**: Normal/plain (gets cooler later)
+- **Discovery**: Exclamation mark on upgrade store
+- **Help**: Info icon with explanation modals
+
+### 🔧 Technical Requirements:
+- **Event Log System**: Needs implementation
+- **Worker Manager**: New autoload for worker management
+- **Station System**: Foundation for future stations
+- **Save Integration**: Track office, workers, assignments
