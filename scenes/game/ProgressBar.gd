@@ -50,12 +50,9 @@ func _on_click_progress_updated(progress: float, click_type: String):
 		current_progress = progress
 		_update_progress_display()
 		visible = true
-		print("ProgressBar: Progress updated to %.1f%%" % (progress * 100))
 
 func _on_click_completed(click_type: String, hot_dogs_produced: int):
 	"""Handle click completion"""
-	print("ProgressBar: Click completed - ", click_type, " produced ", hot_dogs_produced, " hot dogs")
-	
 	# Hide progress bar when click is complete
 	visible = false
 	current_progress = 0.0
@@ -68,13 +65,11 @@ func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 		visible = true
 		current_progress = 0.0
 		_update_progress_display()
-		print("ProgressBar: Hold started, showing progress bar")
 	elif not is_clicking and not is_holding:
 		# Hide progress bar when no action is in progress
 		visible = false
 		current_progress = 0.0
 		_update_progress_display()
-		print("ProgressBar: No action in progress, hiding progress bar")
 
 func _update_progress_display():
 	"""Update the visual progress bar"""

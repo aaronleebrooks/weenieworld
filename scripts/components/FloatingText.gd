@@ -29,8 +29,8 @@ func show_hot_dog_gain(amount: int, position: Vector2):
 	label.text = "+%d" % amount
 	label.modulate = Color(0.8, 0.6, 0.2, 1.0)  # Orange for hot dogs
 	
-	# Position the text
-	global_position = position
+	# Position the text (local position within parent)
+	position = position
 	
 	# Reset appearance
 	modulate = Color.WHITE
@@ -45,8 +45,8 @@ func show_currency_gain(amount: int, position: Vector2):
 	label.text = "+$%d" % amount
 	label.modulate = Color(0.2, 0.8, 0.2, 1.0)  # Green for currency
 	
-	# Position the text
-	global_position = position
+	# Position the text (local position within parent)
+	position = position
 	
 	# Reset appearance
 	modulate = Color.WHITE
@@ -64,9 +64,9 @@ func _start_fade_animation():
 	# Fade out
 	tween.tween_property(self, "modulate", Color(1, 1, 1, 0), fade_duration)
 	
-	# Move up
-	var target_position = global_position + Vector2(0, -move_distance)
-	tween.tween_property(self, "global_position", target_position, fade_duration)
+	# Move up (local position within parent)
+	var target_position = position + Vector2(0, -move_distance)
+	tween.tween_property(self, "position", target_position, fade_duration)
 	
 	# Start timer to hide when done
 	fade_timer.start(fade_duration)

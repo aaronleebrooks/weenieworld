@@ -86,39 +86,29 @@ func _update_responsive_layout():
 
 func _on_button_pressed():
 	"""Handle button press (single click)"""
-	print("DEBUG: Button pressed signal received")
 	# Cancel hold timer and start click action
 	hold_timer.stop()
-	print("DEBUG: Hold timer stopped")
 	
 	# Check if we're in click cooldown (prevent accidental clicks after holding)
 	if is_in_click_cooldown:
-		print("DEBUG: Click blocked - in cooldown after holding")
 		return
 	
 	# Always try to start click action - let ClickManager handle conflicts
 	if click_manager:
-		print("DEBUG: Starting click action")
 		click_manager.start_click_action()
-	else:
-		print("DEBUG: No click_manager available")
 
 func _on_button_down():
 	"""Handle button down (start of hold)"""
-	print("DEBUG: Button down signal received")
 	is_pressed = true
 	# Start hold timer
 	hold_timer.start()
-	print("DEBUG: Hold timer started")
 
 func _on_button_up():
 	"""Handle button up (end of hold)"""
-	print("DEBUG: Button up signal received")
 	is_pressed = false
 	
 	# If we were holding, stop the hold action
 	if is_held:
-		print("DEBUG: Stopping hold action")
 		if click_manager:
 			click_manager.stop_hold_action()
 		is_held = false
@@ -126,15 +116,12 @@ func _on_button_up():
 
 func _on_hold_timer_timeout():
 	"""Handle hold timer timeout (start holding)"""
-	print("DEBUG: Hold timer timeout - starting hold action")
 	is_held = true
 	if click_manager:
 		click_manager.start_hold_action()
 
 func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 	"""Update button state based on click manager state"""
-	print("DEBUG: Click state changed - clicking: %s, holding: %s" % [is_clicking, is_holding])
-	
 	if is_clicking:
 		current_state = ButtonState.CLICKED
 	elif is_holding:
@@ -146,11 +133,8 @@ func _on_click_state_changed(is_clicking: bool, is_holding: bool):
 
 func _on_click_completed(click_type: String, hot_dogs_produced: int):
 	"""Handle click completion"""
-	print("DEBUG: Click completed - ", click_type, " produced ", hot_dogs_produced, " hot dogs")
-	
 	# If this was a hold action that completed, start click cooldown
 	if click_type == "hold":
-		print("DEBUG: Starting click cooldown after hold completion")
 		is_in_click_cooldown = true
 		click_cooldown_timer.start()
 	
@@ -175,7 +159,6 @@ func _reset_click_text():
 
 func _on_click_cooldown_timeout():
 	"""Handle click cooldown timeout"""
-	print("DEBUG: Click cooldown finished")
 	is_in_click_cooldown = false
 
 func _update_visual_state():

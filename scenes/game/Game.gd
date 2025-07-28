@@ -300,11 +300,7 @@ func _on_hot_dogs_produced(amount: int, source: String):
 	"""Handle hot dog production events"""
 	# Show floating text for hot dog gain
 	if floating_text_manager and hot_dog_display:
-		var display_position = hot_dog_display.global_position
-		print("Game: Showing hot dog gain floating text at position: ", display_position)
-		floating_text_manager.show_hot_dog_gain(amount, display_position)
-	else:
-		print("Game: Cannot show floating text - manager: ", floating_text_manager, ", display: ", hot_dog_display)
+		floating_text_manager.show_hot_dog_gain(amount, hot_dog_display)
 
 func _on_hot_dogs_sold(amount: int, value: int):
 	"""Handle hot dog sales events"""
@@ -317,8 +313,7 @@ func _on_currency_earned(amount: int, source: String):
 	"""Handle currency earned events"""
 	# Show floating text for currency gain
 	if floating_text_manager and currency_display:
-		var display_position = currency_display.global_position
-		floating_text_manager.show_currency_gain(amount, display_position)
+		floating_text_manager.show_currency_gain(amount, currency_display)
 
 func _on_currency_spent(amount: int, reason: String):
 	"""Handle currency spent events"""
