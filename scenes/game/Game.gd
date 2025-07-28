@@ -7,7 +7,6 @@ extends Control
 @onready var currency_icon = $TopLeftMenu/CurrencyIcon
 @onready var upgrade_icon = $TopLeftMenu/UpgradeIcon
 @onready var save_icon = $TopLeftMenu/SaveIcon
-@onready var event_log_icon = $TopLeftMenu/EventLogIcon
 @onready var exit_icon = $TopLeftMenu/ExitIcon
 @onready var hot_dog_display = $HotDogDisplay
 @onready var currency_display = $CurrencyDisplay
@@ -42,12 +41,9 @@ func _ready():
 	# Connect button signals
 	upgrade_icon.pressed.connect(_on_upgrade_icon_pressed)
 	save_icon.pressed.connect(_on_save_icon_pressed)
-	event_log_icon.pressed.connect(_on_event_log_icon_pressed)
 	exit_icon.pressed.connect(_on_exit_icon_pressed)
 	
-	# Connect event log signals
-	if event_log:
-		event_log.event_log_closed.connect(_on_event_log_closed)
+
 	
 	# Setup currency icon (non-clickable, blue text)
 	_setup_currency_icon()
@@ -227,8 +223,6 @@ func _setup_tooltips():
 		upgrade_icon.tooltip_text = "Upgrades"
 	if save_icon:
 		save_icon.tooltip_text = "Save Game"
-	if event_log_icon:
-		event_log_icon.tooltip_text = "Event Log"
 	if exit_icon:
 		exit_icon.tooltip_text = "Exit to Menu"
 
@@ -258,8 +252,6 @@ func _on_tooltip_toggle_pressed():
 		upgrade_icon.text = "⚡" if tooltips_visible else ""
 	if save_icon:
 		save_icon.text = "💾" if tooltips_visible else ""
-	if event_log_icon:
-		event_log_icon.text = "📋" if tooltips_visible else ""
 	if exit_icon:
 		exit_icon.text = "❌" if tooltips_visible else ""
 	
@@ -355,15 +347,7 @@ func _on_save_icon_pressed():
 		if event_log_manager:
 			event_log_manager.add_save_event("manual")
 
-func _on_event_log_icon_pressed():
-	"""Handle event log icon press"""
-	print("Game: Event log icon pressed")
-	if event_log:
-		event_log.show_event_log()
 
-func _on_event_log_closed():
-	"""Handle event log close"""
-	print("Game: Event log closed")
 
 func _on_exit_icon_pressed():
 	"""Handle exit icon press"""

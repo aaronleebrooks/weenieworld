@@ -19,8 +19,8 @@ func _ready():
 	# Initial population
 	_populate_event_list()
 	
-	# Hide by default
-	visible = false
+	# Visible by default
+	visible = true
 
 func _on_close_button_pressed():
 	visible = false
@@ -38,9 +38,8 @@ func _populate_event_list():
 	# Get recent events (last 20)
 	var recent_events = event_log_manager.get_recent_events(20)
 	
-	# Add events in reverse order (newest first)
-	for i in range(recent_events.size() - 1, -1, -1):
-		var event = recent_events[i]
+	# Add events in chronological order (oldest first, newest at bottom)
+	for event in recent_events:
 		var event_item = event_item_scene.instantiate()
 		event_list_container.add_child(event_item)
 		event_item.setup_event(event)

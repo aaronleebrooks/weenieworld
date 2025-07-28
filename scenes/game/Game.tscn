@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://c8xvn8yqxqxqx"]
+[gd_scene load_steps=8 format=3 uid="uid://c8xvn8yqxqxqx"]
 
 [ext_resource type="Script" uid="uid://m4hu22y7axg6" path="res://scenes/game/Game.gd" id="1_0x0x0"]
 [ext_resource type="PackedScene" uid="uid://fxvn8yqxqxqx" path="res://scenes/game/CurrencyDisplay.tscn" id="2_0x0x0"]
@@ -76,11 +76,6 @@ custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "💾"
 
-[node name="EventLogIcon" type="Button" parent="TopLeftMenu"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-text = "📋"
-
 [node name="ExitIcon" type="Button" parent="TopLeftMenu"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
@@ -88,3 +83,5 @@ text = "🚪"
 
 [node name="EventLog" parent="." instance=ExtResource("7_eventlog")]
 layout_mode = 1
+grow_horizontal = 2
+grow_vertical = 2
