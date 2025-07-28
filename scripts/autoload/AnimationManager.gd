@@ -103,24 +103,25 @@ func _cleanup_animation_squares():
 	"""Clean up existing animation squares to prevent memory leaks"""
 	print("AnimationManager: Cleaning up animation squares")
 	
-	# Kill any active tweens
-	if production_square:
+	# Kill any active tweens and clean up production square
+	if production_square and is_instance_valid(production_square):
 		_kill_tween(production_square, "hold_tween")
 		_kill_tween(production_square, "pulse_tween")
 		_kill_tween(production_square, "production_tween")
 		if production_square.get_parent():
 			production_square.get_parent().remove_child(production_square)
 		production_square.queue_free()
-		production_square = null
+	production_square = null
 	
-	if sales_square:
+	# Kill any active tweens and clean up sales square
+	if sales_square and is_instance_valid(sales_square):
 		_kill_tween(sales_square, "hold_tween")
 		_kill_tween(sales_square, "pulse_tween")
 		_kill_tween(sales_square, "production_tween")
 		if sales_square.get_parent():
 			sales_square.get_parent().remove_child(sales_square)
 		sales_square.queue_free()
-		sales_square = null
+	sales_square = null
 
 func _create_square(color: Color, size: Vector2, position: Vector2, parent: Node) -> ColorRect:
 	"""Helper function to create a square with consistent properties"""
@@ -156,17 +157,23 @@ func _on_click_completed(click_type: String, hot_dogs_produced: int):
 func _on_hot_dogs_produced(amount: int, source: String):
 	"""Handle hot dog production events - animate production square"""
 	print("AnimationManager: Hot dogs produced - animating production square")
-	_animate_production_event(production_square, ANIMATION_CONFIG.production)
+	if production_square and is_instance_valid(production_square):
+		_animate_production_event(production_square, ANIMATION_CONFIG.production)
+	else:
+		print("AnimationManager: Production square is null or invalid")
 
 func _on_hot_dogs_sold(amount: int, value: int):
 	"""Handle hot dog sales events - animate sales square"""
 	print("AnimationManager: Hot dogs sold - animating sales square")
-	_animate_production_event(sales_square, ANIMATION_CONFIG.sales)
+	if sales_square and is_instance_valid(sales_square):
+		_animate_production_event(sales_square, ANIMATION_CONFIG.sales)
+	else:
+		print("AnimationManager: Sales square is null or invalid")
 
 func _animate_production_pulse():
 	"""Animate production square for instant click"""
-	if not production_square:
-		print("AnimationManager: Cannot animate - production square not found")
+	if not production_square or not is_instance_valid(production_square):
+		print("AnimationManager: Cannot animate - production square not found or invalid")
 		return
 	
 	print("AnimationManager: Animating production pulse")
@@ -174,7 +181,7 @@ func _animate_production_pulse():
 
 func _start_hold_animation():
 	"""Start hold animation"""
-	if not production_square:
+	if not production_square or not is_instance_valid(production_square):
 		return
 	
 	print("AnimationManager: Starting hold animation")
@@ -183,7 +190,7 @@ func _start_hold_animation():
 func _stop_hold_animation():
 	"""Stop hold animation"""
 	print("AnimationManager: Hold animation complete")
-	if production_square:
+	if production_square and is_instance_valid(production_square):
 		_stop_continuous_animation(production_square)
 
 func _start_continuous_animation(square: ColorRect, target_offset: Vector2):
@@ -282,6 +289,9 @@ func _animate_production_event(square: ColorRect, config: Dictionary):
 
 func _kill_tween(square: ColorRect, tween_name: String):
 	"""Helper function to kill a tween and clean up metadata"""
+	if not square or not is_instance_valid(square):
+		return
+	
 	if square.has_meta(tween_name):
 		var existing_tween = square.get_meta(tween_name)
 		if existing_tween:
@@ -290,6 +300,9 @@ func _kill_tween(square: ColorRect, tween_name: String):
 
 func _reset_square_state(square: ColorRect):
 	"""Helper function to reset square to original state"""
+	if not square or not is_instance_valid(square):
+		return
+	
 	square.scale = Vector2(1.0, 1.0)
 	
 	# Return to stored original position
