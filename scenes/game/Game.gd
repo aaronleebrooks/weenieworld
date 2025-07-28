@@ -4,11 +4,11 @@ extends Control
 # Uses intentional naming conventions for future maintainability
 
 @onready var truck_name_display = $TruckNameDisplay
-@onready var currency_icon = $TopLeftMenu/CurrencyIcon
-@onready var upgrade_icon = $TopLeftMenu/UpgradeIcon
-@onready var save_icon = $TopLeftMenu/SaveIcon
-@onready var exit_icon = $TopLeftMenu/ExitIcon
-@onready var toggle_labels_icon = $TopLeftMenu/ToggleLabelsIcon
+@onready var currency_icon = $TopLeftMenu/CurrencyRow/CurrencyIcon
+@onready var upgrade_icon = $TopLeftMenu/UpgradeRow/UpgradeIcon
+@onready var save_icon = $TopLeftMenu/SaveRow/SaveIcon
+@onready var exit_icon = $TopLeftMenu/ExitRow/ExitIcon
+
 @onready var hot_dog_display = $HotDogDisplay
 @onready var currency_display = $CurrencyDisplay
 @onready var upgrade_panel = $UpgradePanel
@@ -22,8 +22,7 @@ var save_system: Node
 var floating_text_manager: Node
 var event_log_manager: Node
 
-# Tooltip toggle state
-var tooltips_visible: bool = true
+
 
 func _ready():
 	print("Game: _ready() called")
@@ -42,7 +41,6 @@ func _ready():
 	upgrade_icon.pressed.connect(_on_upgrade_icon_pressed)
 	save_icon.pressed.connect(_on_save_icon_pressed)
 	exit_icon.pressed.connect(_on_exit_icon_pressed)
-	toggle_labels_icon.pressed.connect(_on_toggle_labels_icon_pressed)
 	
 
 	
@@ -52,9 +50,7 @@ func _ready():
 	# Setup tooltips for icons
 	_setup_tooltips()
 	
-	# Set initial toggle button state
-	if toggle_labels_icon:
-		toggle_labels_icon.text = ">" if tooltips_visible else "<"
+
 	
 	# Connect to viewport size changes using native event system
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
@@ -221,8 +217,7 @@ func _setup_tooltips():
 		save_icon.tooltip_text = "Save Game"
 	if exit_icon:
 		exit_icon.tooltip_text = "Exit to Menu"
-	if toggle_labels_icon:
-		toggle_labels_icon.tooltip_text = "Toggle Labels"
+
 
 func _on_viewport_size_changed():
 	"""Handle viewport size changes for responsive design"""
@@ -234,23 +229,7 @@ func _update_responsive_layout():
 	
 	print("Game: Responsive layout updated for viewport size: ", viewport_size)
 
-func _on_tooltip_toggle_pressed():
-	"""Toggle tooltip visibility"""
-	tooltips_visible = !tooltips_visible
-	
-	# Update toggle button symbol
-	if toggle_labels_icon:
-		toggle_labels_icon.text = ">" if tooltips_visible else "<"
-	
-	# Update button labels visibility
-	if upgrade_icon:
-		upgrade_icon.text = "⚡" if tooltips_visible else ""
-	if save_icon:
-		save_icon.text = "💾" if tooltips_visible else ""
-	if exit_icon:
-		exit_icon.text = "🚪" if tooltips_visible else ""
-	
-	print("Game: Tooltips toggled - visible: ", tooltips_visible)
+
 
 func _load_and_display_truck_name():
 	"""Load and display the truck name from save data"""
@@ -342,10 +321,7 @@ func _on_save_icon_pressed():
 		if event_log_manager:
 			event_log_manager.add_save_event("manual")
 
-func _on_toggle_labels_icon_pressed():
-	"""Handle toggle labels icon press"""
-	print("Game: Toggle labels icon pressed")
-	_on_tooltip_toggle_pressed()
+
 
 
 
