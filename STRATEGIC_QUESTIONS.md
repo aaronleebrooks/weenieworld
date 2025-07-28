@@ -330,6 +330,26 @@ There will also be a hex crawl element as you explore for new locations for your
 3. **Event frequency**: How often should random events occur? Fairly infrequently. We should have a debug button to trigger these
 4. **Cypher intensity**: What should the default cypher level be?
 
+### Phase 3 Priority 1 Decisions ✅
+
+#### Truck Naming System
+- **Validation**: 3-20 characters, allow special characters safely, no profanity filter
+- **Uniqueness**: Single truck name per save file, changeable throughout game
+- **Preview**: No alien cypher preview needed (truck name stays in English)
+- **Flow**: After main menu → New Game → Name modal → Main game
+- **Display**: Prominent header at top, variable substitution in descriptions
+- **UI**: Text wrapping for long names, not in all menu headers
+
+#### Alien Cypher System
+- **Implementation**: `(letter_position + offset) % 26` then `(result - offset) % 26`
+- **Scope**: Only customer/human text (orders, event dialogue), not UI elements
+- **Toggle**: No accessibility toggle needed
+- **Truck Name**: Not cyphered, stays in English
+
+#### Fresh Start
+- **Save Deletion**: Delete immediately during development, warnings for user actions
+- **Modal**: Integrated into main menu flow, not separate scene
+
 ### Future Questions
 1. **Recipe complexity**: How complex should the recipe system be? It should be fairly simple. You can save, edit, and load recipies. You can have any number, and sort by name, last created, or popularity. You can purchase recipies that might unlock you new toppings. The recipies should show the hot dog expected value, plus a list of all effects from the recipie. When in the kitchen screen, 
 2. **Marketing mechanics**: How should the tower defense system work? There will be a grid featuring where your food truck is on the bottom row, with the line forming in front of it. The customers move towards your food truck following the paths you put down, at the rate of hot dogs being sold. You can place down towers along the path you make to give buffs to your customers or try to nullify the effects of bad customers.The buffs could be +50% tip chance, increasing chance to buy multiple hot dogs, or bad things like not paying for a hot dog or taking twice as long to order. The system will start out with you in an empty parking lot. eventually, it will be you on one side of the grid, and another food truck at the opposite side. At that point, you can place towers along the other path that attempt to give priority to your restaurant, such as a tower that has a 10% chance of making someone swap lines, or one that has a high likelyhood of converting, but a 100% chance of creating a bad customer.
@@ -353,3 +373,41 @@ There will also be a hex crawl element as you explore for new locations for your
 - Event frequency and balance parameters
 
 This document will be updated as decisions are made and new questions arise during development. 
+
+🚛 Truck Naming Questions:
+Name Validation Rules:
+Should we allow special characters (like apostrophes, hyphens)? Yes, we should accept as much as we can safely. We should have a 3 character minimum and a 20 character maximum. 
+Should we prevent certain words (profanity, etc.)? No, we should be able to name things anything.
+What's the minimum/maximum length? (I suggested 3-20 characters)
+Name Uniqueness:
+Should truck names be unique across all players? There will only ever be the name of the player's truck. They can change this throughout the game. It should be displayed on the Save gile.
+Or just unique for the current save file?
+Name Preview:
+Should the alien cypher preview be real-time as they type? The Truck title will not be in alien cypher
+Or only show when they click a "Preview" button? It should read in english. Only customer's words will be in the alien cypher.
+👽 Alien Cypher Questions:
+Cypher Implementation:
+You mentioned "letter position + offset, then - offset" - should this be:
+(letter_position + offset) % 26 then (result - offset) % 26? Yes.
+Or a different approach?
+Cypher Scope:
+Should ALL text from customers/humans be cyphered? Yes. So orders if they show up in animations, or things humans say in events, etc.
+What about UI elements like button text, tooltips, etc.? No, none of that should be cyphered.
+Should the truck name itself be cyphered in the game? No
+Cypher Toggle:
+Should this be in the main settings menu? No
+Or a separate accessibility menu? No
+💾 Fresh Start Questions:
+Save Deletion:
+Should we delete saves immediately when starting Phase 3? Yes. Feel free to delete saves willy nilly right now in the development process
+Or prompt the user first with a warning? The user should have warnings before leaving the game, deleting a save, resetting the research pool
+New Game Flow:
+Should the truck naming happen before or after the main menu? After the main menu, when the player picks New Game is when the name modal should appear, followed by the main game.
+Should it be a separate scene or integrated into the main menu? I'm not sure. Should modals be it's own scene or integrated?
+🎨 UI Integration Questions:
+Name Display:
+Where should the truck name appear in the main game UI? Just at the top for right now. And in any descriptions it should be able to use the trucks name as a variable.
+Should it be prominent (like a header) or subtle? It should be prominent.
+Menu Integration:
+Should the truck name appear in all menu headers? No
+How should we handle long names in UI elements? we should wrap the text when the trucks name is too long

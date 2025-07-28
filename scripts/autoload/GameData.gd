@@ -1,9 +1,10 @@
 extends RefCounted
 class_name GameData
 
-# Default save data structure for hot dog store theme
+# Default save data structure for Alien Hot Dog Food Truck
 static func get_default_save_data() -> Dictionary:
 	return {
+		"truck_name": "My Food Truck",  # Default truck name
 		"currency": 0,
 		"hot_dogs_inventory": 0,
 		"hot_dogs_per_click": 1,

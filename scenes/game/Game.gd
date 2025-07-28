@@ -3,6 +3,7 @@ extends Control
 # Main game scene for hot dog store idle game
 # Uses intentional naming conventions for future maintainability
 
+@onready var truck_name_display = $TruckNameDisplay
 @onready var currency_icon = $TopLeftMenu/CurrencyIcon
 @onready var upgrade_icon = $TopLeftMenu/UpgradeIcon
 @onready var save_icon = $TopLeftMenu/SaveIcon
@@ -73,6 +74,9 @@ func _ready():
 	# Display current game data
 	display_game_data()
 	
+	# Load and display truck name
+	_load_and_display_truck_name()
+	
 	# Create animation squares
 	var animation_manager = get_node("/root/AnimationManager")
 	if animation_manager:
@@ -134,6 +138,46 @@ func _on_tooltip_toggle_pressed():
 		exit_icon.text = "❌" if tooltips_visible else ""
 	
 	print("Game: Tooltips toggled - visible: ", tooltips_visible)
+
+func _load_and_display_truck_name():
+	"""Load and display the truck name from save data"""
+	if save_system:
+		var save_list = save_system.get_save_list()
+		if save_list.size() > 0:
+			# Load the most recent save to get truck name
+			var latest_save = save_list[0]
+			var file_path = save_system.save_directory + latest_save["name"] + ".json"
+			
+			if FileAccess.file_exists(file_path):
+				var file = FileAccess.open(file_path, FileAccess.READ)
+				if file:
+					var json_string = file.get_as_text()
+					file.close()
+					
+					var json = JSON.new()
+					var parse_result = json.parse(json_string)
+					
+					if parse_result == OK:
+						var save_data = json.data
+						var truck_name = save_data.get("truck_name", "My Food Truck")
+						_display_truck_name(truck_name)
+						print("Game: Loaded truck name: ", truck_name)
+					else:
+						_display_truck_name("My Food Truck")
+				else:
+					_display_truck_name("My Food Truck")
+			else:
+				_display_truck_name("My Food Truck")
+		else:
+			_display_truck_name("My Food Truck")
+	else:
+		_display_truck_name("My Food Truck")
+
+func _display_truck_name(truck_name: String):
+	"""Display the truck name in the UI"""
+	if truck_name_display:
+		truck_name_display.text = truck_name
+		print("Game: Displaying truck name: ", truck_name)
 
 func _on_hot_dogs_changed(new_inventory: int, change_amount: int):
 	"""Handle hot dog inventory changes"""

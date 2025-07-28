@@ -1,0 +1,69 @@
+[gd_scene load_steps=2 format=3 uid="uid://bqxvn8yqxqxqx"]
+
+[ext_resource type="Script" path="res://scenes/ui/TruckNamingModal.gd" id="1_0x0x0"]
+
+[node name="TruckNamingModal" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_0x0x0")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.7)
+
+[node name="ModalContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+
+[node name="Title" type="Label" parent="ModalContainer"]
+layout_mode = 2
+text = "Name Your Food Truck"
+horizontal_alignment = 1
+
+[node name="Spacer1" type="Control" parent="ModalContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+
+[node name="Description" type="Label" parent="ModalContainer"]
+layout_mode = 2
+text = "Enter a name for your alien food truck business:"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Spacer2" type="Control" parent="ModalContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 10)
+
+[node name="NameInput" type="LineEdit" parent="ModalContainer"]
+layout_mode = 2
+placeholder_text = "Enter truck name (3-20 characters)"
+max_length = 20
+
+[node name="Spacer3" type="Control" parent="ModalContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+
+[node name="ButtonContainer" type="HBoxContainer" parent="ModalContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="ConfirmButton" type="Button" parent="ModalContainer/ButtonContainer"]
+layout_mode = 2
+text = "Start Game"
+
+[node name="CancelButton" type="Button" parent="ModalContainer/ButtonContainer"]
+layout_mode = 2
+text = "Cancel" 

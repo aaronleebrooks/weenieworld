@@ -25,6 +25,17 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.1, 0.2, 1)
 
+[node name="TruckNameDisplay" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 20.0
+offset_bottom = 60.0
+grow_horizontal = 2
+text = "My Food Truck"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="CurrencyDisplay" parent="." instance=ExtResource("2_0x0x0")]
 layout_mode = 1
 

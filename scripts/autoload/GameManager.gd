@@ -38,11 +38,16 @@ func _ready():
 
 # Start a new game
 func start_new_game():
-	print("GameManager: Starting new game")
+	print("GameManager: Starting new game with default truck name")
+	start_new_game_with_name("My Food Truck")
+
+# Start a new game with specific truck name
+func start_new_game_with_name(truck_name: String):
+	print("GameManager: Starting new game with truck name: ", truck_name)
 	
 	# Create new game by resetting all managers
 	if save_system:
-		save_system.create_new_game()
+		save_system.create_new_game_with_name(truck_name)
 	
 	is_game_active = true
 	change_scene(GAME_SCENE)

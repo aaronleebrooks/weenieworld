@@ -59,7 +59,28 @@ func _update_responsive_layout():
 
 func _on_new_game_pressed():
 	print("Starting new game...")
-	get_node("/root/GameManager").start_new_game()
+	_show_truck_naming_modal()
+
+func _show_truck_naming_modal():
+	"""Show the truck naming modal"""
+	var modal_scene = preload("res://scenes/ui/TruckNamingModal.tscn")
+	var modal = modal_scene.instantiate()
+	
+	# Add modal to the scene
+	add_child(modal)
+	
+	# Connect modal signals
+	modal.truck_name_confirmed.connect(_on_truck_name_confirmed)
+	modal.truck_naming_cancelled.connect(_on_truck_naming_cancelled)
+
+func _on_truck_name_confirmed(truck_name: String):
+	"""Handle truck name confirmation"""
+	print("MainMenu: Truck name confirmed: ", truck_name)
+	get_node("/root/GameManager").start_new_game_with_name(truck_name)
+
+func _on_truck_naming_cancelled():
+	"""Handle truck naming cancellation"""
+	print("MainMenu: Truck naming cancelled")
 
 func _on_continue_pressed():
 	print("Continuing existing game...")

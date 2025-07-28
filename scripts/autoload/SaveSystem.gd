@@ -181,8 +181,13 @@ func _apply_save_data(save_data: Dictionary):
 
 func create_new_game():
 	"""Create a new game by resetting all managers"""
-	print("SaveSystem: Creating new game")
+	create_new_game_with_name("My Food Truck")
+
+func create_new_game_with_name(truck_name: String):
+	"""Create a new game with specific truck name"""
+	print("SaveSystem: Creating new game with truck name: ", truck_name)
 	
+	# Reset all managers
 	if hot_dog_manager:
 		hot_dog_manager.reset_hot_dogs()
 	
@@ -195,8 +200,27 @@ func create_new_game():
 	if game_manager:
 		game_manager.reset_game()
 	
-	# Save the new game state
-	save_game(autosave_name)
+	# Set the truck name in the save data
+	var save_data = _collect_save_data()
+	save_data["truck_name"] = truck_name
+	
+	# Save the new game state with truck name
+	_save_new_game_data(save_data)
+
+func _save_new_game_data(save_data: Dictionary):
+	"""Save new game data to autosave"""
+	var file_path = save_directory + autosave_name + ".json"
+	
+	var file = FileAccess.open(file_path, FileAccess.WRITE)
+	if file:
+		var json_string = JSON.stringify(save_data)
+		file.store_string(json_string)
+		file.close()
+		
+		print("SaveSystem: New game saved with truck name: ", save_data.get("truck_name", "Unknown"))
+		emit_signal("save_created", autosave_name)
+	else:
+		print("SaveSystem: Failed to save new game")
 
 func migrate_old_save_data(old_data: Dictionary) -> Dictionary:
 	"""Migrate old save data to new format"""
