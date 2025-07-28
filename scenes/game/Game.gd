@@ -36,8 +36,7 @@ func _ready():
 	floating_text_manager = get_node("/root/FloatingTextManager")
 	event_log_manager = get_node("/root/EventLogManager")
 	
-	# Create tooltip toggle button
-	_create_tooltip_toggle()
+
 	
 	# Connect button signals
 	upgrade_icon.pressed.connect(_on_upgrade_icon_pressed)
@@ -202,16 +201,7 @@ func _debug_check_manager(manager_name: String, manager: Node):
 	else:
 		print("✗ %s: NOT FOUND or INVALID" % manager_name)
 
-func _create_tooltip_toggle():
-	"""Create tooltip toggle button"""
-	var toggle_button = Button.new()
-	toggle_button.text = "Toggle Labels"
-	toggle_button.custom_minimum_size = Vector2(100, 30)
-	toggle_button.pressed.connect(_on_tooltip_toggle_pressed)
-	
-	# Position in top-right corner
-	toggle_button.position = Vector2(get_viewport().get_visible_rect().size.x - 120, 10)
-	add_child(toggle_button)
+
 
 func _setup_currency_icon():
 	"""Setup currency icon display"""
@@ -237,11 +227,6 @@ func _on_viewport_size_changed():
 func _update_responsive_layout():
 	"""Update layout for responsive design"""
 	var viewport_size = get_viewport().get_visible_rect().size
-	
-	# Update tooltip toggle position
-	var toggle_button = get_node_or_null("Button")  # The tooltip toggle button
-	if toggle_button:
-		toggle_button.position = Vector2(viewport_size.x - 120, 10)
 	
 	print("Game: Responsive layout updated for viewport size: ", viewport_size)
 
