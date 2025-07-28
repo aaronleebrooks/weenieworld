@@ -249,17 +249,19 @@ func _on_tooltip_toggle_pressed():
 	"""Toggle tooltip visibility"""
 	tooltips_visible = !tooltips_visible
 	
-	# Update icon labels
-	if currency_icon:
-		currency_icon.text = "💰" if tooltips_visible else ""
-	if upgrade_icon:
-		upgrade_icon.text = "⚡" if tooltips_visible else ""
-	if save_icon:
-		save_icon.text = "💾" if tooltips_visible else ""
-	if exit_icon:
-		exit_icon.text = "❌" if tooltips_visible else ""
+	# Update toggle button symbol
 	if toggle_labels_icon:
-		toggle_labels_icon.text = "^" if tooltips_visible else ""
+		toggle_labels_icon.text = ">" if tooltips_visible else "<"
+	
+	# Update other icon visibility (only backgrounds, never show text)
+	if currency_icon:
+		currency_icon.visible = tooltips_visible
+	if upgrade_icon:
+		upgrade_icon.visible = tooltips_visible
+	if save_icon:
+		save_icon.visible = tooltips_visible
+	if exit_icon:
+		exit_icon.visible = tooltips_visible
 	
 	print("Game: Tooltips toggled - visible: ", tooltips_visible)
 

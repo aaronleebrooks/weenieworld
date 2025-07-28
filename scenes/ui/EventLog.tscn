@@ -39,12 +39,6 @@ text = "Event Log"
 horizontal_alignment = 1
 font_size = 14
 
-[node name="CloseButton" type="Button" parent="EventContainer/Header"]
-layout_mode = 2
-custom_minimum_size = Vector2(20, 20)
-text = "X"
-font_size = 12
-
 [node name="EventList" type="ScrollContainer" parent="EventContainer"]
 layout_mode = 2
 size_flags_vertical = 3

@@ -3,7 +3,6 @@ extends Control
 signal event_log_closed()
 
 @onready var event_list_container = $EventContainer/EventList/EventListContainer
-@onready var close_button = $EventContainer/Header/CloseButton
 @onready var title_label = $EventContainer/Header/Title
 
 var event_log_manager: Node
@@ -13,7 +12,6 @@ func _ready():
 	event_log_manager = get_node("/root/EventLogManager")
 	
 	# Connect signals
-	close_button.pressed.connect(_on_close_button_pressed)
 	event_log_manager.event_log_updated.connect(_on_event_log_updated)
 	
 	# Initial population
@@ -21,10 +19,6 @@ func _ready():
 	
 	# Visible by default
 	visible = true
-
-func _on_close_button_pressed():
-	visible = false
-	emit_signal("event_log_closed")
 
 func _on_event_log_updated():
 	_populate_event_list()
@@ -53,7 +47,4 @@ func hide_event_log():
 	"""Hide the event log"""
 	visible = false
 
-func _input(event):
-	"""Handle input for closing the event log"""
-	if visible and event.is_action_pressed("ui_cancel"):
-		_on_close_button_pressed() 
+ 

@@ -61,6 +61,11 @@ offset_top = 20.0
 offset_right = 120.0
 offset_bottom = 200.0
 
+[node name="ToggleLabelsIcon" type="Button" parent="TopLeftMenu"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = ">"
+
 [node name="CurrencyIcon" type="Button" parent="TopLeftMenu"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
@@ -80,11 +85,6 @@ text = "💾"
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "🚪"
-
-[node name="ToggleLabelsIcon" type="Button" parent="TopLeftMenu"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-text = "^"
 
 [node name="EventLog" parent="." instance=ExtResource("7_eventlog")]
 grow_horizontal = 2
