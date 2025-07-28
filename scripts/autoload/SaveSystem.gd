@@ -168,6 +168,12 @@ func _collect_save_data() -> Dictionary:
 		var upgrade_data = upgrade_manager.get_save_data()
 		save_data.merge(upgrade_data)
 	
+	# Add event log data
+	var event_log_manager = get_node_or_null("/root/EventLogManager")
+	if event_log_manager:
+		var event_log_data = event_log_manager.get_save_data()
+		save_data.merge(event_log_data)
+	
 	# GameManager doesn't need to save data - it just manages scene transitions
 	# All actual game data is stored in the other managers
 	

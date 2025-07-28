@@ -18,7 +18,9 @@ static func get_default_save_data() -> Dictionary:
 		"play_time": 0,
 		"upgrades_purchased": [],
 		"last_save_time": "",
-		"game_version": "1.0.0"
+		"game_version": "1.0.0",
+		"event_log": [],
+		"max_events": 50
 	}
 
 # Upgrade definitions for hot dog store theme

@@ -170,6 +170,11 @@ func purchase_upgrade(upgrade_id: String) -> bool:
 	# Emit signals
 	emit_signal("upgrade_purchased", upgrade_id, upgrade_levels[upgrade_id], cost)
 	
+	# Add event to event log
+	var event_log_manager = get_node_or_null("/root/EventLogManager")
+	if event_log_manager:
+		event_log_manager.add_purchase_event(upgrade.display_name, cost, "upgrade")
+	
 	print("UpgradeManager: Purchased %s (level %d) for %d currency" % [upgrade.display_name, upgrade_levels[upgrade_id], cost])
 	return true
 

@@ -26,6 +26,7 @@ UpgradeManager="*res://scripts/autoload/UpgradeManager.gd"
 AnimationManager="*res://scripts/autoload/AnimationManager.gd"
 FloatingTextManager="*res://scripts/autoload/FloatingTextManager.gd"
 AlienCypher="*res://scripts/autoload/AlienCypher.gd"
+EventLogManager="*res://scripts/autoload/EventLogManager.gd"
 
 [display]
 
