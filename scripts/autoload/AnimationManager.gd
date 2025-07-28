@@ -206,7 +206,8 @@ func _start_continuous_animation(square: ColorRect, target_offset: Vector2):
 	_reset_square_state(square)
 	
 	var tween = create_tween()
-	square.set_meta("hold_tween", tween)
+	if square and is_instance_valid(square):
+		square.set_meta("hold_tween", tween)
 	
 	# Use stored original position
 	var original_pos = square.position
@@ -245,7 +246,8 @@ func _animate_pulse(square: ColorRect, duration: float, scale_factor: float):
 	_kill_tween(square, "pulse_tween")
 	
 	var tween = create_tween()
-	square.set_meta("pulse_tween", tween)
+	if square and is_instance_valid(square):
+		square.set_meta("pulse_tween", tween)
 	
 	var original_scale = Vector2(1.0, 1.0)
 	var target_scale = original_scale * scale_factor
@@ -255,7 +257,10 @@ func _animate_pulse(square: ColorRect, duration: float, scale_factor: float):
 	tween.tween_property(square, "scale", original_scale, duration * 0.5)
 	
 	# Clean up tween reference when done
-	tween.finished.connect(func(): square.set_meta("pulse_tween", null))
+	tween.finished.connect(func(): 
+		if square and is_instance_valid(square):
+			square.set_meta("pulse_tween", null)
+	)
 
 func _animate_production_event(square: ColorRect, config: Dictionary):
 	"""Animate square for production/sales events"""
@@ -269,7 +274,8 @@ func _animate_production_event(square: ColorRect, config: Dictionary):
 	_reset_square_state(square)
 	
 	var tween = create_tween()
-	square.set_meta("production_tween", tween)
+	if square and is_instance_valid(square):
+		square.set_meta("production_tween", tween)
 	
 	# Production animation: quick outward movement and scale up
 	var original_pos = square.position
@@ -285,7 +291,10 @@ func _animate_production_event(square: ColorRect, config: Dictionary):
 	tween.parallel().tween_property(square, "scale", Vector2(1.0, 1.0), config.production_return_duration)
 	
 	# Clean up tween reference when done
-	tween.finished.connect(func(): square.set_meta("production_tween", null))
+	tween.finished.connect(func(): 
+		if square and is_instance_valid(square):
+			square.set_meta("production_tween", null)
+	)
 
 func _kill_tween(square: ColorRect, tween_name: String):
 	"""Helper function to kill a tween and clean up metadata"""

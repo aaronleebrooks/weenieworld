@@ -82,6 +82,51 @@ func _ready():
 	if animation_manager:
 		animation_manager._create_central_animation_squares()
 
+func _exit_tree():
+	"""Clean up when leaving the game scene"""
+	print("Game: Cleaning up game scene")
+	_cleanup_game_scene()
+
+func _cleanup_game_scene():
+	"""Clean up all game scene resources and connections"""
+	print("Game: Starting game scene cleanup")
+	
+	# Disconnect all signals to prevent memory leaks
+	if hot_dog_manager:
+		if hot_dog_manager.hot_dogs_changed.is_connected(_on_hot_dogs_changed):
+			hot_dog_manager.hot_dogs_changed.disconnect(_on_hot_dogs_changed)
+		if hot_dog_manager.hot_dogs_produced.is_connected(_on_hot_dogs_produced):
+			hot_dog_manager.hot_dogs_produced.disconnect(_on_hot_dogs_produced)
+		if hot_dog_manager.hot_dogs_sold.is_connected(_on_hot_dogs_sold):
+			hot_dog_manager.hot_dogs_sold.disconnect(_on_hot_dogs_sold)
+		if hot_dog_manager.currency_changed.is_connected(_on_currency_changed):
+			hot_dog_manager.currency_changed.disconnect(_on_currency_changed)
+		if hot_dog_manager.currency_earned.is_connected(_on_currency_earned):
+			hot_dog_manager.currency_earned.disconnect(_on_currency_earned)
+		if hot_dog_manager.currency_spent.is_connected(_on_currency_spent):
+			hot_dog_manager.currency_spent.disconnect(_on_currency_spent)
+	
+	if customer_manager:
+		if customer_manager.customer_purchase.is_connected(_on_customer_purchase):
+			customer_manager.customer_purchase.disconnect(_on_customer_purchase)
+		if customer_manager.customer_arrived.is_connected(_on_customer_arrived):
+			customer_manager.customer_arrived.disconnect(_on_customer_arrived)
+	
+	var click_manager = get_node_or_null("/root/ClickManager")
+	if click_manager and click_manager.click_completed.is_connected(_on_click_completed):
+		click_manager.click_completed.disconnect(_on_click_completed)
+	
+	# Disconnect viewport size changes
+	if get_viewport().size_changed.is_connected(_on_viewport_size_changed):
+		get_viewport().size_changed.disconnect(_on_viewport_size_changed)
+	
+	# Clean up animation squares
+	var animation_manager = get_node_or_null("/root/AnimationManager")
+	if animation_manager:
+		animation_manager.reset_animations()
+	
+	print("Game: Game scene cleanup completed")
+
 func _create_tooltip_toggle():
 	"""Create tooltip toggle button"""
 	var toggle_button = Button.new()
@@ -246,8 +291,13 @@ func _on_save_icon_pressed():
 func _on_exit_icon_pressed():
 	"""Handle exit icon press"""
 	print("Game: Exit icon pressed")
-	# Return to main menu
-	get_tree().change_scene_to_file("res://scenes/main_menu/MainMenu.tscn")
+	# Return to main menu using GameManager for proper cleanup
+	var game_manager = get_node("/root/GameManager")
+	if game_manager:
+		game_manager.return_to_main_menu()
+	else:
+		# Fallback if GameManager not available
+		get_tree().change_scene_to_file("res://scenes/main_menu/MainMenu.tscn")
 
 func _update_currency_icon_display():
 	"""Update currency icon tooltip with current balance"""

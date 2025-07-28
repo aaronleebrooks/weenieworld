@@ -95,6 +95,11 @@ func return_to_main_menu():
 	if save_system and is_game_active:
 		save_system.save_game("autosave")
 	
+	# Reset animation system to clean up any existing squares
+	var animation_manager = get_node_or_null("/root/AnimationManager")
+	if animation_manager:
+		animation_manager.reset_animations()
+	
 	is_game_active = false
 	change_scene(MAIN_MENU_SCENE)
 
