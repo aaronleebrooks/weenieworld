@@ -1,8 +1,8 @@
 extends Control
 
-@onready var save_list = $SaveList
-@onready var back_button = $BackButton
-@onready var title = $Title
+@onready var save_list = $MenuPanel/SaveList/SaveListContainer
+@onready var back_button = $MenuPanel/ButtonContainer/BackButton
+@onready var title = $MenuPanel/Title
 
 var save_buttons: Array[Button] = []
 var save_containers: Array[Control] = []

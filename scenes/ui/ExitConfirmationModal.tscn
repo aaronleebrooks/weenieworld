@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bqxvn8yqxqxqx"]
+[gd_scene load_steps=4 format=3 uid="uid://btxm2ffcwfwsv"]
 
 [ext_resource type="Script" path="res://scenes/ui/ExitConfirmationModal.gd" id="1_0x0x0"]
 
