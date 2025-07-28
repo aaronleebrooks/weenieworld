@@ -62,8 +62,8 @@ func show_hot_dog_gain(amount: int, hot_dog_display: Node):
 		# Reparent the floating text to the container
 		floating_text.get_parent().remove_child(floating_text)
 		container.add_child(floating_text)
-		# Position at center of container
-		floating_text.position = Vector2(container.size.x / 2, container.size.y / 2)
+		# Position at right side of container
+		floating_text.position = Vector2(container.size.x - 50, container.size.y / 2)
 		floating_text.show_hot_dog_gain(amount, Vector2.ZERO)  # Local position
 	else:
 		print("ERROR: FloatingTextManager: No floating text container found in hot dog display")
@@ -82,8 +82,8 @@ func show_currency_gain(amount: int, currency_display: Node):
 		# Reparent the floating text to the container
 		floating_text.get_parent().remove_child(floating_text)
 		container.add_child(floating_text)
-		# Position at center of container
-		floating_text.position = Vector2(container.size.x / 2, container.size.y / 2)
+		# Position at right side of container
+		floating_text.position = Vector2(container.size.x - 50, container.size.y / 2)
 		floating_text.show_currency_gain(amount, Vector2.ZERO)  # Local position
 	else:
 		print("ERROR: FloatingTextManager: No floating text container found in currency display")
