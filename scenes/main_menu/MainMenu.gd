@@ -84,7 +84,15 @@ func _on_truck_naming_cancelled():
 
 func _on_continue_pressed():
 	print("Continuing existing game...")
-	get_node("/root/GameManager").continue_game()
+	_show_save_selection_modal()
+
+func _show_save_selection_modal():
+	"""Show the save selection modal"""
+	var modal_scene = preload("res://scenes/ui/SaveSelectionMenu.tscn")
+	var modal = modal_scene.instantiate()
+	
+	# Add modal to the scene
+	add_child(modal)
 
 func _on_options_pressed():
 	print("Opening options...")

@@ -291,6 +291,21 @@ func _on_save_icon_pressed():
 func _on_exit_icon_pressed():
 	"""Handle exit icon press"""
 	print("Game: Exit icon pressed")
+	_show_exit_confirmation_modal()
+
+func _show_exit_confirmation_modal():
+	"""Show the exit confirmation modal"""
+	var modal_scene = preload("res://scenes/ui/ExitConfirmationModal.tscn")
+	var modal = modal_scene.instantiate()
+	add_child(modal)
+	
+	# Connect modal signals
+	modal.exit_confirmed.connect(_on_exit_confirmed)
+	modal.exit_cancelled.connect(_on_exit_cancelled)
+
+func _on_exit_confirmed():
+	"""Handle exit confirmation"""
+	print("Game: Exit confirmed, returning to main menu")
 	# Return to main menu using GameManager for proper cleanup
 	var game_manager = get_node("/root/GameManager")
 	if game_manager:
@@ -298,6 +313,10 @@ func _on_exit_icon_pressed():
 	else:
 		# Fallback if GameManager not available
 		get_tree().change_scene_to_file("res://scenes/main_menu/MainMenu.tscn")
+
+func _on_exit_cancelled():
+	"""Handle exit cancellation"""
+	print("Game: Exit cancelled, staying in game")
 
 func _update_currency_icon_display():
 	"""Update currency icon tooltip with current balance"""
