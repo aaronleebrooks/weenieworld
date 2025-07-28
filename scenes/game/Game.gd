@@ -298,8 +298,6 @@ func _on_hot_dogs_changed(new_inventory: int, change_amount: int):
 
 func _on_hot_dogs_produced(amount: int, source: String):
 	"""Handle hot dog production events"""
-	print("Game: Hot dogs produced - %d from %s" % [amount, source])
-	
 	# Show floating text for hot dog gain
 	if floating_text_manager and hot_dog_display:
 		var display_position = hot_dog_display.global_position
@@ -310,7 +308,6 @@ func _on_hot_dogs_produced(amount: int, source: String):
 
 func _on_hot_dogs_sold(amount: int, value: int):
 	"""Handle hot dog sales events"""
-	print("Game: Hot dogs sold - %d for %d currency" % [amount, value])
 
 func _on_currency_changed(new_balance: int, change_amount: int):
 	"""Handle currency balance changes"""
@@ -318,31 +315,22 @@ func _on_currency_changed(new_balance: int, change_amount: int):
 
 func _on_currency_earned(amount: int, source: String):
 	"""Handle currency earned events"""
-	print("Game: Currency earned - %d from %s" % [amount, source])
-	
 	# Show floating text for currency gain
 	if floating_text_manager and currency_display:
 		var display_position = currency_display.global_position
-		print("Game: Showing currency gain floating text at position: ", display_position)
 		floating_text_manager.show_currency_gain(amount, display_position)
-	else:
-		print("Game: Cannot show currency floating text - manager: ", floating_text_manager, ", display: ", currency_display)
 
 func _on_currency_spent(amount: int, reason: String):
 	"""Handle currency spent events"""
-	print("Game: Currency spent - %d for %s" % [amount, reason])
 
 func _on_customer_purchase(amount: int, value: int):
 	"""Handle customer purchase events"""
-	print("Game: Customer purchased %d hot dogs for %d currency" % [amount, value])
 
 func _on_customer_arrived():
 	"""Handle customer arrival events"""
-	print("Game: Customer arrived")
 
 func _on_click_completed(click_type: String, hot_dogs_produced: int):
 	"""Handle click completion events"""
-	print("Game: Click completed - %s produced %d hot dogs" % [click_type, hot_dogs_produced])
 
 func _on_upgrade_icon_pressed():
 	"""Handle upgrade icon press"""

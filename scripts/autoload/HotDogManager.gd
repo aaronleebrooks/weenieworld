@@ -102,7 +102,6 @@ func produce_hot_dogs(amount: int, source: String = "unknown") -> void:
 		hot_dogs_inventory += amount
 		total_hot_dogs_produced += amount
 		emit_signal("hot_dogs_produced", amount, source)
-		print("HotDogManager: Produced %d hot dogs from %s (new inventory: %d)" % [amount, source, hot_dogs_inventory])
 
 func sell_hot_dogs(amount: int) -> bool:
 	"""Sell hot dogs from inventory and earn currency"""
@@ -117,7 +116,6 @@ func sell_hot_dogs(amount: int) -> bool:
 	
 	emit_signal("hot_dogs_sold", amount, earned_currency)
 	emit_signal("currency_earned", earned_currency, "hot_dog_sale")
-	print("HotDogManager: Sold %d hot dogs for %d currency (new inventory: %d, new balance: %d)" % [amount, earned_currency, hot_dogs_inventory, currency_balance])
 	return true
 
 func spend_currency(amount: int, reason: String = "unknown") -> bool:

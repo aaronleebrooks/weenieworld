@@ -25,19 +25,15 @@ func _setup_floating_text_pool():
 
 func _get_floating_text() -> Node:
 	"""Get a floating text instance from the pool"""
-	print("FloatingTextManager: Getting floating text from pool (pool size: %d)" % floating_text_pool.size())
-	
 	if floating_text_pool.size() > 0:
 		var floating_text = floating_text_pool.pop_back()
 		active_floating_texts.append(floating_text)
-		print("FloatingTextManager: Retrieved floating text from pool")
 		return floating_text
 	else:
 		# Create a new one if pool is empty
 		var floating_text = FLOATING_TEXT_SCENE.instantiate()
 		add_child(floating_text)
 		active_floating_texts.append(floating_text)
-		print("FloatingTextManager: Created additional floating text instance")
 		return floating_text
 
 func _return_floating_text(floating_text: Node):
@@ -49,17 +45,13 @@ func _return_floating_text(floating_text: Node):
 
 func show_hot_dog_gain(amount: int, target_position: Vector2):
 	"""Show floating text for hot dog gain near the hot dog display"""
-	print("FloatingTextManager: Showing hot dog gain +%d at position %s" % [amount, target_position])
-	
 	var floating_text = _get_floating_text()
 	if not floating_text:
 		print("ERROR: FloatingTextManager: Could not get floating text from pool!")
 		return
 	
-	print("FloatingTextManager: Got floating text, showing at position %s" % target_position)
-	
-	# Position near the hot dog display (top-right area)
-	var display_position = target_position + Vector2(100, -30)
+	# Position near the hot dog display (centered above it)
+	var display_position = target_position + Vector2(0, -50)
 	
 	floating_text.show_hot_dog_gain(amount, display_position)
 	
@@ -67,17 +59,13 @@ func show_hot_dog_gain(amount: int, target_position: Vector2):
 
 func show_currency_gain(amount: int, target_position: Vector2):
 	"""Show floating text for currency gain near the currency display"""
-	print("FloatingTextManager: Showing currency gain +$%d at position %s" % [amount, target_position])
-	
 	var floating_text = _get_floating_text()
 	if not floating_text:
 		print("ERROR: FloatingTextManager: Could not get floating text from pool!")
 		return
 	
-	print("FloatingTextManager: Got floating text, showing at position %s" % target_position)
-	
-	# Position near the currency display (top-right area)
-	var display_position = target_position + Vector2(100, -30)
+	# Position near the currency display (centered above it)
+	var display_position = target_position + Vector2(0, -50)
 	
 	floating_text.show_currency_gain(amount, display_position)
 	
