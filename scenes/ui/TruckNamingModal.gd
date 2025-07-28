@@ -103,11 +103,35 @@ func _on_confirm_pressed():
 	var truck_name = name_input.text.strip_edges()
 	
 	if _validate_truck_name(truck_name):
-		print("TruckNamingModal: Truck name confirmed: ", truck_name)
-		emit_signal("truck_name_confirmed", truck_name)
-		queue_free()
+		print("TruckNamingModal: Showing confirmation modal for: ", truck_name)
+		_show_confirmation_modal(truck_name)
 	else:
 		print("TruckNamingModal: Invalid truck name: ", truck_name)
+
+func _show_confirmation_modal(truck_name: String):
+	"""Show the confirmation modal with the truck name"""
+	var confirmation_scene = preload("res://scenes/ui/TruckConfirmationModal.tscn")
+	var confirmation_modal = confirmation_scene.instantiate()
+	add_child(confirmation_modal)
+	
+	# Set the truck name in the confirmation modal
+	confirmation_modal.set_truck_name(truck_name)
+	
+	# Connect confirmation modal signals
+	confirmation_modal.truck_confirmed.connect(_on_confirmation_confirmed)
+	confirmation_modal.confirmation_cancelled.connect(_on_confirmation_cancelled)
+
+func _on_confirmation_confirmed(truck_name: String):
+	"""Handle confirmation modal confirmation"""
+	print("TruckNamingModal: Confirmation confirmed, starting game with: ", truck_name)
+	emit_signal("truck_name_confirmed", truck_name)
+	queue_free()
+
+func _on_confirmation_cancelled():
+	"""Handle confirmation modal cancellation"""
+	print("TruckNamingModal: Confirmation cancelled, returning to naming")
+	# The confirmation modal will be automatically removed
+	# and we'll return to the naming modal
 
 func _on_cancel_pressed():
 	"""Handle cancel button press"""
@@ -119,7 +143,7 @@ func _input(event):
 	"""Handle input events"""
 	if event.is_action_pressed("ui_cancel"):
 		_on_cancel_pressed()
-	elif event.is_action_pressed("ui_accept"):
+	elif event is InputEventKey and event.pressed and event.keycode == KEY_ENTER:
 		if _validate_truck_name(name_input.text.strip_edges()):
 			_on_confirm_pressed()
 
