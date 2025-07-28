@@ -1,6 +1,50 @@
-[gd_scene load_steps=2 format=3 uid="uid://31yg3auvqodx"]
+[gd_scene load_steps=7 format=3 uid="uid://31yg3auvqodx"]
 
 [ext_resource type="Script" path="res://scenes/ui/TruckNamingModal.gd" id="1_0x0x0"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24
+font_color = Color(1, 1, 1, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_2"]
+font_size = 16
+font_color = Color(0.9, 0.9, 0.9, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+bg_color = Color(0.2, 0.2, 0.2, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.4, 0.4, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+bg_color = Color(0.3, 0.3, 0.3, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.5, 0.5, 0.5, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3"]
+bg_color = Color(0.4, 0.4, 0.4, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.6, 0.6, 0.6, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [node name="TruckNamingModal" type="Control"]
 layout_mode = 3
@@ -14,7 +58,7 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0, 0, 0, 0.7)
+color = Color(0, 0, 0, 0.85)
 
 [node name="ModalContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -28,10 +72,39 @@ offset_top = -150.0
 offset_right = 200.0
 offset_bottom = 150.0
 
+[node name="ModalBackground" type="ColorRect" parent="ModalContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.15, 0.15, 0.15, 1)
+z_index = -1
+
+[node name="Border" type="ColorRect" parent="ModalContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.3, 0.3, 0.3, 1)
+z_index = -2
+
+[node name="InnerBackground" type="ColorRect" parent="ModalContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = -2.0
+offset_bottom = -2.0
+color = Color(0.1, 0.1, 0.1, 1)
+z_index = -1
+
 [node name="Title" type="Label" parent="ModalContainer"]
 layout_mode = 2
 text = "Name Your Food Truck"
 horizontal_alignment = 1
+label_settings = SubResource("LabelSettings_1")
 
 [node name="Spacer1" type="Control" parent="ModalContainer"]
 layout_mode = 2
@@ -42,6 +115,7 @@ layout_mode = 2
 text = "Enter a name for your alien food truck business:"
 horizontal_alignment = 1
 autowrap_mode = 2
+label_settings = SubResource("LabelSettings_2")
 
 [node name="Spacer2" type="Control" parent="ModalContainer"]
 layout_mode = 2
@@ -51,6 +125,9 @@ custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 placeholder_text = "Enter truck name (3-20 characters)"
 max_length = 20
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_placeholder_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_1")
 
 [node name="Spacer3" type="Control" parent="ModalContainer"]
 layout_mode = 2
@@ -63,7 +140,13 @@ alignment = 1
 [node name="ConfirmButton" type="Button" parent="ModalContainer/ButtonContainer"]
 layout_mode = 2
 text = "Start Game"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_2")
+theme_override_styles/hover = SubResource("StyleBoxFlat_3")
 
 [node name="CancelButton" type="Button" parent="ModalContainer/ButtonContainer"]
 layout_mode = 2
-text = "Cancel" 
+text = "Cancel"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_2")
+theme_override_styles/hover = SubResource("StyleBoxFlat_3") 
