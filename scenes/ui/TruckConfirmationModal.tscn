@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bqxvn8yqxqxqx"]
+[gd_scene load_steps=5 format=3 uid="uid://dwtdgagmt51o6"]
 
 [ext_resource type="Script" path="res://scenes/ui/TruckConfirmationModal.gd" id="1_0x0x0"]
 
@@ -17,6 +17,18 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.5, 0.5, 0.5, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+bg_color = Color(0.4, 0.4, 0.4, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.6, 0.6, 0.6, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -114,11 +126,15 @@ alignment = 1
 [node name="ConfirmButton" type="Button" parent="ModalContainer/ButtonContainer"]
 layout_mode = 2
 text = "Start Game"
+custom_minimum_size = Vector2(120, 40)
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2")
 
 [node name="CancelButton" type="Button" parent="ModalContainer/ButtonContainer"]
 layout_mode = 2
 text = "Go Back"
+custom_minimum_size = Vector2(120, 40)
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_1") 
+theme_override_styles/normal = SubResource("StyleBoxFlat_1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2") 
