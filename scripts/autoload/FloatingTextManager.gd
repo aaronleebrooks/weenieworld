@@ -52,6 +52,11 @@ func show_hot_dog_gain(amount: int, target_position: Vector2):
 	print("FloatingTextManager: Showing hot dog gain +%d at position %s" % [amount, target_position])
 	
 	var floating_text = _get_floating_text()
+	if not floating_text:
+		print("ERROR: FloatingTextManager: Could not get floating text from pool!")
+		return
+	
+	print("FloatingTextManager: Got floating text, showing at position %s" % target_position)
 	
 	# Position near the hot dog display (top-right area)
 	var display_position = target_position + Vector2(100, -30)
@@ -65,6 +70,11 @@ func show_currency_gain(amount: int, target_position: Vector2):
 	print("FloatingTextManager: Showing currency gain +$%d at position %s" % [amount, target_position])
 	
 	var floating_text = _get_floating_text()
+	if not floating_text:
+		print("ERROR: FloatingTextManager: Could not get floating text from pool!")
+		return
+	
+	print("FloatingTextManager: Got floating text, showing at position %s" % target_position)
 	
 	# Position near the currency display (top-right area)
 	var display_position = target_position + Vector2(100, -30)

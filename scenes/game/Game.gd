@@ -81,6 +81,9 @@ func _ready():
 	var animation_manager = get_node("/root/AnimationManager")
 	if animation_manager:
 		animation_manager._create_central_animation_squares()
+	
+	# Debug: Verify all UI elements are properly connected
+	_debug_verify_ui_elements()
 
 func _exit_tree():
 	"""Clean up when leaving the game scene"""
@@ -126,6 +129,71 @@ func _cleanup_game_scene():
 		animation_manager.reset_animations()
 	
 	print("Game: Game scene cleanup completed")
+
+func _debug_verify_ui_elements():
+	"""Debug function to verify all UI elements are properly connected"""
+	print("\n=== GAME SCENE UI AUDIT ===")
+	
+	# Check main UI elements
+	print("Checking main UI elements...")
+	_debug_check_node("TruckNameDisplay", truck_name_display)
+	_debug_check_node("CurrencyDisplay", currency_display)
+	_debug_check_node("HotDogDisplay", hot_dog_display)
+	_debug_check_node("ProgressBar", get_node_or_null("ProgressBar"))
+	_debug_check_node("CurrencyGainButton", get_node_or_null("CurrencyGainButton"))
+	_debug_check_node("UpgradePanel", upgrade_panel)
+	
+	# Check top-left menu elements
+	print("\nChecking top-left menu elements...")
+	_debug_check_node("CurrencyIcon", currency_icon)
+	_debug_check_node("UpgradeIcon", upgrade_icon)
+	_debug_check_node("SaveIcon", get_node_or_null("TopLeftMenu/SaveIcon"))
+	_debug_check_node("ExitIcon", get_node_or_null("TopLeftMenu/ExitIcon"))
+	
+	# Check manager connections
+	print("\nChecking manager connections...")
+	_debug_check_manager("HotDogManager", hot_dog_manager)
+	_debug_check_manager("CustomerManager", customer_manager)
+	_debug_check_manager("UpgradeManager", upgrade_manager)
+	_debug_check_manager("SaveSystem", save_system)
+	_debug_check_manager("FloatingTextManager", floating_text_manager)
+	
+	# Check FloatingText system specifically
+	print("\nChecking FloatingText system...")
+	var floating_text_manager = get_node_or_null("/root/FloatingTextManager")
+	if floating_text_manager:
+		print("✓ FloatingTextManager found")
+		print("  - Pool size: %d" % floating_text_manager.floating_text_pool.size())
+		print("  - Active texts: %d" % floating_text_manager.active_floating_texts.size())
+	else:
+		print("✗ FloatingTextManager NOT FOUND")
+	
+	# Check if FloatingText scene exists
+	var floating_text_scene = preload("res://scenes/ui/FloatingText.tscn")
+	if floating_text_scene:
+		print("✓ FloatingText scene can be loaded")
+	else:
+		print("✗ FloatingText scene cannot be loaded")
+	
+	print("=== END UI AUDIT ===\n")
+
+func _debug_check_node(node_name: String, node: Node):
+	"""Debug helper to check if a node exists and is valid"""
+	if node and is_instance_valid(node):
+		print("✓ %s: Found and valid" % node_name)
+		if node.has_method("get_text"):
+			print("  - Text: '%s'" % node.text)
+		elif node.has_method("get_tooltip_text"):
+			print("  - Tooltip: '%s'" % node.tooltip_text)
+	else:
+		print("✗ %s: NOT FOUND or INVALID" % node_name)
+
+func _debug_check_manager(manager_name: String, manager: Node):
+	"""Debug helper to check if a manager exists and is valid"""
+	if manager and is_instance_valid(manager):
+		print("✓ %s: Found and valid" % manager_name)
+	else:
+		print("✗ %s: NOT FOUND or INVALID" % manager_name)
 
 func _create_tooltip_toggle():
 	"""Create tooltip toggle button"""

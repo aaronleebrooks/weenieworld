@@ -23,16 +23,22 @@ func show_hot_dog_gain(amount: int, position: Vector2):
 	"""Show floating text for hot dog gain"""
 	print("FloatingText: Showing hot dog gain +%d at position %s" % [amount, position])
 	
+	if not label:
+		print("ERROR: FloatingText: Label node is null!")
+		return
+	
 	# Set text and color
 	label.text = "+%d" % amount
 	label.modulate = Color(0.8, 0.6, 0.2, 1.0)  # Orange for hot dogs
 	
 	# Position the text
 	global_position = position
+	print("FloatingText: Set global_position to %s" % global_position)
 	
 	# Reset appearance
 	modulate = Color.WHITE
 	visible = true
+	print("FloatingText: Set visible = true")
 	
 	# Start fade animation
 	_start_fade_animation()
