@@ -94,6 +94,7 @@ func hire_worker(assignment: WorkerDefinition.WorkerAssignment = WorkerDefinitio
 		"hire_cost": hire_cost,
 		"hot_dogs_consumed": 0.0,
 		"hot_dogs_produced": 0.0,
+		"production_buffer": 0.0,
 		"hire_time": Time.get_datetime_string_from_system()
 	}
 	
@@ -119,7 +120,7 @@ func hire_worker(assignment: WorkerDefinition.WorkerAssignment = WorkerDefinitio
 
 func assign_worker(worker_id: String, assignment: WorkerDefinition.WorkerAssignment) -> bool:
 	"""Assign a worker to a different station"""
-	var worker = _get_worker_by_id(worker_id)
+	var worker = get_worker_by_id(worker_id)
 	if not worker:
 		return false
 	
@@ -156,15 +157,26 @@ func _process_kitchen_worker(worker: Dictionary):
 	var quota_per_second = 1.0
 	var production_per_second = 0.5 * office_efficiency_bonus
 	
+	# Initialize production buffer if not already present
+	if not worker.has("production_buffer"):
+		worker["production_buffer"] = 0.0
+	
 	# Check if we have enough hot dogs for quota
-	if hot_dog_manager and hot_dog_manager.hot_dogs_inventory >= quota_per_second:
+	if hot_dog_manager and hot_dog_manager.hot_dogs_inventory >= int(quota_per_second):
 		# Consume hot dogs
-		hot_dog_manager.hot_dogs_inventory -= int(quota_per_second)
-		worker["hot_dogs_consumed"] += quota_per_second
+		var quota_to_consume = int(quota_per_second)
+		hot_dog_manager.hot_dogs_inventory -= quota_to_consume
+		worker["hot_dogs_consumed"] += quota_to_consume
 		
-		# Produce hot dogs
-		hot_dog_manager.produce_hot_dogs(int(production_per_second), "kitchen_worker")
-		worker["hot_dogs_produced"] += production_per_second
+		# Accumulate production in the buffer
+		worker["production_buffer"] += production_per_second
+		
+		# Produce whole hot dogs from the buffer
+		var whole_hot_dogs = int(worker["production_buffer"])
+		if whole_hot_dogs > 0:
+			hot_dog_manager.produce_hot_dogs(whole_hot_dogs, "kitchen_worker")
+			worker["hot_dogs_produced"] += whole_hot_dogs
+			worker["production_buffer"] -= whole_hot_dogs
 	else:
 		# Not enough hot dogs for quota - emit warning
 		var deficit = quota_per_second - (hot_dog_manager.hot_dogs_inventory if hot_dog_manager else 0)
@@ -175,9 +187,10 @@ func _process_office_worker(worker: Dictionary):
 	var quota_per_second = 1.0
 	
 	# Check if we have enough hot dogs for quota
-	if hot_dog_manager and hot_dog_manager.hot_dogs_inventory >= quota_per_second:
-		hot_dog_manager.hot_dogs_inventory -= int(quota_per_second)
-		worker["hot_dogs_consumed"] += quota_per_second
+	if hot_dog_manager and hot_dog_manager.hot_dogs_inventory >= int(quota_per_second):
+		var quota_to_consume = int(quota_per_second)
+		hot_dog_manager.hot_dogs_inventory -= quota_to_consume
+		worker["hot_dogs_consumed"] += quota_to_consume
 	else:
 		# Not enough hot dogs for quota - emit warning
 		var deficit = quota_per_second - (hot_dog_manager.hot_dogs_inventory if hot_dog_manager else 0)
@@ -212,7 +225,7 @@ func get_total_consumption_rate() -> float:
 	"""Get the total hot dog consumption rate from all workers"""
 	return hired_workers.size() * 1.0  # 1 hot dog per second per worker
 
-func _get_worker_by_id(worker_id: String) -> Dictionary:
+func get_worker_by_id(worker_id: String) -> Dictionary:
 	"""Get worker data by ID"""
 	for worker in hired_workers:
 		if worker["worker_id"] == worker_id:
@@ -226,6 +239,12 @@ func _on_save_data_loaded(save_data: Dictionary):
 		hired_workers = workers_data.get("hired_workers", [])
 		next_worker_id = workers_data.get("next_worker_id", 1)
 		max_workers = workers_data.get("max_workers", 2)
+		
+		# Ensure backward compatibility - add production buffer to existing workers
+		for worker in hired_workers:
+			if not worker.has("production_buffer"):
+				worker["production_buffer"] = 0.0
+		
 		_recalculate_production_rates()
 		print("WorkerManager: Loaded %d workers from save" % hired_workers.size())
 

@@ -298,7 +298,7 @@ func _update_all_buttons():
 					button.disabled = not worker_manager.can_hire_worker()
 				else:
 					# This is a worker assignment button
-					var worker = worker_manager._get_worker_by_id(worker_id)
+					var worker = worker_manager.get_worker_by_id(worker_id)
 					if not worker.is_empty():
 						button.text = _get_worker_assignment_text(worker)
 
@@ -426,7 +426,7 @@ func _on_worker_assignment_button_pressed(worker_id: String):
 	if not worker_manager:
 		return
 	
-	var worker = worker_manager._get_worker_by_id(worker_id)
+	var worker = worker_manager.get_worker_by_id(worker_id)
 	if worker.is_empty():
 		return
 	
