@@ -43,7 +43,7 @@ func _ready():
 	save_system = get_node_or_null("/root/SaveSystem")
 	floating_text_manager = get_node_or_null("/root/FloatingTextManager")
 	event_log_manager = get_node_or_null("/root/EventLogManager")
-	
+
 	# Validate critical dependencies
 	if not hot_dog_manager:
 		push_error("Game: HotDogManager not found!")
@@ -370,13 +370,16 @@ func _on_customer_arrived():
 func _on_click_completed(click_type: String, hot_dogs_produced: int):
 	"""Handle click completion events"""
 
+
 func _on_production_rates_changed():
 	"""Handle production rate changes"""
 	_update_currency_button_display()
 
+
 func _on_worker_hired(worker_id: String, cost: int):
 	"""Handle worker hired events"""
 	_update_currency_button_display()
+
 
 func _on_worker_assigned(worker_id: String, assignment: int):
 	"""Handle worker assignment events"""
