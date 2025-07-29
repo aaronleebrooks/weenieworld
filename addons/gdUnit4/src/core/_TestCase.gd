@@ -126,10 +126,10 @@ func do_interrupt() -> void:
 		var execution_context:= GdUnitThreadManager.get_current_context().get_execution_context()
 		if is_fuzzed():
 			execution_context.add_report(GdUnitReport.new()\
-				.create(GdUnitReport.INTERUPTED, line_number(), GdAssertMessages.fuzzer_interuped(_current_iteration, "timedout")))
+				.create(GdUnitReport.INTERRUPTED, line_number(), GdAssertMessages.fuzzer_interuped(_current_iteration, "timedout")))
 		else:
 			execution_context.add_report(GdUnitReport.new()\
-				.create(GdUnitReport.INTERUPTED, line_number(), GdAssertMessages.test_timeout(_attribute.timeout)))
+				.create(GdUnitReport.INTERRUPTED, line_number(), GdAssertMessages.test_timeout(_attribute.timeout)))
 	completed.emit()
 
 

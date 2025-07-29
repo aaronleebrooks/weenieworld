@@ -13,7 +13,7 @@ func before():
 		# If autoload not available, create a mock instance for testing
 		hot_dog_manager = preload("res://scripts/autoload/HotDogManager.gd").new()
 		add_child(hot_dog_manager)
-	
+
 	# Reset state for clean tests
 	hot_dog_manager.hot_dogs_inventory = 0
 	hot_dog_manager.currency_balance = 0
