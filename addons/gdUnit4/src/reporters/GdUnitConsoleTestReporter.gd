@@ -58,7 +58,7 @@ func on_gdunit_event(event: GdUnitEvent) -> void:
 					.style(GdUnitMessageWritter.BOLD)\
 					.println_message(event.suite_name()+":finalze")
 			_print_failure_report(event.reports())
-			_print_statistics(build_test_suite_statisitcs(event))
+			_print_statistics(build_test_suite_statistics(event))
 			_print_status(event)
 			println_message("")
 			if _detailed:
