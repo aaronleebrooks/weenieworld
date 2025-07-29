@@ -2,19 +2,19 @@
 # For use with gdlint from gdtoolkit
 
 # Line length limit
-line-length = 100
+line-length: 100
 
 # Disable specific checks
-disable = 
-	missing-docstring,          # Allow functions without docstrings for now
-	too-many-arguments,         # Allow more than 5 arguments in functions
-	too-many-locals,            # Allow more than 15 local variables
-	too-many-branches,          # Allow more than 12 branches in function
-	too-many-statements,        # Allow more than 50 statements in function
+disable: 
+  - missing-docstring           # Allow functions without docstrings for now
+  - too-many-arguments          # Allow more than 5 arguments in functions
+  - too-many-locals             # Allow more than 15 local variables
+  - too-many-branches           # Allow more than 12 branches in function
+  - too-many-statements         # Allow more than 50 statements in function
 
 # Enable additional checks
-enable = 
-	function-name,              # Check function naming conventions
-	class-name,                 # Check class naming conventions
-	constant-name,              # Check constant naming conventions
-	variable-name,              # Check variable naming conventions
+enable: 
+  - function-name               # Check function naming conventions
+  - class-name                  # Check class naming conventions
+  - constant-name               # Check constant naming conventions
+  - variable-name               # Check variable naming conventions
