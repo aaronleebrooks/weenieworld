@@ -232,7 +232,7 @@ With the Office & Worker System complete, we now have the foundation needed to b
   - Cost (currency to hire)
   - Specialization (research tree focus)
 - **Quota System**: 
-  - 1 hot dog per second per scientist
+  - 0.5 hot dog per second per scientist
   - Quota curves using Godot Curve resource
   - Penalty for missed quotas (no research)
   - Quota display in worker assignment interface

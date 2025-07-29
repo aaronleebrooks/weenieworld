@@ -400,7 +400,7 @@ This document will be updated as decisions are made and new questions arise duri
 - **Worker System**: 
   - Hire workers for increasing costs: 10, 100, 1000 currency
   - Maximum 2 workers initially (upgradeable)
-  - Workers consume 1 hot dog per second each
+  - Workers consume 0.5 hot dog per second each
   - Workers can be assigned to different stations
 - **Worker Assignments**:
   - Kitchen: Auto-clicker on slow timer (slower than manual holding)
@@ -455,7 +455,7 @@ How should it integrate with the existing game flow? It will allow the player to
 ### 👥 Worker System:
 - **Costs**: 10, 100, 1000 currency (increasing)
 - **Max Workers**: 2 initially (upgradeable)
-- **Consumption**: 1 hot dog per second per worker
+- **Consumption**: 0.5 hot dog per second per worker
 - **Assignments**: Kitchen (auto-clicker) or Office (auto-buyer)
 
 ### 🎮 UI/UX:

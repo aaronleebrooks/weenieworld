@@ -1,0 +1,119 @@
+[gd_scene load_steps=2 format=3 uid="uid://bvn8yqxqxqxqx"]
+
+[ext_resource type="Script" path="res://scripts/scenes/ui/OfficeMenu.gd" id="1_office"]
+
+[node name="OfficeMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+visible = false
+script = ExtResource("1_office")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.2, 0.9)
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+
+[node name="Header" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MainContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🏢 Office Management"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="MainContainer/Header"]
+layout_mode = 2
+text = "✕"
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="Content" type="ScrollContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="OfficeStatus" type="VBoxContainer" parent="MainContainer/Content/VBoxContainer"]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="MainContainer/Content/VBoxContainer/OfficeStatus"]
+layout_mode = 2
+text = "Office Status: Operational"
+horizontal_alignment = 1
+
+[node name="WorkerSection" type="VBoxContainer" parent="MainContainer/Content/VBoxContainer"]
+layout_mode = 2
+
+[node name="WorkerHeader" type="Label" parent="MainContainer/Content/VBoxContainer/WorkerSection"]
+layout_mode = 2
+text = "👥 Worker Management"
+horizontal_alignment = 1
+
+[node name="WorkerStats" type="Label" parent="MainContainer/Content/VBoxContainer/WorkerSection"]
+layout_mode = 2
+text = "Workers: 0/2"
+horizontal_alignment = 1
+
+[node name="HireWorkerButton" type="Button" parent="MainContainer/Content/VBoxContainer/WorkerSection"]
+layout_mode = 2
+text = "Hire Worker (10 currency)"
+
+[node name="WorkerList" type="VBoxContainer" parent="MainContainer/Content/VBoxContainer"]
+layout_mode = 2
+
+[node name="StationSection" type="VBoxContainer" parent="MainContainer/Content/VBoxContainer"]
+layout_mode = 2
+
+[node name="StationHeader" type="Label" parent="MainContainer/Content/VBoxContainer/StationSection"]
+layout_mode = 2
+text = "🏭 Station Overview"
+horizontal_alignment = 1
+
+[node name="KitchenStation" type="HBoxContainer" parent="MainContainer/Content/VBoxContainer/StationSection"]
+layout_mode = 2
+
+[node name="KitchenLabel" type="Label" parent="MainContainer/Content/VBoxContainer/StationSection/KitchenStation"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Kitchen: 0 workers"
+
+[node name="KitchenStatus" type="Label" parent="MainContainer/Content/VBoxContainer/StationSection/KitchenStation"]
+layout_mode = 2
+text = "🟢 Operational"
+
+[node name="OfficeStation" type="HBoxContainer" parent="MainContainer/Content/VBoxContainer/StationSection"]
+layout_mode = 2
+
+[node name="OfficeLabel" type="Label" parent="MainContainer/Content/VBoxContainer/StationSection/OfficeStation"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Office: 0 workers"
+
+[node name="OfficeStatus" type="Label" parent="MainContainer/Content/VBoxContainer/StationSection/OfficeStation"]
+layout_mode = 2
+text = "🟢 Operational" 

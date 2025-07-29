@@ -7,6 +7,9 @@ extends Control
 const UpgradeEnums = preload("res://scripts/resources/UpgradeEnums.gd")
 const WorkerDefinition = preload("res://scripts/resources/WorkerDefinition.gd")
 
+# Constants (extracted per code review feedback)
+const BUILDINGS_UNLOCK_THRESHOLD: int = 100  # Currency earned threshold to unlock buildings
+
 @onready var kitchen_upgrade_container = $SubMenuContainer/KitchenUpgrades/KitchenUpgradeContainer
 @onready var building_container = $SubMenuContainer/Buildings/BuildingContainer
 @onready var kitchen_upgrades_scroll = $SubMenuContainer/KitchenUpgrades
@@ -60,6 +63,9 @@ func _ready():
 	_create_upgrade_buttons()
 	_switch_to_submenu(SubmenuType.KITCHEN_UPGRADES)
 
+	# Set initial Buildings tab state
+	_update_buildings_tab_visibility()
+
 	# Initial currency display update
 	_update_currency_display()
 
@@ -105,7 +111,7 @@ func _create_building_buttons():
 	print("UpgradePanel: Created %d building buttons" % building_buttons.size())
 
 
-func _create_upgrade_button(upgrade) -> Button:
+func _create_upgrade_button(upgrade: Resource) -> Button:
 	"""Create a button for a specific upgrade"""
 	var button = Button.new()
 	button.custom_minimum_size = Vector2(0, 60)
@@ -118,7 +124,7 @@ func _create_upgrade_button(upgrade) -> Button:
 	return button
 
 
-func _create_building_button(building) -> Button:
+func _create_building_button(building: Resource) -> Button:
 	"""Create a button for a specific building"""
 	var button = Button.new()
 	button.custom_minimum_size = Vector2(0, 80)
@@ -131,7 +137,7 @@ func _create_building_button(building) -> Button:
 	return button
 
 
-func _get_upgrade_button_text(upgrade) -> String:
+func _get_upgrade_button_text(upgrade: Resource) -> String:
 	"""Get the text to display on an upgrade button"""
 	if not upgrade_manager:
 		return upgrade.display_name
@@ -155,7 +161,7 @@ func _get_upgrade_button_text(upgrade) -> String:
 	return text
 
 
-func _get_building_button_text(building) -> String:
+func _get_building_button_text(building: Resource) -> String:
 	"""Get the text to display on a building button"""
 	if not building_manager:
 		return building.display_name
@@ -184,37 +190,36 @@ func _switch_to_submenu(submenu_type: SubmenuType):
 	"""Switch between Kitchen Upgrades and Buildings submenus"""
 	current_submenu = submenu_type
 
-	# Update tab button states
-	kitchen_tab.disabled = (submenu_type == SubmenuType.KITCHEN_UPGRADES)
-	buildings_tab.disabled = (submenu_type == SubmenuType.BUILDINGS)
+	# Update tab visual styling - active tab is white, inactive is gray
+	if submenu_type == SubmenuType.KITCHEN_UPGRADES:
+		kitchen_tab.modulate = Color.WHITE
+		buildings_tab.modulate = Color.GRAY
+	else:
+		kitchen_tab.modulate = Color.GRAY
+		buildings_tab.modulate = Color.WHITE
 
 	# Show/hide appropriate containers
 	kitchen_upgrades_scroll.visible = (submenu_type == SubmenuType.KITCHEN_UPGRADES)
 	buildings_scroll.visible = (submenu_type == SubmenuType.BUILDINGS)
 
-	# Update building buttons if switching to buildings
-	if submenu_type == SubmenuType.BUILDINGS:
-		_update_buildings_submenu()
+	# Create building buttons if switching to buildings and they don't exist yet
+	if submenu_type == SubmenuType.BUILDINGS and building_buttons.is_empty():
+		_create_building_buttons()
 
 	if DEBUG_MODE:
 		print("UpgradePanel: Switched to submenu: ", submenu_type)
 
 
-func _update_buildings_submenu():
-	"""Update the buildings submenu visibility and content"""
-	# Check if buildings should be unlocked (after earning 100 currency)
+func _update_buildings_tab_visibility():
+	"""Update the buildings tab visibility based on unlock conditions"""
 	var buildings_unlocked = _check_buildings_unlock()
 
 	if buildings_unlocked:
+		buildings_tab.visible = true
 		buildings_tab.disabled = false
-		buildings_tab.modulate = Color.WHITE
-
-		# Create building buttons if not already created
-		if building_buttons.is_empty():
-			_create_building_buttons()
 	else:
+		buildings_tab.visible = false
 		buildings_tab.disabled = true
-		buildings_tab.modulate = Color.GRAY
 
 		# If currently on buildings tab but it's locked, switch to kitchen
 		if current_submenu == SubmenuType.BUILDINGS:
@@ -226,8 +231,8 @@ func _check_buildings_unlock() -> bool:
 	if not hot_dog_manager:
 		return false
 
-	# Unlock buildings after earning 100 total currency
-	return hot_dog_manager.total_currency_earned >= 100
+	# Unlock buildings after earning the threshold defined in BUILDINGS_UNLOCK_THRESHOLD
+	return hot_dog_manager.total_currency_earned >= BUILDINGS_UNLOCK_THRESHOLD
 
 
 func _on_kitchen_tab_pressed():
@@ -237,11 +242,9 @@ func _on_kitchen_tab_pressed():
 
 func _on_buildings_tab_pressed():
 	"""Handle Buildings tab button press"""
+	# Only allow switching if buildings are unlocked
 	if _check_buildings_unlock():
 		_switch_to_submenu(SubmenuType.BUILDINGS)
-	else:
-		if DEBUG_MODE:
-			print("UpgradePanel: Buildings submenu still locked")
 
 
 func _on_upgrade_button_pressed(upgrade_id: String):
@@ -268,21 +271,21 @@ func _on_building_button_pressed(building_id: String):
 		print("UpgradePanel: Failed to purchase building: ", building_id)
 
 
-func _on_building_purchased(building_id: String, cost: int):
+func _on_building_purchased(building_id: String, _cost: int):
 	"""Handle building purchase event"""
 	_update_all_buttons()
 	if DEBUG_MODE:
 		print("UpgradePanel: Building purchased event received: ", building_id)
 
 
-func _on_currency_changed(new_balance: int, change_amount: int):
+func _on_currency_changed(_new_balance: int, _change_amount: int):
 	"""Update button states when currency changes"""
 	_update_all_buttons()
 	_update_currency_display()
-	_update_buildings_submenu()
+	_update_buildings_tab_visibility()
 
 
-func _on_upgrade_purchased(upgrade_id: String, level: int, cost: int):
+func _on_upgrade_purchased(_upgrade_id: String, _level: int, _cost: int):
 	"""Update buttons when an upgrade is purchased"""
 	_update_all_buttons()
 
@@ -340,7 +343,7 @@ func show_panel():
 	visible = true
 	_update_all_buttons()
 	_update_currency_display()
-	_update_buildings_submenu()
+	_update_buildings_tab_visibility()
 
 
 func _create_worker_management_ui():
@@ -422,10 +425,9 @@ func _get_hire_worker_button_text() -> String:
 
 		if worker_count >= max_workers:
 			return "Hire Worker - Max Workers Reached (%d/%d)" % [worker_count, max_workers]
-		elif not hot_dog_manager or not hot_dog_manager.can_afford(cost):
+		if not hot_dog_manager or not hot_dog_manager.can_afford(cost):
 			return "Hire Worker - Can't Afford (%d currency)" % cost
-		else:
-			return "Hire Worker - Requirements Not Met"
+		return "Hire Worker - Requirements Not Met"
 
 	var cost = worker_manager.get_next_hire_cost()
 	var worker_count = worker_manager.get_worker_count()
@@ -477,14 +479,14 @@ func _on_worker_assignment_button_pressed(worker_id: String):
 		print("UpgradePanel: Failed to reassign worker")
 
 
-func _on_worker_hired(worker_id: String, cost: int):
+func _on_worker_hired(worker_id: String, _cost: int):
 	"""Handle worker hired event"""
 	_refresh_worker_ui()
 	if DEBUG_MODE:
 		print("UpgradePanel: Worker hired event received: ", worker_id)
 
 
-func _on_worker_assigned(worker_id: String, assignment: WorkerDefinition.WorkerAssignment):
+func _on_worker_assigned(worker_id: String, _assignment: WorkerDefinition.WorkerAssignment):
 	"""Handle worker assignment event"""
 	_refresh_worker_ui()
 	if DEBUG_MODE:

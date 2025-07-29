@@ -4,7 +4,7 @@ signal event_added(event: Dictionary)
 signal event_log_updated
 
 # Event types for categorization
-enum EventType { PURCHASE, SAVE, RANDOM_EVENT, SYSTEM, WORKER, NOTIFICATION }  # Upgrades, office, workers, etc.  # Manual saves  # Random events and achievements  # System events (game start, etc.)  # Worker-related events  # General notifications
+enum EventType { PURCHASE, SAVE, RANDOM_EVENT, SYSTEM, WORKER, NOTIFICATION, DEBUG }  # Upgrades, office, workers, etc.  # Manual saves  # Random events and achievements  # System events (game start, etc.)  # Worker-related events  # General notifications  # Debug events
 
 # Event log storage
 var event_log: Array[Dictionary] = []
@@ -120,6 +120,11 @@ func add_worker_event(title: String, description: String, icon: String = "👷")
 func add_notification(title: String, description: String, icon: String = "📢"):
 	"""Add a general notification"""
 	add_event(EventType.NOTIFICATION, title, description, icon)
+
+
+func add_debug_event(description: String, icon: String = "🔧"):
+	"""Add a debug event"""
+	add_event(EventType.DEBUG, "Debug Action", description, icon)
 
 
 func get_recent_events(count: int = 10) -> Array[Dictionary]:
