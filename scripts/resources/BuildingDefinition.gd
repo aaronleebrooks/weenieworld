@@ -15,7 +15,7 @@ extends Resource
 @export var unlock_condition_value: int = 0
 
 # Building effects
-@export var effects: Array[String] = []  # Text descriptions of what the building unlocks
+@export var effects: Array = []  # Text descriptions of what the building unlocks
 
 enum UnlockConditionType {
 	CURRENCY_EARNED,    # Unlocks after earning X total currency
