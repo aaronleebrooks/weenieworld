@@ -126,8 +126,8 @@ static func to_type(type :int) -> String:
 			return "ORPHAN"
 		GdUnitReport.TERMINATED:
 			return "TERMINATED"
-		GdUnitReport.INTERUPTED:
-			return "INTERUPTED"
+		GdUnitReport.INTERRUPTED:
+			return "INTERRUPTED"
 		GdUnitReport.ABORT:
 			return "ABORT"
 	return "UNKNOWN"
