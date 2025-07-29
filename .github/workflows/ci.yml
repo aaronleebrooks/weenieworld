@@ -72,13 +72,15 @@ jobs:
       run: |
         echo "Running GdUnit4 tests..."
         # Import project first to ensure .godot folder is generated
-        ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --quit
-        # Run tests using GdUnit4 command line tool
-        ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --script addons/gdUnit4/bin/GdUnitCmdTool.gd --add tests/unit/ --no-fail-fast
+        timeout 30 ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --import || true
+        # Wait for import to complete
+        sleep 2
+        # Run tests using GdUnit4 command line tool  
+        ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --script addons/gdUnit4/bin/GdUnitCmdTool.gd --add tests/unit/ --no-fail-fast --verbose
         
     - name: Upload test results
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-results
         path: |
