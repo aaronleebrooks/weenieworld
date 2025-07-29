@@ -31,12 +31,39 @@ func setup_event(event: Dictionary):
 
 func _format_timestamp(timestamp: String) -> String:
 	"""Format timestamp to be more readable"""
-	# Parse the timestamp and format it
-	# For now, just return the time part if it exists
+	# Handle UTC timestamp format like "2025-07-28T20:16:00"
+	if "T" in timestamp:
+		# Parse the UTC timestamp
+		var time_parts = timestamp.split("T")
+		if time_parts.size() >= 2:
+			var time_part = time_parts[1]
+			# Remove any trailing timezone info
+			if "." in time_part:
+				time_part = time_part.split(".")[0]
+			
+			# Parse hours and minutes
+			var time_components = time_part.split(":")
+			if time_components.size() >= 2:
+				var hour = int(time_components[0])
+				var minute = time_components[1]
+				
+				# Convert to 12-hour format
+				var period = "AM"
+				if hour >= 12:
+					period = "PM"
+				if hour > 12:
+					hour -= 12
+				elif hour == 0:
+					hour = 12
+				
+				return "%d:%s %s" % [hour, minute, period]
+	
+	# Fallback: return just the time part if it exists
 	if " " in timestamp:
 		var parts = timestamp.split(" ")
 		if parts.size() >= 2:
 			return parts[1]  # Return just the time part
+	
 	return timestamp
 
 func _ready():

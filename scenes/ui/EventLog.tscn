@@ -1,15 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://fljaxk5mlg7x"]
+[gd_scene load_steps=3 format=3 uid="uid://bvujp2cd5guc1"]
 
-[ext_resource type="Script" path="res://scenes/ui/EventLog.gd" id="1_0xqxqx"]
+[ext_resource type="Script" uid="uid://cko6qmtq41q80" path="res://scenes/ui/EventLog.gd" id="1_0xqxqx"]
+[ext_resource type="PackedScene" uid="uid://co0psmrj5t32m" path="res://scenes/ui/EventLogItem.tscn" id="2_lo53r"]
 
 [node name="EventLog" type="Control"]
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -300.0
 grow_horizontal = 0
+grow_vertical = 2
 script = ExtResource("1_0xqxqx")
 
 [node name="Background" type="ColorRect" parent="."]
@@ -17,6 +19,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0, 0, 0, 0.7)
 
 [node name="MainContainer" type="VBoxContainer" parent="."]
@@ -28,12 +32,13 @@ offset_left = 15.0
 offset_top = 15.0
 offset_right = -15.0
 offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Header" type="Label" parent="MainContainer"]
 layout_mode = 2
 text = "Event Log"
 horizontal_alignment = 1
-font_size = 14
 
 [node name="HSeparator" type="HSeparator" parent="MainContainer"]
 layout_mode = 2
@@ -44,4 +49,12 @@ size_flags_vertical = 3
 
 [node name="EventListContainer" type="VBoxContainer" parent="MainContainer/ScrollContainer"]
 layout_mode = 2
-size_flags_horizontal = 3 
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 2
+
+[node name="EventLogItem" parent="MainContainer/ScrollContainer/EventListContainer" instance=ExtResource("2_lo53r")]
+layout_mode = 2
+
+[node name="EventLogItem2" parent="MainContainer/ScrollContainer/EventListContainer" instance=ExtResource("2_lo53r")]
+layout_mode = 2
