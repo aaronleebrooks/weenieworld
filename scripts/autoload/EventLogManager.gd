@@ -4,14 +4,7 @@ signal event_added(event: Dictionary)
 signal event_log_updated
 
 # Event types for categorization
-enum EventType {
-	PURCHASE,      # Upgrades, office, workers, etc.
-	SAVE,          # Manual saves
-	RANDOM_EVENT,  # Random events and achievements
-	SYSTEM,        # System events (game start, etc.)
-	WORKER,        # Worker-related events
-	NOTIFICATION   # General notifications
-}
+enum EventType { PURCHASE, SAVE, RANDOM_EVENT, SYSTEM, WORKER, NOTIFICATION }  # Upgrades, office, workers, etc.  # Manual saves  # Random events and achievements  # System events (game start, etc.)  # Worker-related events  # General notifications
 
 # Event log storage
 var event_log: Array[Dictionary] = []
