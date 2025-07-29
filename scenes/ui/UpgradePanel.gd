@@ -7,6 +7,9 @@ extends Control
 const UpgradeEnums = preload("res://scripts/resources/UpgradeEnums.gd")
 const WorkerDefinition = preload("res://scripts/resources/WorkerDefinition.gd")
 
+# Constants (extracted per code review feedback)
+const BUILDINGS_UNLOCK_THRESHOLD: int = 100  # Currency earned threshold to unlock buildings
+
 @onready var kitchen_upgrade_container = $SubMenuContainer/KitchenUpgrades/KitchenUpgradeContainer
 @onready var building_container = $SubMenuContainer/Buildings/BuildingContainer
 @onready var kitchen_upgrades_scroll = $SubMenuContainer/KitchenUpgrades
@@ -108,7 +111,7 @@ func _create_building_buttons():
 	print("UpgradePanel: Created %d building buttons" % building_buttons.size())
 
 
-func _create_upgrade_button(upgrade) -> Button:
+func _create_upgrade_button(upgrade: Dictionary) -> Button:
 	"""Create a button for a specific upgrade"""
 	var button = Button.new()
 	button.custom_minimum_size = Vector2(0, 60)
@@ -121,7 +124,7 @@ func _create_upgrade_button(upgrade) -> Button:
 	return button
 
 
-func _create_building_button(building) -> Button:
+func _create_building_button(building: Dictionary) -> Button:
 	"""Create a button for a specific building"""
 	var button = Button.new()
 	button.custom_minimum_size = Vector2(0, 80)
@@ -134,7 +137,7 @@ func _create_building_button(building) -> Button:
 	return button
 
 
-func _get_upgrade_button_text(upgrade) -> String:
+func _get_upgrade_button_text(upgrade: Dictionary) -> String:
 	"""Get the text to display on an upgrade button"""
 	if not upgrade_manager:
 		return upgrade.display_name
@@ -158,7 +161,7 @@ func _get_upgrade_button_text(upgrade) -> String:
 	return text
 
 
-func _get_building_button_text(building) -> String:
+func _get_building_button_text(building: Dictionary) -> String:
 	"""Get the text to display on a building button"""
 	if not building_manager:
 		return building.display_name
@@ -228,8 +231,8 @@ func _check_buildings_unlock() -> bool:
 	if not hot_dog_manager:
 		return false
 
-	# Unlock buildings after earning 100 total currency
-	return hot_dog_manager.total_currency_earned >= 100
+	# Unlock buildings after earning the threshold defined in BUILDINGS_UNLOCK_THRESHOLD
+	return hot_dog_manager.total_currency_earned >= BUILDINGS_UNLOCK_THRESHOLD
 
 
 func _on_kitchen_tab_pressed():

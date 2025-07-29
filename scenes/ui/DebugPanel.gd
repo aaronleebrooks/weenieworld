@@ -19,6 +19,7 @@ var event_log_manager: Node
 
 # Debug mode constants
 const DEBUG_MODE: bool = true  # Set to false for production builds
+const DEBUG_SOURCE: String = "debug_panel"  # Source identifier for debug actions
 const OFFICE_UNLOCK_CURRENCY: int = 600  # 100 to unlock + 500 to purchase
 const WORKER_SETUP_CURRENCY: int = 20
 const WORKER_SETUP_HOT_DOGS: int = 10
@@ -31,11 +32,11 @@ func _ready():
 		visible = false
 		return
 	
-	# Get references to managers
-	hot_dog_manager = get_node_or_null("/root/HotDogManager")
-	building_manager = get_node_or_null("/root/BuildingManager")
-	worker_manager = get_node_or_null("/root/WorkerManager")
-	event_log_manager = get_node_or_null("/root/EventLogManager")
+	# Get references to managers using helper method
+	hot_dog_manager = _get_manager("HotDogManager")
+	building_manager = _get_manager("BuildingManager")
+	worker_manager = _get_manager("WorkerManager")
+	event_log_manager = _get_manager("EventLogManager")
 	
 	# Connect button signals
 	add_currency_button.pressed.connect(_on_add_currency_button_pressed)
@@ -101,7 +102,10 @@ func _on_hire_worker_button_pressed():
 	"""Handle quick worker hire button press"""
 	if _quick_worker_setup():
 		print("DebugPanel: Successfully set up worker hiring conditions")
-		_log_debug_action("Quick worker setup - added %d currency and %d hot dogs" % [WORKER_SETUP_CURRENCY, WORKER_SETUP_HOT_DOGS])
+		_log_debug_action(
+			"Quick worker setup - added %d currency and %d hot dogs" 
+			% [WORKER_SETUP_CURRENCY, WORKER_SETUP_HOT_DOGS]
+		)
 	else:
 		print("DebugPanel: Failed to set up worker conditions")
 
@@ -118,15 +122,8 @@ func _add_debug_currency(amount: int) -> bool:
 	if not _validate_debug_input(amount):
 		return false
 	
-	# Add currency directly and track as earned
-	hot_dog_manager.currency_balance += amount
-	hot_dog_manager.total_currency_earned += amount
-	
-	# Emit currency changed signal
-	hot_dog_manager.currency_changed.emit(hot_dog_manager.currency_balance, amount)
-	hot_dog_manager.currency_earned.emit(amount, "debug_panel")
-	
-	return true
+	# Use the proper method to add currency
+	return hot_dog_manager.add_currency(amount, DEBUG_SOURCE)
 
 func _add_debug_hot_dogs(amount: int) -> bool:
 	"""Add hot dogs through debug system with validation"""
@@ -138,7 +135,7 @@ func _add_debug_hot_dogs(amount: int) -> bool:
 		return false
 	
 	# Use the existing produce_hot_dogs method to maintain consistency
-	hot_dog_manager.produce_hot_dogs(amount, "debug_panel")
+	hot_dog_manager.produce_hot_dogs(amount, DEBUG_SOURCE)
 	
 	return true
 
@@ -234,8 +231,16 @@ func update_quick_action_buttons():
 			hire_worker_button.text = "Need Office First"
 			hire_worker_button.disabled = true
 		else:
-			hire_worker_button.text = "Quick Worker Setup (%d currency + %d hot dogs)" % [WORKER_SETUP_CURRENCY, WORKER_SETUP_HOT_DOGS]
+			hire_worker_button.text = (
+				"Quick Worker Setup (%d currency + %d hot dogs)" 
+				% [WORKER_SETUP_CURRENCY, WORKER_SETUP_HOT_DOGS]
+			)
 			hire_worker_button.disabled = false
+
+func _get_manager(manager_name: String) -> Node:
+	"""Helper method to get manager references with consistent path pattern"""
+	return get_node_or_null("/root/" + manager_name)
+
 
 func _on_visibility_changed():
 	"""Update button states when panel becomes visible"""

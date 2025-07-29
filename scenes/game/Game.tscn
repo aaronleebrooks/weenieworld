@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://ixvn8yqxqxqx" path="res://scenes/game/HotDogDisplay.tscn" id="6_0x0x0"]
 [ext_resource type="PackedScene" uid="uid://bvujp2cd5guc1" path="res://scenes/ui/EventLog.tscn" id="7_eventlog"]
 [ext_resource type="PackedScene" path="res://scenes/ui/DebugPanel.tscn" id="8_debug"]
-[ext_resource type="PackedScene" path="res://scenes/ui/OfficeMenu.tscn" id="9_office"]
+[ext_resource type="PackedScene" uid="uid://bvn8yqxqxqxqx" path="res://scenes/ui/OfficeMenu.tscn" id="9_office"]
 
 [node name="Game" type="Control"]
 layout_mode = 3

@@ -128,6 +128,27 @@ func sell_hot_dogs(amount: int) -> bool:
 	return true
 
 
+func add_currency(amount: int, source: String = "unknown") -> bool:
+	"""Add currency to balance and track as earned"""
+	if amount <= 0:
+		return false
+
+	currency_balance += amount
+	total_currency_earned += amount
+	
+	emit_signal("currency_changed", currency_balance, amount)
+	emit_signal("currency_earned", amount, source)
+	
+	if DEBUG_MODE:
+		print(
+			(
+				"HotDogManager: Added %d currency from %s (new balance: %d)"
+				% [amount, source, currency_balance]
+			)
+		)
+	return true
+
+
 func spend_currency(amount: int, reason: String = "unknown") -> bool:
 	"""Spend currency if sufficient balance exists"""
 	if amount <= 0:
