@@ -20,6 +20,8 @@ var max_manual_saves: int = 3
 var hot_dog_manager: Node
 var customer_manager: Node
 var upgrade_manager: Node
+var building_manager: Node
+var worker_manager: Node
 var game_manager: Node
 
 
@@ -30,6 +32,8 @@ func _ready():
 	hot_dog_manager = get_node("/root/HotDogManager")
 	customer_manager = get_node("/root/CustomerManager")
 	upgrade_manager = get_node("/root/UpgradeManager")
+	building_manager = get_node_or_null("/root/BuildingManager")
+	worker_manager = get_node_or_null("/root/WorkerManager")
 	game_manager = get_node("/root/GameManager")
 
 	# Ensure save directory exists
@@ -182,6 +186,14 @@ func _collect_save_data() -> Dictionary:
 		var upgrade_data = upgrade_manager.get_save_data()
 		save_data.merge(upgrade_data)
 
+	if building_manager:
+		var building_data = building_manager.get_save_data()
+		save_data.merge(building_data)
+
+	if worker_manager:
+		var worker_data = worker_manager.get_save_data()
+		save_data.merge(worker_data)
+
 	# Add event log data
 	var event_log_manager = get_node_or_null("/root/EventLogManager")
 	if event_log_manager:
@@ -219,6 +231,12 @@ func create_new_game_with_name(truck_name: String):
 
 	if upgrade_manager:
 		upgrade_manager.reset_upgrades()
+
+	if building_manager:
+		building_manager.reset_buildings()
+
+	if worker_manager:
+		worker_manager.reset_workers()
 
 	if game_manager:
 		game_manager.reset_game()

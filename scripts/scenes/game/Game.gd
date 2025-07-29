@@ -22,6 +22,7 @@ const DEBUG_MODE: bool = false
 var hot_dog_manager: Node
 var customer_manager: Node
 var upgrade_manager: Node
+var worker_manager: Node
 var save_system: Node
 var floating_text_manager: Node
 var event_log_manager: Node
@@ -38,10 +39,11 @@ func _ready():
 	hot_dog_manager = get_node_or_null("/root/HotDogManager")
 	customer_manager = get_node_or_null("/root/CustomerManager")
 	upgrade_manager = get_node_or_null("/root/UpgradeManager")
+	worker_manager = get_node_or_null("/root/WorkerManager")
 	save_system = get_node_or_null("/root/SaveSystem")
 	floating_text_manager = get_node_or_null("/root/FloatingTextManager")
 	event_log_manager = get_node_or_null("/root/EventLogManager")
-	
+
 	# Validate critical dependencies
 	if not hot_dog_manager:
 		push_error("Game: HotDogManager not found!")
@@ -76,6 +78,12 @@ func _ready():
 	if customer_manager:
 		customer_manager.customer_purchase.connect(_on_customer_purchase)
 		customer_manager.customer_arrived.connect(_on_customer_arrived)
+
+	# Connect to worker manager
+	if worker_manager:
+		worker_manager.production_rates_changed.connect(_on_production_rates_changed)
+		worker_manager.worker_hired.connect(_on_worker_hired)
+		worker_manager.worker_assigned.connect(_on_worker_assigned)
 
 	# Connect to click manager for hot dog production events
 	var click_manager = get_node("/root/ClickManager")
@@ -361,6 +369,21 @@ func _on_customer_arrived():
 
 func _on_click_completed(click_type: String, hot_dogs_produced: int):
 	"""Handle click completion events"""
+
+
+func _on_production_rates_changed():
+	"""Handle production rate changes"""
+	_update_currency_button_display()
+
+
+func _on_worker_hired(worker_id: String, cost: int):
+	"""Handle worker hired events"""
+	_update_currency_button_display()
+
+
+func _on_worker_assigned(worker_id: String, assignment: int):
+	"""Handle worker assignment events"""
+	_update_currency_button_display()
 
 
 func _on_menu_toggle_pressed():

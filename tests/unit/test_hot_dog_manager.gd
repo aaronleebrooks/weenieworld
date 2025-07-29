@@ -7,7 +7,7 @@ var hot_dog_manager: Node
 
 
 func before():
-	"""Setup before each test"""
+	# Setup before each test
 	hot_dog_manager = get_node_or_null("/root/HotDogManager")
 	if not hot_dog_manager:
 		# If autoload not available, create a mock instance for testing
@@ -20,7 +20,7 @@ func before():
 
 
 func test_produce_hot_dogs():
-	"""Test hot dog production increases inventory"""
+	# Test hot dog production increases inventory
 	var initial_inventory: int = hot_dog_manager.hot_dogs_inventory
 	var production_amount: int = 5
 
@@ -30,16 +30,19 @@ func test_produce_hot_dogs():
 
 
 func test_produce_hot_dogs_emits_signal():
-	"""Test that producing hot dogs emits the correct signal"""
-	# Use await to monitor signals properly in GdUnit4
+	# Test that producing hot dogs emits the correct signal
+	# Use GdUnit4's signal monitoring approach
+	var signal_monitor = monitor_signal(hot_dog_manager, "hot_dogs_produced")
+
 	hot_dog_manager.produce_hot_dogs(3, "unit_test")
 
-	# Verify signal was emitted with correct parameters
-	await assert_signal(hot_dog_manager, "hot_dogs_produced").is_emitted()
+	# Allow one frame for signal processing
+	await get_tree().process_frame
+	assert_signal(signal_monitor).is_emitted()
 
 
 func test_sell_hot_dogs_success():
-	"""Test successful hot dog sale"""
+	# Test successful hot dog sale
 	# Setup: have some hot dogs in inventory
 	hot_dog_manager.hot_dogs_inventory = 10
 	hot_dog_manager.sale_value = 2
@@ -53,7 +56,7 @@ func test_sell_hot_dogs_success():
 
 
 func test_sell_hot_dogs_insufficient_inventory():
-	"""Test selling more hot dogs than available"""
+	# Test selling more hot dogs than available
 	hot_dog_manager.hot_dogs_inventory = 2
 	var initial_currency: int = hot_dog_manager.currency_balance
 
@@ -65,18 +68,22 @@ func test_sell_hot_dogs_insufficient_inventory():
 
 
 func test_sell_hot_dogs_emits_signal():
-	"""Test that selling hot dogs emits the correct signal"""
+	# Test that selling hot dogs emits the correct signal
 	hot_dog_manager.hot_dogs_inventory = 10
 	hot_dog_manager.sale_value = 3
 
+	# Use GdUnit4's signal monitoring approach
+	var signal_monitor = monitor_signal(hot_dog_manager, "hot_dogs_sold")
+
 	hot_dog_manager.sell_hot_dogs(2)
 
-	# Verify signal was emitted
-	await assert_signal(hot_dog_manager, "hot_dogs_sold").is_emitted()
+	# Allow one frame for signal processing
+	await get_tree().process_frame
+	assert_signal(signal_monitor).is_emitted()
 
 
 func test_zero_production():
-	"""Test that zero or negative production amounts are handled correctly"""
+	# Test that zero or negative production amounts are handled correctly
 	var initial_inventory: int = hot_dog_manager.hot_dogs_inventory
 
 	hot_dog_manager.produce_hot_dogs(0, "test")
@@ -87,7 +94,7 @@ func test_zero_production():
 
 
 func test_zero_sale():
-	"""Test that zero or negative sale amounts are handled correctly"""
+	# Test that zero or negative sale amounts are handled correctly
 	hot_dog_manager.hot_dogs_inventory = 10
 	var initial_inventory: int = hot_dog_manager.hot_dogs_inventory
 	var initial_currency: int = hot_dog_manager.currency_balance
@@ -100,3 +107,35 @@ func test_zero_sale():
 
 	assert_int(hot_dog_manager.hot_dogs_inventory).is_equal(initial_inventory)
 	assert_int(hot_dog_manager.currency_balance).is_equal(initial_currency)
+
+
+func test_manual_hot_dogs_per_second():
+	# Test manual hot dog production rate estimation
+	hot_dog_manager.hot_dogs_per_click = 2
+
+	var manual_rate = hot_dog_manager.get_hot_dogs_per_second_manual()
+	# 2 hot dogs per click * 0.5 clicks per second = 1.0 hot dogs / second
+	assert_float(manual_rate).is_equal(1.0)
+
+
+func test_rate_calculations_exist():
+	# Test that all rate calculation methods exist and don't crash
+	# Test that methods exist and return valid numbers
+	var currency_rate = hot_dog_manager.get_currency_per_second()
+	assert_float(currency_rate).is_greater_equal(0.0)
+
+	var manual_rate = hot_dog_manager.get_hot_dogs_per_second_manual()
+	assert_float(manual_rate).is_greater_equal(0.0)
+
+	var worker_rate = hot_dog_manager.get_hot_dogs_per_second_workers()
+	assert_float(worker_rate).is_greater_equal(0.0)
+
+	var total_rate = hot_dog_manager.get_hot_dogs_per_second_total()
+	assert_float(total_rate).is_greater_equal(0.0)
+
+	var consumption_rate = hot_dog_manager.get_hot_dog_consumption_per_second()
+	assert_float(consumption_rate).is_greater_equal(0.0)
+
+	var net_rate = hot_dog_manager.get_net_hot_dog_rate()
+	# Net rate can be negative (consumption > production), just test it's a valid number
+	assert_that(net_rate).is_not_null()

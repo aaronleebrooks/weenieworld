@@ -7,6 +7,9 @@ extends Control
 const UpgradeEnums = preload("res://scripts/resources/UpgradeEnums.gd")
 const WorkerDefinition = preload("res://scripts/resources/WorkerDefinition.gd")
 
+# Constants (extracted per code review feedback)
+const BUILDINGS_UNLOCK_THRESHOLD: int = 100  # Currency earned threshold to unlock buildings
+
 @onready var kitchen_upgrade_container = $SubMenuContainer/KitchenUpgrades/KitchenUpgradeContainer
 @onready var building_container = $SubMenuContainer/Buildings/BuildingContainer
 @onready var kitchen_upgrades_scroll = $SubMenuContainer/KitchenUpgrades
@@ -222,12 +225,12 @@ func _update_buildings_submenu():
 
 
 func _check_buildings_unlock() -> bool:
-	"""Check if buildings submenu should be unlocked (after earning 100 currency)"""
+	"""Check if buildings submenu should be unlocked (after earning threshold currency)"""
 	if not hot_dog_manager:
 		return false
 
-	# Unlock buildings after earning 100 total currency
-	return hot_dog_manager.total_currency_earned >= 100
+	# Unlock buildings after earning the threshold defined in BUILDINGS_UNLOCK_THRESHOLD
+	return hot_dog_manager.total_currency_earned >= BUILDINGS_UNLOCK_THRESHOLD
 
 
 func _on_kitchen_tab_pressed():

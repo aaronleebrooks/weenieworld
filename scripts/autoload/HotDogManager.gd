@@ -161,13 +161,60 @@ func can_afford(amount: int) -> bool:
 
 
 func get_formatted_currency() -> String:
-	"""Get formatted currency string (e.g., "1,234" or "1.2K")"""
+	"""Get formatted currency string (e.g., "1, 234" or "1.2K")"""
 	return currency_formatter.format(currency_balance)
 
 
 func get_formatted_hot_dogs() -> String:
 	"""Get formatted hot dog inventory string"""
 	return currency_formatter.format(hot_dogs_inventory)
+
+
+func get_currency_per_second() -> float:
+	"""Calculate currency earned per second from customer purchases"""
+	var customer_manager = get_node_or_null("/root/CustomerManager")
+	if not customer_manager:
+		return 0.0
+
+	# Currency per second = (hot dogs per purchase * sale value) / purchase interval
+	var purchases_per_second = 1.0 / customer_manager.get_purchase_rate()
+	var purchase_amount = customer_manager.get_purchase_amount()
+	return purchases_per_second * purchase_amount * sale_value
+
+
+func get_hot_dogs_per_second_manual() -> float:
+	"""Calculate hot dog production per second from manual clicking / holding"""
+	# This is an estimate based on typical clicking patterns
+	# For now, we'll estimate 1 click every 2 seconds during active play
+	return hot_dogs_per_click * 0.5
+
+
+func get_hot_dogs_per_second_workers() -> float:
+	"""Calculate hot dog production per second from workers"""
+	var worker_manager = get_node_or_null("/root/WorkerManager")
+	if not worker_manager:
+		return 0.0
+
+	return worker_manager.get_kitchen_production_rate()
+
+
+func get_hot_dogs_per_second_total() -> float:
+	"""Calculate total hot dog production per second (manual + workers)"""
+	return get_hot_dogs_per_second_manual() + get_hot_dogs_per_second_workers()
+
+
+func get_hot_dog_consumption_per_second() -> float:
+	"""Calculate hot dog consumption per second from workers"""
+	var worker_manager = get_node_or_null("/root/WorkerManager")
+	if not worker_manager:
+		return 0.0
+
+	return worker_manager.get_total_consumption_rate()
+
+
+func get_net_hot_dog_rate() -> float:
+	"""Calculate net hot dog rate (production - consumption)"""
+	return get_hot_dogs_per_second_total() - get_hot_dog_consumption_per_second()
 
 
 func reset_hot_dogs() -> void:
