@@ -20,7 +20,7 @@ func on_gdunit_event(event: GdUnitEvent) -> void:
 			init_statistics()
 			_report.add_testsuite_report(event.resource_path(), event.suite_name(), event.total_count())
 		GdUnitEvent.TESTSUITE_AFTER:
-			var statistics := build_test_suite_statisitcs(event)
+			var statistics := build_test_suite_statistics(event)
 			_report.update_testsuite_counters(
 				event.resource_path(),
 				error_count(statistics),
