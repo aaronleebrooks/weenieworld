@@ -55,6 +55,9 @@ func _ready():
 	# Setup tooltips for buttons
 	_setup_tooltips()
 	
+	# Set initial menu state
+	_update_menu_button_texts()
+	
 
 	
 	# Connect to viewport size changes using native event system
@@ -214,15 +217,24 @@ func _setup_currency_button():
 	if currency_button:
 		currency_button.text = "💰 Currency"
 		currency_button.add_theme_font_size_override("font_size", 16)
+		currency_button.tooltip_text = "Currency Balance"
 
 func _setup_tooltips():
 	"""Setup tooltips for UI buttons"""
+	# Only add tooltips for buttons that need additional info
+	if currency_button:
+		currency_button.tooltip_text = "Currency Balance"
+
+func _update_menu_button_texts():
+	"""Update button texts based on current menu state"""
+	if currency_button:
+		currency_button.text = "💰" if not menu_visible else "💰 Currency"
 	if upgrade_button:
-		upgrade_button.tooltip_text = "Upgrades"
+		upgrade_button.text = "⚡" if not menu_visible else "⚡ Upgrades"
 	if save_button:
-		save_button.tooltip_text = "Save Game"
+		save_button.text = "💾" if not menu_visible else "💾 Save"
 	if exit_button:
-		exit_button.tooltip_text = "Exit to Menu"
+		exit_button.text = "🚪" if not menu_visible else "🚪 Exit"
 
 
 func _on_viewport_size_changed():
@@ -321,13 +333,15 @@ func _on_menu_toggle_pressed():
 	if menu_toggle_button:
 		menu_toggle_button.text = "<" if menu_visible else ">"
 	
-	# Toggle menu visibility
-	var top_left_menu = get_node_or_null("TopLeftMenu")
-	if top_left_menu:
-		# Hide/show all buttons except the toggle button
-		for child in top_left_menu.get_children():
-			if child != menu_toggle_button:
-				child.visible = menu_visible
+	# Toggle between icon-only and full-button modes
+	if currency_button:
+		currency_button.text = "💰" if not menu_visible else "💰 Currency"
+	if upgrade_button:
+		upgrade_button.text = "⚡" if not menu_visible else "⚡ Upgrades"
+	if save_button:
+		save_button.text = "💾" if not menu_visible else "💾 Save"
+	if exit_button:
+		exit_button.text = "🚪" if not menu_visible else "🚪 Exit"
 
 func _on_upgrade_button_pressed():
 	"""Handle upgrade button press"""
