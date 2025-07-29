@@ -10,6 +10,7 @@ const UpgradeEnums = preload("res://scripts/resources/UpgradeEnums.gd")
 @export var display_name: String
 @export var description: String
 @export var icon_path: String = ""
+@export var category: int = 0  # UpgradeCategory.KITCHEN
 
 # Cost configuration
 @export var base_cost: int = 10

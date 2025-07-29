@@ -63,6 +63,7 @@ func _create_default_upgrades():
 	faster_production.effect_type = UpgradeEnums.EffectType.PRODUCTION_RATE
 	faster_production.effect_value = -0.02
 	faster_production.max_level = 10
+	faster_production.category = UpgradeEnums.UpgradeCategory.KITCHEN
 	upgrade_definitions.append(faster_production)
 
 	var efficient_cooking = UpgradeDefinition.new()
@@ -75,6 +76,7 @@ func _create_default_upgrades():
 	efficient_cooking.effect_type = UpgradeEnums.EffectType.IDLE_RATE
 	efficient_cooking.effect_value = -0.05
 	efficient_cooking.max_level = 5
+	efficient_cooking.category = UpgradeEnums.UpgradeCategory.KITCHEN
 	upgrade_definitions.append(efficient_cooking)
 
 	# Hot Dogs Per Click Upgrade (1)
@@ -88,6 +90,7 @@ func _create_default_upgrades():
 	better_recipe.effect_type = UpgradeEnums.EffectType.HOT_DOGS_PER_CLICK
 	better_recipe.effect_value = 1
 	better_recipe.max_level = 8
+	better_recipe.category = UpgradeEnums.UpgradeCategory.KITCHEN
 	upgrade_definitions.append(better_recipe)
 
 	# Customer System Upgrades (2)
@@ -101,6 +104,7 @@ func _create_default_upgrades():
 	customer_service.effect_type = UpgradeEnums.EffectType.CUSTOMER_PURCHASE_RATE
 	customer_service.effect_value = -0.2
 	customer_service.max_level = 6
+	customer_service.category = UpgradeEnums.UpgradeCategory.KITCHEN
 	upgrade_definitions.append(customer_service)
 
 	var premium_pricing = UpgradeDefinition.new()
@@ -113,6 +117,7 @@ func _create_default_upgrades():
 	premium_pricing.effect_type = UpgradeEnums.EffectType.SALE_VALUE
 	premium_pricing.effect_value = 1
 	premium_pricing.max_level = 5
+	premium_pricing.category = UpgradeEnums.UpgradeCategory.KITCHEN
 	upgrade_definitions.append(premium_pricing)
 
 
@@ -257,6 +262,14 @@ func _apply_upgrade_effects(upgrade_id: String):
 func get_all_upgrades() -> Array[UpgradeDefinition]:
 	"""Get all upgrade definitions"""
 	return upgrade_definitions
+
+func get_upgrades_by_category(category: UpgradeEnums.UpgradeCategory) -> Array[UpgradeDefinition]:
+	"""Get upgrade definitions filtered by category"""
+	var filtered_upgrades: Array[UpgradeDefinition] = []
+	for upgrade in upgrade_definitions:
+		if upgrade.category == category:
+			filtered_upgrades.append(upgrade)
+	return filtered_upgrades
 
 
 func get_upgrade_info(upgrade_id: String) -> Dictionary:
