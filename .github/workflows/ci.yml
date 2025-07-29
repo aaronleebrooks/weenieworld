@@ -71,8 +71,10 @@ jobs:
     - name: Run unit tests
       run: |
         echo "Running GdUnit4 tests..."
-        # Run tests using GdUnit4 command line
-        ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add tests/unit/ --no-fail-fast
+        # Import project first to ensure .godot folder is generated
+        ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --quit
+        # Run tests using GdUnit4 command line tool
+        ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --script addons/gdUnit4/bin/GdUnitCmdTool.gd --add tests/unit/ --no-fail-fast
         
     - name: Upload test results
       if: always()
@@ -128,14 +130,25 @@ jobs:
     - name: Validate project files
       run: |
         echo "Validating Godot project..."
-        # Check project.godot is valid
-        ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --check-only
+        # Check project.godot exists and is readable
+        if [ ! -f "project.godot" ]; then
+          echo "ERROR: project.godot not found!"
+          exit 1
+        fi
+        # Try to import the project (this validates the project files)
+        ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --quit
+        echo "✓ Project validation completed"
         
     - name: Test export capabilities
       run: |
         echo "Testing export presets..."
-        # Basic export validation (without actually exporting)
-        ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --export-debug "Linux/X11" --no-window test_build.x86_64 || true
+        # Check if export presets exist first
+        if [ -f "export_presets.cfg" ]; then
+          echo "Export presets found, testing export..."
+          ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --export-debug "Linux/X11" --no-window test_build.x86_64 || true
+        else
+          echo "No export presets configured - skipping export test"
+        fi
         echo "✓ Export validation completed"
 
   # Documentation & Code Coverage (Future)
