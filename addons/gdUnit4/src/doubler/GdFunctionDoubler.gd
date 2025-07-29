@@ -109,7 +109,7 @@ func _init(push_errors :bool = false) -> void:
 	_push_errors = "true" if push_errors else "false"
 	for type_key in TYPE_MAX:
 		if not DEFAULT_TYPED_RETURN_VALUES.has(type_key):
-			push_error("missing default definitions! Expexting %d bud is %d" % [DEFAULT_TYPED_RETURN_VALUES.size(), TYPE_MAX])
+			push_error("missing default definitions! Expecting %d but is %d" % [DEFAULT_TYPED_RETURN_VALUES.size(), TYPE_MAX])
 			prints("missing default definition for type", type_key)
 			assert(DEFAULT_TYPED_RETURN_VALUES.has(type_key), "Missing Type default definition!")
 
