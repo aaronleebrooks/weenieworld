@@ -35,7 +35,7 @@ func write(report :GdUnitReportSummary) -> String:
 	var result_file: String = "%s/results.xml" % _report_path
 	var file := FileAccess.open(result_file, FileAccess.WRITE)
 	if file == null:
-		push_warning("Can't saving the result to '%s'\n Error: %s" % [result_file, error_string(FileAccess.get_open_error())])
+		push_warning("Can't save the result to '%s'\n Error: %s" % [result_file, error_string(FileAccess.get_open_error())])
 	file.store_string(build_junit_report(report))
 	return result_file
 
