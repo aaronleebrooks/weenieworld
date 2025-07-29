@@ -295,12 +295,16 @@ func test_office_worker_consumption():
 	worker_manager.hire_worker(WorkerDefinition.WorkerAssignment.OFFICE)
 	var worker = worker_manager.hired_workers[0]
 
-	# Process worker consumption
+	# Process worker consumption once (0.5 hot dogs)
 	worker_manager._process_office_worker(worker)
+	assert_int(hot_dog_manager.hot_dogs_inventory).is_equal(10)  # No consumption yet (buffer < 1.0)
+	assert_float(worker["consumption_buffer"]).is_equal(0.5)
 
-	# Should consume 1 hot dog, no production
-	assert_int(hot_dog_manager.hot_dogs_inventory).is_equal(9)  # 10 - 1
+	# Process worker consumption again (1.0 hot dogs total)
+	worker_manager._process_office_worker(worker)
+	assert_int(hot_dog_manager.hot_dogs_inventory).is_equal(9)  # Now consumes 1 hot dog
 	assert_float(worker["hot_dogs_consumed"]).is_equal(1.0)
+	assert_float(worker["consumption_buffer"]).is_equal(0.0)  # Buffer reset
 	assert_bool(worker.has("hot_dogs_produced")).is_true()  # Should exist but be 0
 
 
@@ -343,7 +347,7 @@ func test_backward_compatibility():
 				"hot_dogs_consumed": 0.0,
 				"hot_dogs_produced": 0.0,
 				"hire_time": "test_time"
-				# No production_buffer field
+				# No production_buffer or consumption_buffer fields
 			}
 		],
 		"next_worker_id": 2,
@@ -353,10 +357,12 @@ func test_backward_compatibility():
 	# Load old save data
 	worker_manager._on_save_data_loaded({"workers": old_worker_data})
 
-	# Should automatically add production buffer
+	# Should automatically add production and consumption buffers
 	var worker = worker_manager.hired_workers[0]
 	assert_bool(worker.has("production_buffer")).is_true()
 	assert_float(worker["production_buffer"]).is_equal(0.0)
+	assert_bool(worker.has("consumption_buffer")).is_true()
+	assert_float(worker["consumption_buffer"]).is_equal(0.0)
 
 
 func test_get_worker_by_id():

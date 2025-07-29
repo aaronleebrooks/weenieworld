@@ -6,7 +6,7 @@ extends Node
 const WorkerDefinition = preload("res://scripts/resources/WorkerDefinition.gd")
 
 # Constants for worker mechanics (extracted per code review feedback)
-const WORKER_QUOTA_PER_SECOND: float = 1.0
+const WORKER_QUOTA_PER_SECOND: float = 0.5
 const KITCHEN_PRODUCTION_RATE: float = 0.5
 const OFFICE_EFFICIENCY_BONUS_PER_WORKER: float = 0.1  # 10% bonus per office worker
 
@@ -209,17 +209,24 @@ func _process_office_worker(worker: Dictionary):
 	"""Process an office worker's consumption (no production)"""
 	var quota_per_second = WORKER_QUOTA_PER_SECOND
 
-	# Check if we have enough hot dogs for quota
-	if hot_dog_manager and hot_dog_manager.hot_dogs_inventory >= int(quota_per_second):
-		var quota_to_consume = int(quota_per_second)
-		hot_dog_manager.hot_dogs_inventory -= quota_to_consume
-		worker["hot_dogs_consumed"] += quota_to_consume
-	else:
-		# Not enough hot dogs for quota - emit warning
-		var deficit = (
-			quota_per_second - (hot_dog_manager.hot_dogs_inventory if hot_dog_manager else 0)
-		)
-		emit_signal("worker_quota_warning", worker["worker_id"], deficit)
+	# Add to consumption buffer
+	if not worker.has("consumption_buffer"):
+		worker["consumption_buffer"] = 0.0
+	
+	worker["consumption_buffer"] += quota_per_second
+
+	# Consume whole hot dogs when buffer reaches 1.0 or more
+	if worker["consumption_buffer"] >= 1.0:
+		var hot_dogs_to_consume = int(worker["consumption_buffer"])
+		
+		if hot_dog_manager and hot_dog_manager.hot_dogs_inventory >= hot_dogs_to_consume:
+			hot_dog_manager.hot_dogs_inventory -= hot_dogs_to_consume
+			worker["hot_dogs_consumed"] += hot_dogs_to_consume
+			worker["consumption_buffer"] -= hot_dogs_to_consume
+		else:
+			# Not enough hot dogs for quota - emit warning
+			var deficit = hot_dogs_to_consume - (hot_dog_manager.hot_dogs_inventory if hot_dog_manager else 0)
+			emit_signal("worker_quota_warning", worker["worker_id"], deficit)
 
 
 func _recalculate_production_rates():
@@ -246,15 +253,30 @@ func get_worker_count() -> int:
 	return hired_workers.size()
 
 
+func get_total_worker_count() -> int:
+	"""Get the total number of hired workers (alias for get_worker_count)"""
+	return get_worker_count()
+
+
+func get_max_workers() -> int:
+	"""Get the maximum number of workers that can be hired"""
+	return max_workers
+
+
 func get_kitchen_production_rate() -> float:
 	"""Get the total hot dog production rate from kitchen workers"""
 	var kitchen_workers = get_workers_by_assignment(WorkerDefinition.WorkerAssignment.KITCHEN)
 	return kitchen_workers.size() * KITCHEN_PRODUCTION_RATE * office_efficiency_bonus
 
 
+func get_office_efficiency_bonus() -> float:
+	"""Get the current office efficiency bonus multiplier"""
+	return office_efficiency_bonus
+
+
 func get_total_consumption_rate() -> float:
 	"""Get the total hot dog consumption rate from all workers"""
-	return hired_workers.size() * WORKER_QUOTA_PER_SECOND  # 1 hot dog per second per worker
+	return hired_workers.size() * WORKER_QUOTA_PER_SECOND  # 0.5 hot dogs per second per worker
 
 
 func get_worker_by_id(worker_id: String) -> Dictionary:
@@ -263,6 +285,11 @@ func get_worker_by_id(worker_id: String) -> Dictionary:
 		if worker["worker_id"] == worker_id:
 			return worker
 	return {}
+
+
+func get_all_workers() -> Array[Dictionary]:
+	"""Get all hired workers"""
+	return hired_workers.duplicate()
 
 
 func _on_save_data_loaded(save_data: Dictionary):
@@ -281,6 +308,8 @@ func _on_save_data_loaded(save_data: Dictionary):
 		for worker in hired_workers:
 			if not worker.has("production_buffer"):
 				worker["production_buffer"] = 0.0
+			if not worker.has("consumption_buffer"):
+				worker["consumption_buffer"] = 0.0
 
 		_recalculate_production_rates()
 		print("WorkerManager: Loaded %d workers from save" % hired_workers.size())

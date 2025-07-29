@@ -60,6 +60,9 @@ func _ready():
 	_create_upgrade_buttons()
 	_switch_to_submenu(SubmenuType.KITCHEN_UPGRADES)
 
+	# Set initial Buildings tab state
+	_update_buildings_tab_visibility()
+
 	# Initial currency display update
 	_update_currency_display()
 
@@ -184,38 +187,37 @@ func _switch_to_submenu(submenu_type: SubmenuType):
 	"""Switch between Kitchen Upgrades and Buildings submenus"""
 	current_submenu = submenu_type
 
-	# Update tab button states
-	kitchen_tab.disabled = (submenu_type == SubmenuType.KITCHEN_UPGRADES)
-	buildings_tab.disabled = (submenu_type == SubmenuType.BUILDINGS)
+	# Update tab visual styling - active tab is white, inactive is gray
+	if submenu_type == SubmenuType.KITCHEN_UPGRADES:
+		kitchen_tab.modulate = Color.WHITE
+		buildings_tab.modulate = Color.GRAY
+	else:
+		kitchen_tab.modulate = Color.GRAY
+		buildings_tab.modulate = Color.WHITE
 
 	# Show/hide appropriate containers
 	kitchen_upgrades_scroll.visible = (submenu_type == SubmenuType.KITCHEN_UPGRADES)
 	buildings_scroll.visible = (submenu_type == SubmenuType.BUILDINGS)
 
-	# Update building buttons if switching to buildings
-	if submenu_type == SubmenuType.BUILDINGS:
-		_update_buildings_submenu()
+	# Create building buttons if switching to buildings and they don't exist yet
+	if submenu_type == SubmenuType.BUILDINGS and building_buttons.is_empty():
+		_create_building_buttons()
 
 	if DEBUG_MODE:
 		print("UpgradePanel: Switched to submenu: ", submenu_type)
 
 
-func _update_buildings_submenu():
-	"""Update the buildings submenu visibility and content"""
-	# Check if buildings should be unlocked (after earning 100 currency)
+func _update_buildings_tab_visibility():
+	"""Update the buildings tab visibility based on unlock conditions"""
 	var buildings_unlocked = _check_buildings_unlock()
-
+	
 	if buildings_unlocked:
+		buildings_tab.visible = true
 		buildings_tab.disabled = false
-		buildings_tab.modulate = Color.WHITE
-
-		# Create building buttons if not already created
-		if building_buttons.is_empty():
-			_create_building_buttons()
 	else:
+		buildings_tab.visible = false
 		buildings_tab.disabled = true
-		buildings_tab.modulate = Color.GRAY
-
+		
 		# If currently on buildings tab but it's locked, switch to kitchen
 		if current_submenu == SubmenuType.BUILDINGS:
 			_switch_to_submenu(SubmenuType.KITCHEN_UPGRADES)
@@ -237,11 +239,9 @@ func _on_kitchen_tab_pressed():
 
 func _on_buildings_tab_pressed():
 	"""Handle Buildings tab button press"""
+	# Only allow switching if buildings are unlocked
 	if _check_buildings_unlock():
 		_switch_to_submenu(SubmenuType.BUILDINGS)
-	else:
-		if DEBUG_MODE:
-			print("UpgradePanel: Buildings submenu still locked")
 
 
 func _on_upgrade_button_pressed(upgrade_id: String):
@@ -279,7 +279,7 @@ func _on_currency_changed(new_balance: int, change_amount: int):
 	"""Update button states when currency changes"""
 	_update_all_buttons()
 	_update_currency_display()
-	_update_buildings_submenu()
+	_update_buildings_tab_visibility()
 
 
 func _on_upgrade_purchased(upgrade_id: String, level: int, cost: int):
@@ -340,7 +340,7 @@ func show_panel():
 	visible = true
 	_update_all_buttons()
 	_update_currency_display()
-	_update_buildings_submenu()
+	_update_buildings_tab_visibility()
 
 
 func _create_worker_management_ui():

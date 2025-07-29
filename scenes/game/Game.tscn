@@ -1,13 +1,14 @@
-[gd_scene load_steps=8 format=3 uid="uid://c8xvn8yqxqxqx"]
+[gd_scene load_steps=10 format=3 uid="uid://c8xvn8yqxqxqx"]
 
-[ext_resource type="Script" uid="uid://m4hu22y7axg6" path="res://scripts/scenes/game/Game.gd" id="1_0x0x0"]
+[ext_resource type="Script" uid="uid://01xip1swy6x" path="res://scripts/scenes/game/Game.gd" id="1_0x0x0"]
 [ext_resource type="PackedScene" uid="uid://fxvn8yqxqxqx" path="res://scenes/game/CurrencyDisplay.tscn" id="2_0x0x0"]
 [ext_resource type="PackedScene" uid="uid://gxvn8yqxqxqx" path="res://scenes/game/ProgressBar.tscn" id="3_0x0x0"]
 [ext_resource type="PackedScene" uid="uid://hxvn8yqxqxqx" path="res://scenes/game/CurrencyGainButton.tscn" id="4_0x0x0"]
 [ext_resource type="PackedScene" path="res://scenes/ui/UpgradePanel.tscn" id="5_upgrade"]
 [ext_resource type="PackedScene" uid="uid://ixvn8yqxqxqx" path="res://scenes/game/HotDogDisplay.tscn" id="6_0x0x0"]
 [ext_resource type="PackedScene" uid="uid://bvujp2cd5guc1" path="res://scenes/ui/EventLog.tscn" id="7_eventlog"]
-[ext_resource type="PackedScene" uid="uid://debug_panel_uid" path="res://scenes/ui/DebugPanel.tscn" id="8_debug"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DebugPanel.tscn" id="8_debug"]
+[ext_resource type="PackedScene" path="res://scenes/ui/OfficeMenu.tscn" id="9_office"]
 
 [node name="Game" type="Control"]
 layout_mode = 3
@@ -80,6 +81,11 @@ custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "⚡ Upgrades"
 
+[node name="OfficeButton" type="Button" parent="TopLeftMenu/MenuButtonsContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "🏢 Office"
+
 [node name="SaveButton" type="Button" parent="TopLeftMenu/MenuButtonsContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
@@ -96,7 +102,13 @@ layout_mode = 2
 text = "🔧 Debug"
 
 [node name="EventLog" parent="." instance=ExtResource("7_eventlog")]
+layout_mode = 1
+grow_horizontal = 2
+
+[node name="DebugPanel" parent="." instance=ExtResource("8_debug")]
+layout_mode = 1
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="DebugPanel" parent="." instance=ExtResource("8_debug")]
+[node name="OfficeMenu" parent="." instance=ExtResource("9_office")]
+layout_mode = 1

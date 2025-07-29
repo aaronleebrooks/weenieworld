@@ -10,6 +10,7 @@ const DEBUG_MODE: bool = false
 @onready var menu_buttons_container = $TopLeftMenu/MenuButtonsContainer
 @onready var currency_button = $TopLeftMenu/MenuButtonsContainer/CurrencyButton
 @onready var upgrade_button = $TopLeftMenu/MenuButtonsContainer/UpgradeButton
+@onready var office_button = $TopLeftMenu/MenuButtonsContainer/OfficeButton
 @onready var save_button = $TopLeftMenu/MenuButtonsContainer/SaveButton
 @onready var exit_button = $TopLeftMenu/MenuButtonsContainer/ExitButton
 @onready var debug_button = $TopLeftMenu/MenuButtonsContainer/DebugButton
@@ -19,12 +20,14 @@ const DEBUG_MODE: bool = false
 @onready var upgrade_panel = $UpgradePanel
 @onready var debug_panel = $DebugPanel
 @onready var event_log = $EventLog
+@onready var office_menu = $OfficeMenu
 
 # References to managers
 var hot_dog_manager: Node
 var customer_manager: Node
 var upgrade_manager: Node
 var worker_manager: Node
+var building_manager: Node
 var save_system: Node
 var floating_text_manager: Node
 var event_log_manager: Node
@@ -42,6 +45,7 @@ func _ready():
 	customer_manager = get_node_or_null("/root/CustomerManager")
 	upgrade_manager = get_node_or_null("/root/UpgradeManager")
 	worker_manager = get_node_or_null("/root/WorkerManager")
+	building_manager = get_node_or_null("/root/BuildingManager")
 	save_system = get_node_or_null("/root/SaveSystem")
 	floating_text_manager = get_node_or_null("/root/FloatingTextManager")
 	event_log_manager = get_node_or_null("/root/EventLogManager")
@@ -55,6 +59,7 @@ func _ready():
 	# Connect button signals
 	menu_toggle_button.pressed.connect(_on_menu_toggle_pressed)
 	upgrade_button.pressed.connect(_on_upgrade_button_pressed)
+	office_button.pressed.connect(_on_office_button_pressed)
 	save_button.pressed.connect(_on_save_button_pressed)
 	exit_button.pressed.connect(_on_exit_button_pressed)
 	debug_button.pressed.connect(_on_debug_button_pressed)
@@ -64,6 +69,7 @@ func _ready():
 
 	# Set initial menu state
 	_update_menu_display()
+	_update_office_button_visibility()
 
 	# Connect to viewport size changes using native event system
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
@@ -87,6 +93,10 @@ func _ready():
 		worker_manager.production_rates_changed.connect(_on_production_rates_changed)
 		worker_manager.worker_hired.connect(_on_worker_hired)
 		worker_manager.worker_assigned.connect(_on_worker_assigned)
+
+	# Connect to building manager
+	if building_manager:
+		building_manager.building_purchased.connect(_on_building_purchased)
 
 	# Connect to click manager for hot dog production events
 	var click_manager = get_node("/root/ClickManager")
@@ -236,6 +246,8 @@ func _setup_menu_buttons():
 		currency_button.tooltip_text = "Currency and Hot Dog Balance"
 	if upgrade_button:
 		upgrade_button.tooltip_text = "Upgrades"
+	if office_button:
+		office_button.tooltip_text = "Office Management"
 	if save_button:
 		save_button.tooltip_text = "Save Game"
 	if exit_button:
@@ -259,6 +271,9 @@ func _update_menu_button_texts():
 		if upgrade_button:
 			upgrade_button.text = "⚡ Upgrades"
 			upgrade_button.custom_minimum_size.x = 0
+		if office_button:
+			office_button.text = "🏢 Office"
+			office_button.custom_minimum_size.x = 0
 		if save_button:
 			save_button.text = "💾 Save"
 			save_button.custom_minimum_size.x = 0
@@ -275,6 +290,9 @@ func _update_menu_button_texts():
 		if upgrade_button:
 			upgrade_button.text = "⚡"
 			upgrade_button.custom_minimum_size.x = 40
+		if office_button:
+			office_button.text = "🏢"
+			office_button.custom_minimum_size.x = 40
 		if save_button:
 			save_button.text = "💾"
 			save_button.custom_minimum_size.x = 40
@@ -359,6 +377,7 @@ func _on_hot_dogs_sold(amount: int, value: int):
 func _on_currency_changed(new_balance: int, change_amount: int):
 	"""Handle currency balance changes"""
 	_update_currency_button_display()
+	_update_office_button_visibility()
 
 
 func _on_currency_earned(amount: int, source: String):
@@ -399,6 +418,13 @@ func _on_worker_assigned(worker_id: String, assignment: int):
 	_update_currency_button_display()
 
 
+func _on_building_purchased(building_id: String, cost: int):
+	"""Handle building purchased events"""
+	if building_id == "office":
+		_update_office_button_visibility()
+	_update_currency_button_display()
+
+
 func _on_menu_toggle_pressed():
 	"""Handle menu toggle button press"""
 	print("Game: Menu toggle pressed")
@@ -410,6 +436,7 @@ func _on_menu_toggle_pressed():
 
 	# Update menu display
 	_update_menu_display()
+	_update_office_button_visibility()
 
 
 func _on_upgrade_button_pressed():
@@ -417,6 +444,13 @@ func _on_upgrade_button_pressed():
 	print("Game: Upgrade button pressed")
 	if upgrade_panel:
 		upgrade_panel.visible = !upgrade_panel.visible
+
+
+func _on_office_button_pressed():
+	"""Handle office button press"""
+	print("Game: Office button pressed")
+	if office_menu:
+		office_menu.show_menu()
 
 
 func _on_save_button_pressed():
@@ -511,3 +545,15 @@ func display_game_data():
 
 	# Update displays
 	_update_currency_button_display()
+
+
+func _update_office_button_visibility():
+	"""Update the visibility of the office button based on office purchase status"""
+	if not office_button or not building_manager:
+		return
+
+	var office_purchased = building_manager.is_building_purchased("office")
+	office_button.visible = office_purchased
+
+	if DEBUG_MODE:
+		print("Game: Office button visibility updated - Office purchased: ", office_purchased)
