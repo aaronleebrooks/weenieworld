@@ -85,7 +85,7 @@ func start(server_port := GdUnitServerConstants.GD_TEST_SERVER_PORT) -> GdUnitRe
 		if err == ERR_ALREADY_IN_USE:
 			return GdUnitResult.error("GdUnit4: Can't establish server, the server is already in use. Error: %s, " % error_string(err))
 		return GdUnitResult.error("GdUnit4: Can't establish server. Error: %s." % error_string(err))
-	console("Successfully started checked port: %d" % server_port)
+	console("Successfully started on port: %d" % server_port)
 	return GdUnitResult.success(server_port)
 
 
