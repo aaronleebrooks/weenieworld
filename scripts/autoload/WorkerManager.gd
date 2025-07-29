@@ -212,20 +212,22 @@ func _process_office_worker(worker: Dictionary):
 	# Add to consumption buffer
 	if not worker.has("consumption_buffer"):
 		worker["consumption_buffer"] = 0.0
-	
+
 	worker["consumption_buffer"] += quota_per_second
 
 	# Consume whole hot dogs when buffer reaches 1.0 or more
 	if worker["consumption_buffer"] >= 1.0:
 		var hot_dogs_to_consume = int(worker["consumption_buffer"])
-		
+
 		if hot_dog_manager and hot_dog_manager.hot_dogs_inventory >= hot_dogs_to_consume:
 			hot_dog_manager.hot_dogs_inventory -= hot_dogs_to_consume
 			worker["hot_dogs_consumed"] += hot_dogs_to_consume
 			worker["consumption_buffer"] -= hot_dogs_to_consume
 		else:
 			# Not enough hot dogs for quota - emit warning
-			var deficit = hot_dogs_to_consume - (hot_dog_manager.hot_dogs_inventory if hot_dog_manager else 0)
+			var deficit = (
+				hot_dogs_to_consume - (hot_dog_manager.hot_dogs_inventory if hot_dog_manager else 0)
+			)
 			emit_signal("worker_quota_warning", worker["worker_id"], deficit)
 
 

@@ -213,14 +213,14 @@ func _switch_to_submenu(submenu_type: SubmenuType):
 func _update_buildings_tab_visibility():
 	"""Update the buildings tab visibility based on unlock conditions"""
 	var buildings_unlocked = _check_buildings_unlock()
-	
+
 	if buildings_unlocked:
 		buildings_tab.visible = true
 		buildings_tab.disabled = false
 	else:
 		buildings_tab.visible = false
 		buildings_tab.disabled = true
-		
+
 		# If currently on buildings tab but it's locked, switch to kitchen
 		if current_submenu == SubmenuType.BUILDINGS:
 			_switch_to_submenu(SubmenuType.KITCHEN_UPGRADES)
@@ -271,21 +271,21 @@ func _on_building_button_pressed(building_id: String):
 		print("UpgradePanel: Failed to purchase building: ", building_id)
 
 
-func _on_building_purchased(building_id: String, cost: int):
+func _on_building_purchased(building_id: String, _cost: int):
 	"""Handle building purchase event"""
 	_update_all_buttons()
 	if DEBUG_MODE:
 		print("UpgradePanel: Building purchased event received: ", building_id)
 
 
-func _on_currency_changed(new_balance: int, change_amount: int):
+func _on_currency_changed(_new_balance: int, _change_amount: int):
 	"""Update button states when currency changes"""
 	_update_all_buttons()
 	_update_currency_display()
 	_update_buildings_tab_visibility()
 
 
-func _on_upgrade_purchased(upgrade_id: String, level: int, cost: int):
+func _on_upgrade_purchased(_upgrade_id: String, _level: int, _cost: int):
 	"""Update buttons when an upgrade is purchased"""
 	_update_all_buttons()
 
@@ -425,10 +425,9 @@ func _get_hire_worker_button_text() -> String:
 
 		if worker_count >= max_workers:
 			return "Hire Worker - Max Workers Reached (%d/%d)" % [worker_count, max_workers]
-		elif not hot_dog_manager or not hot_dog_manager.can_afford(cost):
+		if not hot_dog_manager or not hot_dog_manager.can_afford(cost):
 			return "Hire Worker - Can't Afford (%d currency)" % cost
-		else:
-			return "Hire Worker - Requirements Not Met"
+		return "Hire Worker - Requirements Not Met"
 
 	var cost = worker_manager.get_next_hire_cost()
 	var worker_count = worker_manager.get_worker_count()
@@ -480,14 +479,14 @@ func _on_worker_assignment_button_pressed(worker_id: String):
 		print("UpgradePanel: Failed to reassign worker")
 
 
-func _on_worker_hired(worker_id: String, cost: int):
+func _on_worker_hired(worker_id: String, _cost: int):
 	"""Handle worker hired event"""
 	_refresh_worker_ui()
 	if DEBUG_MODE:
 		print("UpgradePanel: Worker hired event received: ", worker_id)
 
 
-func _on_worker_assigned(worker_id: String, assignment: WorkerDefinition.WorkerAssignment):
+func _on_worker_assigned(worker_id: String, _assignment: WorkerDefinition.WorkerAssignment):
 	"""Handle worker assignment event"""
 	_refresh_worker_ui()
 	if DEBUG_MODE:

@@ -135,10 +135,10 @@ func add_currency(amount: int, source: String = "unknown") -> bool:
 
 	currency_balance += amount
 	total_currency_earned += amount
-	
+
 	emit_signal("currency_changed", currency_balance, amount)
 	emit_signal("currency_earned", amount, source)
-	
+
 	if DEBUG_MODE:
 		print(
 			(
