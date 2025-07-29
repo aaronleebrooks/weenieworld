@@ -12,7 +12,4 @@ extends Resource
 @export var production_rate_per_second: float = 0.5  # For kitchen workers
 @export var efficiency_bonus: float = 1.0  # For office workers
 
-enum WorkerAssignment {
-	KITCHEN,  # Auto - produce hot dogs
-	OFFICE    # Improve all worker efficiency
-}
+enum WorkerAssignment { KITCHEN, OFFICE }  # Auto - produce hot dogs  # Improve all worker efficiency

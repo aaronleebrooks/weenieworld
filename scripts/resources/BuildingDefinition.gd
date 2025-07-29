@@ -17,8 +17,4 @@ extends Resource
 # Building effects
 @export var effects: Array = []  # Text descriptions of what the building unlocks
 
-enum UnlockConditionType {
-	CURRENCY_EARNED,    # Unlocks after earning X total currency
-	BUILDINGS_OWNED,    # Unlocks after owning X buildings
-	UPGRADES_PURCHASED  # Unlocks after purchasing X upgrades
-}
+enum UnlockConditionType { CURRENCY_EARNED, BUILDINGS_OWNED, UPGRADES_PURCHASED }  # Unlocks after earning X total currency  # Unlocks after owning X buildings  # Unlocks after purchasing X upgrades

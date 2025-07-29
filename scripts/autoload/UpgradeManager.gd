@@ -263,6 +263,7 @@ func get_all_upgrades() -> Array[UpgradeDefinition]:
 	"""Get all upgrade definitions"""
 	return upgrade_definitions
 
+
 func get_upgrades_by_category(category: UpgradeEnums.UpgradeCategory) -> Array[UpgradeDefinition]:
 	"""Get upgrade definitions filtered by category"""
 	var filtered_upgrades: Array[UpgradeDefinition] = []
