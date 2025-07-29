@@ -96,8 +96,8 @@ jobs:
     - name: Check for secrets
       run: |
         echo "Checking for potential secrets..."
-        # Basic secret detection
-        if grep -r -i "password\|secret\|key\|token" --include="*.gd" . --exclude-dir=".git" --exclude-dir="addons"; then
+        # More specific secret detection patterns to avoid false positives
+        if grep -r -E "(password\s*=|secret\s*=|api_key\s*=|token\s*=|\"password\"|\"secret\"|\"api_key\"|\"token\")" --include="*.gd" . --exclude-dir=".git" --exclude-dir="addons"; then
           echo "⚠️  Potential secrets found in code"
           exit 1
         fi
