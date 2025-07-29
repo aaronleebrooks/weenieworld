@@ -23,4 +23,4 @@ const UpgradeEnums = preload("res://scripts/resources/UpgradeEnums.gd")
 @export var effect_value: float = 1.0
 
 # Level configuration
-@export var max_level: int = -1  # -1 means unlimited 
+@export var max_level: int = -1  # -1 means unlimited

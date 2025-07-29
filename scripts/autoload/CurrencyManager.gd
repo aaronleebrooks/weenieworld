@@ -31,14 +31,16 @@ var idle_rate_seconds: float = 0.3:
 # Currency formatting
 var currency_formatter: CurrencyFormatter
 
+
 func _ready():
 	print("CurrencyManager: Initialized")
 	currency_formatter = CurrencyFormatter.new()
-	
+
 	# Connect to save system for persistence
 	var save_system = get_node_or_null("/root/SaveSystem")
 	if save_system:
 		save_system.save_data_loaded.connect(_on_save_data_loaded)
+
 
 func _on_save_data_loaded(save_data: Dictionary):
 	"""Load currency data from save file"""
@@ -50,10 +52,12 @@ func _on_save_data_loaded(save_data: Dictionary):
 		idle_rate_seconds = currency_data.get("idle_rate", 0.3)
 		print("CurrencyManager: Loaded currency data from save")
 
+
 func get_save_data() -> Dictionary:
 	"""Get currency data for saving"""
 	return {
-		"currency": {
+		"currency":
+		{
 			"balance": currency_balance,
 			"per_click": currency_per_click,
 			"click_rate": click_rate_seconds,
@@ -61,34 +65,54 @@ func get_save_data() -> Dictionary:
 		}
 	}
 
+
 func gain_currency(amount: int, source: String = "unknown") -> void:
 	"""Add currency to balance with source tracking"""
 	if amount > 0:
 		currency_balance += amount
 		emit_signal("currency_gained", amount, source)
-		print("CurrencyManager: Gained %d currency from %s (new balance: %d)" % [amount, source, currency_balance])
+		print(
+			(
+				"CurrencyManager: Gained %d currency from %s (new balance: %d)"
+				% [amount, source, currency_balance]
+			)
+		)
+
 
 func spend_currency(amount: int, reason: String = "unknown") -> bool:
 	"""Spend currency if sufficient balance exists"""
 	if amount <= 0:
 		return false
-	
+
 	if currency_balance >= amount:
 		currency_balance -= amount
 		emit_signal("currency_spent", amount, reason)
-		print("CurrencyManager: Spent %d currency for %s (new balance: %d)" % [amount, reason, currency_balance])
+		print(
+			(
+				"CurrencyManager: Spent %d currency for %s (new balance: %d)"
+				% [amount, reason, currency_balance]
+			)
+		)
 		return true
 	else:
-		print("CurrencyManager: Insufficient currency for %s (need %d, have %d)" % [reason, amount, currency_balance])
+		print(
+			(
+				"CurrencyManager: Insufficient currency for %s (need %d, have %d)"
+				% [reason, amount, currency_balance]
+			)
+		)
 		return false
+
 
 func can_afford(amount: int) -> bool:
 	"""Check if player can afford the specified amount"""
 	return currency_balance >= amount
 
+
 func get_formatted_currency() -> String:
 	"""Get formatted currency string (e.g., "1,234" or "1.2K")"""
 	return currency_formatter.format(currency_balance)
+
 
 func reset_currency() -> void:
 	"""Reset currency to starting values (for new game)"""
@@ -97,11 +121,12 @@ func reset_currency() -> void:
 	click_rate_seconds = 0.1
 	idle_rate_seconds = 0.3
 	print("CurrencyManager: Reset to starting values")
-	
+
 	# Also reset upgrades
 	var upgrade_manager = get_node_or_null("/root/UpgradeManager")
 	if upgrade_manager:
 		upgrade_manager.reset_upgrades()
+
 
 # Currency formatting helper class
 class CurrencyFormatter:
@@ -114,4 +139,4 @@ class CurrencyFormatter:
 		elif amount < 1000000000:
 			return "%.1fM" % (amount / 1000000.0)
 		else:
-			return "%.1fB" % (amount / 1000000000.0) 
+			return "%.1fB" % (amount / 1000000000.0)
