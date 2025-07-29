@@ -50,7 +50,7 @@ func is_failure() -> bool:
 
 
 func is_error() -> bool:
-	return _type == TERMINATED or _type == INTERUPTED or _type == ABORT
+	return _type == TERMINATED or _type == INTERRUPTED or _type == ABORT
 
 
 func _to_string() -> String:
