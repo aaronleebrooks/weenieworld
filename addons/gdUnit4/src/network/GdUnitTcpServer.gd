@@ -76,7 +76,7 @@ func start(server_port := GdUnitServerConstants.GD_TEST_SERVER_PORT) -> GdUnitRe
 	for retry in GdUnitServerConstants.DEFAULT_SERVER_START_RETRY_TIMES:
 		err = _server.listen(server_port, "127.0.0.1")
 		if err != OK:
-			prints("GdUnit4: Can't establish server checked port: %d, Error: %s" % [server_port, error_string(err)])
+			prints("GdUnit4: Can't establish server on port: %d, Error: %s" % [server_port, error_string(err)])
 			server_port += 1
 			prints("GdUnit4: Retry (%d) ..." % retry)
 		else:
