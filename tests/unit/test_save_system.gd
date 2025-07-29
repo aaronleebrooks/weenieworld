@@ -8,7 +8,11 @@ var save_system: Node
 
 func before():
 	"""Setup before each test"""
-	save_system = get_node("/root/SaveSystem")
+	save_system = get_node_or_null("/root/SaveSystem")
+	if not save_system:
+		# If autoload not available, create a mock instance for testing
+		save_system = preload("res://scripts/autoload/SaveSystem.gd").new()
+		add_child(save_system)
 
 
 func test_save_system_exists():

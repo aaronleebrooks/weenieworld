@@ -48,13 +48,13 @@ func _ready():
 
 
 # Start a new game
-func start_new_game():
+func start_new_game() -> void:
 	print("GameManager: Starting new game with default truck name")
 	start_new_game_with_name("My Food Truck")
 
 
 # Start a new game with specific truck name
-func start_new_game_with_name(truck_name: String):
+func start_new_game_with_name(truck_name: String) -> void:
 	print("GameManager: Starting new game with truck name: ", truck_name)
 
 	# Reset animation system first
@@ -72,7 +72,7 @@ func start_new_game_with_name(truck_name: String):
 
 
 # Continue existing game
-func continue_game():
+func continue_game() -> void:
 	print("GameManager: Continuing existing game")
 
 	# Try to load autosave
