@@ -58,6 +58,9 @@ func _ready():
 	# Set initial menu state
 	_update_menu_button_texts()
 	
+	# Update currency display
+	_update_currency_button_display()
+	
 
 	
 	# Connect to viewport size changes using native event system
@@ -228,13 +231,33 @@ func _setup_tooltips():
 func _update_menu_button_texts():
 	"""Update button texts based on current menu state"""
 	if currency_button:
-		currency_button.text = "💰" if not menu_visible else "💰 Currency"
+		if not menu_visible:
+			currency_button.text = "💰"
+			currency_button.custom_minimum_size.x = 50
+		else:
+			currency_button.text = "💰 Currency"
+			currency_button.custom_minimum_size.x = 0
 	if upgrade_button:
-		upgrade_button.text = "⚡" if not menu_visible else "⚡ Upgrades"
+		if not menu_visible:
+			upgrade_button.text = "⚡"
+			upgrade_button.custom_minimum_size.x = 50
+		else:
+			upgrade_button.text = "⚡ Upgrades"
+			upgrade_button.custom_minimum_size.x = 0
 	if save_button:
-		save_button.text = "💾" if not menu_visible else "💾 Save"
+		if not menu_visible:
+			save_button.text = "💾"
+			save_button.custom_minimum_size.x = 50
+		else:
+			save_button.text = "💾 Save"
+			save_button.custom_minimum_size.x = 0
 	if exit_button:
-		exit_button.text = "🚪" if not menu_visible else "🚪 Exit"
+		if not menu_visible:
+			exit_button.text = "🚪"
+			exit_button.custom_minimum_size.x = 50
+		else:
+			exit_button.text = "🚪 Exit"
+			exit_button.custom_minimum_size.x = 0
 
 
 func _on_viewport_size_changed():
@@ -393,10 +416,17 @@ func _on_exit_cancelled():
 	print("Game: Exit cancelled, staying in game")
 
 func _update_currency_button_display():
-	"""Update currency button tooltip with current balance"""
+	"""Update currency button with current values"""
 	if currency_button and hot_dog_manager:
-		var formatted_currency = hot_dog_manager.get_formatted_currency()
-		currency_button.tooltip_text = formatted_currency
+		var currency = hot_dog_manager.currency_balance
+		var hot_dogs = hot_dog_manager.hot_dogs_inventory
+		
+		if not menu_visible:
+			currency_button.text = "💰"
+			currency_button.tooltip_text = "Currency: %d\nHot Dogs: %d" % [currency, hot_dogs]
+		else:
+			currency_button.text = "💰 Currency: %d | Hot Dogs: %d" % [currency, hot_dogs]
+			currency_button.tooltip_text = "Current balances"
 
 func display_game_data():
 	"""Display current game data for debugging"""

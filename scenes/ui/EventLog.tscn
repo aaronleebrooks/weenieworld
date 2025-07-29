@@ -31,6 +31,7 @@ offset_bottom = -5.0
 
 [node name="Header" type="HBoxContainer" parent="EventContainer"]
 layout_mode = 2
+custom_minimum_size = Vector2(0, 30)
 
 [node name="Title" type="Label" parent="EventContainer/Header"]
 layout_mode = 2
@@ -45,5 +46,4 @@ size_flags_vertical = 3
 
 [node name="EventListContainer" type="VBoxContainer" parent="EventContainer/EventList"]
 layout_mode = 2
-size_flags_horizontal = 3
-offset_top = 25.0 
+size_flags_horizontal = 3 
