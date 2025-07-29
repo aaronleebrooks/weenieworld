@@ -10,16 +10,16 @@ var mock_save_system: Node
 
 func before():
 	"""Setup before each test"""
-	building_manager = get_node_or_null("/root / BuildingManager")
+		building_manager = get_node_or_null("/root/BuildingManager")
 	if not building_manager:
 		# If autoload not available, create a mock instance for testing
-		building_manager = preload("res://scripts / autoload / BuildingManager.gd").new()
+		building_manager = preload("res://scripts/autoload/BuildingManager.gd").new()
 		add_child(building_manager)
-
-	hot_dog_manager = get_node_or_null("/root / HotDogManager")
+	
+	hot_dog_manager = get_node_or_null("/root/HotDogManager")
 	if not hot_dog_manager:
 		# Create mock HotDogManager for testing
-		hot_dog_manager = preload("res://scripts / autoload / HotDogManager.gd").new()
+		hot_dog_manager = preload("res://scripts/autoload/HotDogManager.gd").new()
 		add_child(hot_dog_manager)
 		building_manager.hot_dog_manager = hot_dog_manager
 

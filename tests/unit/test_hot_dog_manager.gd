@@ -8,10 +8,10 @@ var hot_dog_manager: Node
 
 func before():
 	"""Setup before each test"""
-	hot_dog_manager = get_node_or_null("/root / HotDogManager")
+	hot_dog_manager = get_node_or_null("/root/HotDogManager")
 	if not hot_dog_manager:
 		# If autoload not available, create a mock instance for testing
-		hot_dog_manager = preload("res://scripts / autoload / HotDogManager.gd").new()
+		hot_dog_manager = preload("res://scripts/autoload/HotDogManager.gd").new()
 		add_child(hot_dog_manager)
 
 	# Reset state for clean tests

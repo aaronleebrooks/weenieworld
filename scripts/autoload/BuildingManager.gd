@@ -3,7 +3,7 @@ extends Node
 # Building management system autoload for managing building purchases
 # Uses intentional naming conventions for future maintainability
 
-const BuildingDefinition = preload("res://scripts / resources / BuildingDefinition.gd")
+const BuildingDefinition = preload("res://scripts/resources/BuildingDefinition.gd")
 
 # Signals
 signal building_purchased(building_id: String, cost: int)

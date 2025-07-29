@@ -3,8 +3,8 @@ extends Node
 # Upgrade system autoload for managing game upgrades
 # Uses intentional naming conventions for future maintainability
 
-const UpgradeEnums = preload("res://scripts / resources / UpgradeEnums.gd")
-const UpgradeDefinition = preload("res://scripts / resources / UpgradeDefinition.gd")
+const UpgradeEnums = preload("res://scripts/resources/UpgradeEnums.gd")
+const UpgradeDefinition = preload("res://scripts/resources/UpgradeDefinition.gd")
 
 # Signals
 signal upgrade_purchased(upgrade_id: String, level: int, cost: int)

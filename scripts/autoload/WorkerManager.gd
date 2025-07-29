@@ -3,7 +3,7 @@ extends Node
 # Worker management system autoload for worker hiring and assignment
 # Uses intentional naming conventions for future maintainability
 
-const WorkerDefinition = preload("res://scripts / resources / WorkerDefinition.gd")
+const WorkerDefinition = preload("res://scripts/resources/WorkerDefinition.gd")
 
 # Constants for worker mechanics (extracted per code review feedback)
 const WORKER_QUOTA_PER_SECOND: float = 1.0
