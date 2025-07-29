@@ -76,14 +76,14 @@ func _on_save_data_loaded(save_data: Dictionary) -> void:
 		total_hot_dogs_sold = hot_dogs_data.get("total_sold", 0)
 		total_currency_earned = hot_dogs_data.get("total_currency_earned", 0)
 		if DEBUG_MODE:
-		print("HotDogManager: Loaded hot dog data from save")
+			print("HotDogManager: Loaded hot dog data from save")
 
 	# Load currency data
 	if save_data.has("currency"):
 		var currency_data: Dictionary = save_data["currency"]
 		currency_balance = currency_data.get("balance", 0)
 		if DEBUG_MODE:
-		print("HotDogManager: Loaded currency data from save")
+			print("HotDogManager: Loaded currency data from save")
 
 
 func get_save_data() -> Dictionary:

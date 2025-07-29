@@ -76,7 +76,7 @@ jobs:
         # Wait for import to complete
         sleep 2
         # Run tests using GdUnit4 command line tool  
-        ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --script addons/gdUnit4/bin/GdUnitCmdTool.gd --add tests/unit/ --no-fail-fast --verbose
+        ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --script addons/gdUnit4/bin/GdUnitCmdTool.gd -a tests/unit/ -c
         
     - name: Upload test results
       if: always()
