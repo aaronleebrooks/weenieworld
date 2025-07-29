@@ -31,10 +31,16 @@ func _ready():
 		print("GameManager: Initialized")
 
 	# Get references to managers
-	save_system = get_node("/root/SaveSystem")
-	hot_dog_manager = get_node("/root/HotDogManager")
-	customer_manager = get_node("/root/CustomerManager")
-	upgrade_manager = get_node("/root/UpgradeManager")
+	save_system = get_node_or_null("/root/SaveSystem")
+	hot_dog_manager = get_node_or_null("/root/HotDogManager")
+	customer_manager = get_node_or_null("/root/CustomerManager")
+	upgrade_manager = get_node_or_null("/root/UpgradeManager")
+	
+	# Validate critical dependencies
+	if not save_system:
+		push_error("GameManager: SaveSystem not found!")
+	if not hot_dog_manager:
+		push_error("GameManager: HotDogManager not found!")
 
 	# Connect to save system
 	if save_system:

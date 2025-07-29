@@ -3,6 +3,10 @@ extends Node
 # Save system autoload for managing game saves
 # Uses intentional naming conventions for future maintainability
 
+# Constants
+const AUTOSAVE_INTERVAL: float = 30.0  # seconds
+const DEBUG_MODE: bool = false
+
 signal save_data_loaded(save_data: Dictionary)
 signal save_created(save_name: String)
 signal save_deleted(save_name: String)
@@ -38,7 +42,7 @@ func _ready():
 func _start_autosave_timer():
 	"""Start the autosave timer"""
 	var autosave_timer = Timer.new()
-	autosave_timer.wait_time = 30.0  # 30 seconds
+	autosave_timer.wait_time = AUTOSAVE_INTERVAL
 	autosave_timer.timeout.connect(_perform_autosave)
 	add_child(autosave_timer)
 	autosave_timer.start()

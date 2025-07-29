@@ -34,13 +34,19 @@ func _ready():
 	if DEBUG_MODE:
 		print("Game: _ready() called")
 
-	# Get references to managers
-	hot_dog_manager = get_node("/root/HotDogManager")
-	customer_manager = get_node("/root/CustomerManager")
-	upgrade_manager = get_node("/root/UpgradeManager")
-	save_system = get_node("/root/SaveSystem")
-	floating_text_manager = get_node("/root/FloatingTextManager")
-	event_log_manager = get_node("/root/EventLogManager")
+	# Get references to managers with error handling
+	hot_dog_manager = get_node_or_null("/root/HotDogManager")
+	customer_manager = get_node_or_null("/root/CustomerManager")
+	upgrade_manager = get_node_or_null("/root/UpgradeManager")
+	save_system = get_node_or_null("/root/SaveSystem")
+	floating_text_manager = get_node_or_null("/root/FloatingTextManager")
+	event_log_manager = get_node_or_null("/root/EventLogManager")
+	
+	# Validate critical dependencies
+	if not hot_dog_manager:
+		push_error("Game: HotDogManager not found!")
+	if not save_system:
+		push_error("Game: SaveSystem not found!")
 
 	# Connect button signals
 	menu_toggle_button.pressed.connect(_on_menu_toggle_pressed)
