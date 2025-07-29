@@ -35,7 +35,7 @@ func _ready():
 	hot_dog_manager = get_node_or_null("/root/HotDogManager")
 	customer_manager = get_node_or_null("/root/CustomerManager")
 	upgrade_manager = get_node_or_null("/root/UpgradeManager")
-	
+
 	# Validate critical dependencies
 	if not save_system:
 		push_error("GameManager: SaveSystem not found!")
