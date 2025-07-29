@@ -9,13 +9,13 @@ var mock_save_system: Node
 
 
 func before():
-	"""Setup before each test"""
-		building_manager = get_node_or_null("/root/BuildingManager")
+	# Setup before each test
+	building_manager = get_node_or_null("/root/BuildingManager")
 	if not building_manager:
 		# If autoload not available, create a mock instance for testing
 		building_manager = preload("res://scripts/autoload/BuildingManager.gd").new()
 		add_child(building_manager)
-	
+
 	hot_dog_manager = get_node_or_null("/root/HotDogManager")
 	if not hot_dog_manager:
 		# Create mock HotDogManager for testing
@@ -30,13 +30,13 @@ func before():
 
 
 func test_initial_state():
-	"""Test BuildingManager starts with no purchased buildings"""
+	# Test BuildingManager starts with no purchased buildings
 	assert_bool(building_manager.is_building_purchased("office")).is_false()
 	assert_int(building_manager.get_purchased_building_count()).is_equal(0)
 
 
 func test_get_building_definitions():
-	"""Test that building definitions are loaded"""
+	# Test that building definitions are loaded
 	var buildings = building_manager.get_all_buildings()
 	assert_int(buildings.size()).is_greater(0)
 
@@ -53,7 +53,7 @@ func test_get_building_definitions():
 
 
 func test_unlock_conditions():
-	"""Test building unlock conditions"""
+	# Test building unlock conditions
 	# Office should be locked initially (need 100 total currency earned)
 	assert_bool(building_manager.is_building_unlocked("office")).is_false()
 
@@ -66,7 +66,7 @@ func test_unlock_conditions():
 
 
 func test_purchase_requirements():
-	"""Test building purchase requirements"""
+	# Test building purchase requirements
 	# Setup conditions for office purchase
 	hot_dog_manager.total_currency_earned = 100  # Unlock condition
 	hot_dog_manager.currency_balance = 500  # Purchase cost
@@ -80,7 +80,7 @@ func test_purchase_requirements():
 
 
 func test_successful_purchase():
-	"""Test successful building purchase"""
+	# Test successful building purchase
 	# Setup conditions
 	hot_dog_manager.total_currency_earned = 100
 	hot_dog_manager.currency_balance = 500
@@ -103,7 +103,7 @@ func test_successful_purchase():
 
 
 func test_cannot_purchase_twice():
-	"""Test that buildings cannot be purchased multiple times"""
+	# Test that buildings cannot be purchased multiple times
 	# Setup and purchase once
 	hot_dog_manager.total_currency_earned = 100
 	hot_dog_manager.currency_balance = 1000
@@ -118,7 +118,7 @@ func test_cannot_purchase_twice():
 
 
 func test_get_building_info():
-	"""Test building info retrieval"""
+	# Test building info retrieval
 	hot_dog_manager.total_currency_earned = 100
 	hot_dog_manager.currency_balance = 300  # Not enough for purchase
 
@@ -134,7 +134,7 @@ func test_get_building_info():
 
 
 func test_save_and_load():
-	"""Test save and load functionality"""
+	# Test save and load functionality
 	# Purchase a building
 	hot_dog_manager.total_currency_earned = 100
 	hot_dog_manager.currency_balance = 500
@@ -156,7 +156,7 @@ func test_save_and_load():
 
 
 func test_reset_buildings():
-	"""Test building reset functionality"""
+	# Test building reset functionality
 	# Purchase a building
 	hot_dog_manager.total_currency_earned = 100
 	hot_dog_manager.currency_balance = 500
@@ -170,7 +170,7 @@ func test_reset_buildings():
 
 
 func test_nonexistent_building():
-	"""Test handling of nonexistent buildings"""
+	# Test handling of nonexistent buildings
 	assert_bool(building_manager.can_purchase_building("nonexistent")).is_false()
 	assert_bool(building_manager.purchase_building("nonexistent")).is_false()
 	assert_bool(building_manager.is_building_purchased("nonexistent")).is_false()

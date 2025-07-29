@@ -12,19 +12,19 @@ var building_manager: Node
 
 func before():
 	# Setup before each test
-		worker_manager = get_node_or_null("/root/WorkerManager")
+	worker_manager = get_node_or_null("/root/WorkerManager")
 	if not worker_manager:
 		# If autoload not available, create a mock instance for testing
 		worker_manager = preload("res://scripts/autoload/WorkerManager.gd").new()
 		add_child(worker_manager)
-	
+
 	hot_dog_manager = get_node_or_null("/root/HotDogManager")
 	if not hot_dog_manager:
 		# Create mock HotDogManager for testing
 		hot_dog_manager = preload("res://scripts/autoload/HotDogManager.gd").new()
 		add_child(hot_dog_manager)
 		worker_manager.hot_dog_manager = hot_dog_manager
-	
+
 	building_manager = get_node_or_null("/root/BuildingManager")
 	if not building_manager:
 		# Create mock BuildingManager for testing
@@ -40,14 +40,14 @@ func before():
 
 
 func test_initial_state():
-	"""Test WorkerManager starts with no hired workers"""
+	# Test WorkerManager starts with no hired workers
 	assert_int(worker_manager.get_worker_count()).is_equal(0)
 	assert_array(worker_manager.hired_workers).is_empty()
 	assert_int(worker_manager.max_workers).is_equal(2)
 
 
 func test_hire_cost_scaling():
-	"""Test worker hire cost scaling (10, 100, 1000)"""
+	# Test worker hire cost scaling (10, 100, 1000)
 	assert_int(worker_manager.get_next_hire_cost()).is_equal(10)
 
 	# Simulate hiring workers to test cost scaling with complete worker structures
@@ -81,7 +81,7 @@ func test_hire_cost_scaling():
 
 
 func test_cannot_hire_without_office():
-	"""Test that workers cannot be hired without office building"""
+	# Test that workers cannot be hired without office building
 	hot_dog_manager.currency_balance = 1000
 
 	# Office not purchased
@@ -93,7 +93,7 @@ func test_cannot_hire_without_office():
 
 
 func test_cannot_hire_without_currency():
-	"""Test that workers cannot be hired without sufficient currency"""
+	# Test that workers cannot be hired without sufficient currency
 	# Setup office purchased
 	building_manager.purchased_buildings["office"] = true
 
@@ -107,7 +107,7 @@ func test_cannot_hire_without_currency():
 
 
 func test_worker_limit():
-	"""Test worker hiring respects max worker limit"""
+	# Test worker hiring respects max worker limit
 	# Setup conditions
 	building_manager.purchased_buildings["office"] = true
 	hot_dog_manager.currency_balance = 10000
@@ -135,7 +135,7 @@ func test_worker_limit():
 
 
 func test_successful_hire():
-	"""Test successful worker hiring"""
+	# Test successful worker hiring
 	# Setup conditions
 	building_manager.purchased_buildings["office"] = true
 	hot_dog_manager.currency_balance = 100
@@ -164,7 +164,7 @@ func test_successful_hire():
 
 
 func test_worker_assignment():
-	"""Test worker assignment changes"""
+	# Test worker assignment changes
 	# Setup and hire worker
 	building_manager.purchased_buildings["office"] = true
 	hot_dog_manager.currency_balance = 100
@@ -189,7 +189,7 @@ func test_worker_assignment():
 
 
 func test_get_workers_by_assignment():
-	"""Test filtering workers by assignment"""
+	# Test filtering workers by assignment
 	# Setup and hire multiple workers
 	building_manager.purchased_buildings["office"] = true
 	hot_dog_manager.currency_balance = 1000
@@ -210,7 +210,7 @@ func test_get_workers_by_assignment():
 
 
 func test_production_rates():
-	"""Test worker production rate calculations"""
+	# Test worker production rate calculations
 	# Setup and hire workers
 	building_manager.purchased_buildings["office"] = true
 	hot_dog_manager.currency_balance = 1000
@@ -231,7 +231,7 @@ func test_production_rates():
 
 
 func test_kitchen_worker_production():
-	"""Test kitchen worker production with sufficient hot dogs"""
+	# Test kitchen worker production with sufficient hot dogs
 	# Setup
 	building_manager.purchased_buildings["office"] = true
 	hot_dog_manager.currency_balance = 100
@@ -258,7 +258,7 @@ func test_kitchen_worker_production():
 
 
 func test_kitchen_worker_insufficient_hotdogs():
-	"""Test kitchen worker behavior with insufficient hot dogs"""
+	# Test kitchen worker behavior with insufficient hot dogs
 	# Setup
 	building_manager.purchased_buildings["office"] = true
 	hot_dog_manager.currency_balance = 100
@@ -285,7 +285,7 @@ func test_kitchen_worker_insufficient_hotdogs():
 
 
 func test_office_worker_consumption():
-	"""Test office worker consumption"""
+	# Test office worker consumption
 	# Setup
 	building_manager.purchased_buildings["office"] = true
 	hot_dog_manager.currency_balance = 100
@@ -305,7 +305,7 @@ func test_office_worker_consumption():
 
 
 func test_save_and_load():
-	"""Test save and load functionality"""
+	# Test save and load functionality
 	# Setup and hire workers
 	building_manager.purchased_buildings["office"] = true
 	hot_dog_manager.currency_balance = 1000
@@ -330,7 +330,7 @@ func test_save_and_load():
 
 
 func test_backward_compatibility():
-	"""Test backward compatibility for production buffer"""
+	# Test backward compatibility for production buffer
 	# Create worker data without production buffer (old save format)
 	var old_worker_data = {
 		"hired_workers":
@@ -360,7 +360,7 @@ func test_backward_compatibility():
 
 
 func test_get_worker_by_id():
-	"""Test worker retrieval by ID"""
+	# Test worker retrieval by ID
 	# Setup
 	building_manager.purchased_buildings["office"] = true
 	hot_dog_manager.currency_balance = 100
@@ -380,7 +380,7 @@ func test_get_worker_by_id():
 
 
 func test_reset_workers():
-	"""Test worker reset functionality"""
+	# Test worker reset functionality
 	# Setup and hire workers
 	building_manager.purchased_buildings["office"] = true
 	hot_dog_manager.currency_balance = 1000

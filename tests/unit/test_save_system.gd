@@ -7,7 +7,7 @@ var save_system: Node
 
 
 func before():
-	"""Setup before each test"""
+	# Setup before each test
 	save_system = get_node_or_null("/root/SaveSystem")
 	if not save_system:
 		# If autoload not available, create a mock instance for testing
@@ -16,12 +16,12 @@ func before():
 
 
 func test_save_system_exists():
-	"""Test that SaveSystem autoload exists and is accessible"""
+	# Test that SaveSystem autoload exists and is accessible
 	assert_object(save_system).is_not_null()
 
 
 func test_get_default_save_data():
-	"""Test that default save data structure is correct"""
+	# Test that default save data structure is correct
 	var default_data: Dictionary = GameData.get_default_save_data()
 
 	assert_dict(default_data).is_not_empty()
@@ -29,7 +29,7 @@ func test_get_default_save_data():
 
 
 func test_save_data_structure():
-	"""Test save data contains expected fields"""
+	# Test save data contains expected fields
 	var save_data: Dictionary = save_system._collect_save_data()
 
 	# Test basic structure - save system collects data from various managers
