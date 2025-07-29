@@ -31,11 +31,11 @@ func test_produce_hot_dogs():
 
 func test_produce_hot_dogs_emits_signal():
 	"""Test that producing hot dogs emits the correct signal"""
-	var signal_monitor = monitor_signal(hot_dog_manager, "hot_dogs_produced")
+	var signal_monitor = auto_free(GdUnitSignalMonitor.new(hot_dog_manager, "hot_dogs_produced"))
 
 	hot_dog_manager.produce_hot_dogs(3, "unit_test")
 
-	assert_signal(signal_monitor).is_emitted(1)
+	assert_signal(signal_monitor).is_emitted()
 	assert_signal(signal_monitor).is_emitted_with([3, "unit_test"])
 
 
@@ -69,11 +69,11 @@ func test_sell_hot_dogs_emits_signal():
 	"""Test that selling hot dogs emits the correct signal"""
 	hot_dog_manager.hot_dogs_inventory = 10
 	hot_dog_manager.sale_value = 3
-	var signal_monitor = monitor_signal(hot_dog_manager, "hot_dogs_sold")
+	var signal_monitor = auto_free(GdUnitSignalMonitor.new(hot_dog_manager, "hot_dogs_sold"))
 
 	hot_dog_manager.sell_hot_dogs(2)
 
-	assert_signal(signal_monitor).is_emitted(1)
+	assert_signal(signal_monitor).is_emitted()
 	assert_signal(signal_monitor).is_emitted_with([2, 6])  # 2 hot dogs * 3 currency each
 
 

@@ -22,7 +22,7 @@ func test_save_system_exists():
 
 func test_get_default_save_data():
 	"""Test that default save data structure is correct"""
-	var default_data: Dictionary = save_system.get_default_save_data()
+	var default_data: Dictionary = GameData.get_default_save_data()
 
 	assert_dict(default_data).is_not_empty()
 	assert_dict(default_data).contains_keys(["hot_dogs", "currency", "upgrades"])
@@ -30,7 +30,7 @@ func test_get_default_save_data():
 
 func test_save_data_structure():
 	"""Test save data contains expected fields"""
-	var save_data: Dictionary = save_system.get_save_data()
+	var save_data: Dictionary = save_system._collect_save_data()
 
 	# Test top-level structure
 	assert_dict(save_data).contains_key("hot_dogs")
