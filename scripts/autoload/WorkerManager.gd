@@ -187,6 +187,10 @@ func _recalculate_production_rates():
 	"""Recalculate and emit production rate changes"""
 	emit_signal("production_rates_changed")
 
+func _emit_production_rates_changed():
+	"""Emit production rates changed signal for UI updates"""
+	emit_signal("production_rates_changed")
+
 func get_workers_by_assignment(assignment: WorkerDefinition.WorkerAssignment) -> Array[Dictionary]:
 	"""Get all workers assigned to a specific station"""
 	var workers: Array[Dictionary] = []
