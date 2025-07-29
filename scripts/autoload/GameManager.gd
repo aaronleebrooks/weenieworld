@@ -3,6 +3,8 @@ extends Node
 # Game state management for hot dog store idle game
 # Uses intentional naming conventions for future maintainability
 
+const DEBUG_MODE: bool = false
+
 # Scene paths
 const MAIN_MENU_SCENE = "res://scenes/main_menu/MainMenu.tscn"
 const GAME_SCENE = "res://scenes/game/Game.tscn"
@@ -25,7 +27,8 @@ var upgrade_manager: Node
 
 
 func _ready():
-	print("GameManager: Initialized")
+	if DEBUG_MODE:
+		print("GameManager: Initialized")
 
 	# Get references to managers
 	save_system = get_node("/root/SaveSystem")

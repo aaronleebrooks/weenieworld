@@ -3,6 +3,8 @@ extends Node
 # Hot dog production system autoload for global hot dog management
 # Uses intentional naming conventions for future maintainability
 
+const DEBUG_MODE: bool = false
+
 signal hot_dogs_changed(new_inventory: int, change_amount: int)
 signal hot_dogs_produced(amount: int, source: String)
 signal hot_dogs_sold(amount: int, value: int)
@@ -51,7 +53,8 @@ var currency_formatter: CurrencyFormatter
 
 
 func _ready() -> void:
-	print("HotDogManager: Initialized")
+	if DEBUG_MODE:
+		print("HotDogManager: Initialized")
 	currency_formatter = CurrencyFormatter.new()
 
 	# Connect to save system for persistence
@@ -72,12 +75,14 @@ func _on_save_data_loaded(save_data: Dictionary) -> void:
 		total_hot_dogs_produced = hot_dogs_data.get("total_produced", 0)
 		total_hot_dogs_sold = hot_dogs_data.get("total_sold", 0)
 		total_currency_earned = hot_dogs_data.get("total_currency_earned", 0)
+		if DEBUG_MODE:
 		print("HotDogManager: Loaded hot dog data from save")
 
 	# Load currency data
 	if save_data.has("currency"):
 		var currency_data: Dictionary = save_data["currency"]
 		currency_balance = currency_data.get("balance", 0)
+		if DEBUG_MODE:
 		print("HotDogManager: Loaded currency data from save")
 
 
@@ -131,20 +136,22 @@ func spend_currency(amount: int, reason: String = "unknown") -> bool:
 	if currency_balance >= amount:
 		currency_balance -= amount
 		emit_signal("currency_spent", amount, reason)
-		print(
-			(
-				"HotDogManager: Spent %d currency for %s (new balance: %d)"
-				% [amount, reason, currency_balance]
+		if DEBUG_MODE:
+			print(
+				(
+					"HotDogManager: Spent %d currency for %s (new balance: %d)"
+					% [amount, reason, currency_balance]
+				)
 			)
-		)
 		return true
 
-	print(
-		(
-			"HotDogManager: Insufficient currency for %s (need %d, have %d)"
-			% [reason, amount, currency_balance]
+	if DEBUG_MODE:
+		print(
+			(
+				"HotDogManager: Insufficient currency for %s (need %d, have %d)"
+				% [reason, amount, currency_balance]
+			)
 		)
-	)
 	return false
 
 
@@ -174,7 +181,8 @@ func reset_hot_dogs() -> void:
 	total_hot_dogs_sold = 0
 	total_currency_earned = 0
 	currency_balance = 0
-	print("HotDogManager: Reset to starting values")
+	if DEBUG_MODE:
+		print("HotDogManager: Reset to starting values")
 
 	# Also reset upgrades
 	var upgrade_manager: Node = get_node_or_null("/root/UpgradeManager")
