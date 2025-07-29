@@ -40,7 +40,7 @@ func is_parameter_set_static(index: int) -> bool:
 # validates the given arguments are complete and matches to required input fields of the test function
 func validate(parameter_sets: Array, parameter_set_index: int) -> GdUnitResult:
 	if parameter_sets.size() < parameter_set_index:
-		return GdUnitResult.error("Internal error: the resolved paremeterset has invalid size.")
+		return GdUnitResult.error("Internal error: the resolved parameterset has invalid size.")
 
 	var input_values: Array = parameter_sets[parameter_set_index]
 	if input_values == null:
