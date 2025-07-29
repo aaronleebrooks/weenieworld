@@ -58,7 +58,7 @@ func _ready() -> void:
 	currency_formatter = CurrencyFormatter.new()
 
 	# Connect to save system for persistence
-	var save_system: Node = get_node_or_null("/root/SaveSystem")
+	var save_system: Node = get_node_or_null("/root / SaveSystem")
 	if save_system:
 		save_system.save_data_loaded.connect(_on_save_data_loaded)
 
@@ -161,7 +161,7 @@ func can_afford(amount: int) -> bool:
 
 
 func get_formatted_currency() -> String:
-	"""Get formatted currency string (e.g., "1,234" or "1.2K")"""
+	"""Get formatted currency string (e.g., "1, 234" or "1.2K")"""
 	return currency_formatter.format(currency_balance)
 
 
@@ -171,7 +171,7 @@ func get_formatted_hot_dogs() -> String:
 
 func get_currency_per_second() -> float:
 	"""Calculate currency earned per second from customer purchases"""
-	var customer_manager = get_node_or_null("/root/CustomerManager")
+	var customer_manager = get_node_or_null("/root / CustomerManager")
 	if not customer_manager:
 		return 0.0
 	
@@ -181,14 +181,14 @@ func get_currency_per_second() -> float:
 	return purchases_per_second * purchase_amount * sale_value
 
 func get_hot_dogs_per_second_manual() -> float:
-	"""Calculate hot dog production per second from manual clicking/holding"""
+	"""Calculate hot dog production per second from manual clicking / holding"""
 	# This is an estimate based on typical clicking patterns
 	# For now, we'll estimate 1 click every 2 seconds during active play
 	return hot_dogs_per_click * 0.5
 
 func get_hot_dogs_per_second_workers() -> float:
 	"""Calculate hot dog production per second from workers"""
-	var worker_manager = get_node_or_null("/root/WorkerManager")
+	var worker_manager = get_node_or_null("/root / WorkerManager")
 	if not worker_manager:
 		return 0.0
 	
@@ -200,7 +200,7 @@ func get_hot_dogs_per_second_total() -> float:
 
 func get_hot_dog_consumption_per_second() -> float:
 	"""Calculate hot dog consumption per second from workers"""
-	var worker_manager = get_node_or_null("/root/WorkerManager")
+	var worker_manager = get_node_or_null("/root / WorkerManager")
 	if not worker_manager:
 		return 0.0
 	
@@ -226,7 +226,7 @@ func reset_hot_dogs() -> void:
 		print("HotDogManager: Reset to starting values")
 
 	# Also reset upgrades
-	var upgrade_manager: Node = get_node_or_null("/root/UpgradeManager")
+	var upgrade_manager: Node = get_node_or_null("/root / UpgradeManager")
 	if upgrade_manager:
 		upgrade_manager.reset_upgrades()
 

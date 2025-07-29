@@ -3,7 +3,7 @@ extends Node
 # Building management system autoload for managing building purchases
 # Uses intentional naming conventions for future maintainability
 
-const BuildingDefinition = preload("res://scripts/resources/BuildingDefinition.gd")
+const BuildingDefinition = preload("res://scripts / resources / BuildingDefinition.gd")
 
 # Signals
 signal building_purchased(building_id: String, cost: int)
@@ -23,8 +23,8 @@ func _ready():
 	print("BuildingManager: Initialized")
 	
 	# Get references to other managers
-	hot_dog_manager = get_node_or_null("/root/HotDogManager")
-	upgrade_manager = get_node_or_null("/root/UpgradeManager")
+	hot_dog_manager = get_node_or_null("/root / HotDogManager")
+	upgrade_manager = get_node_or_null("/root / UpgradeManager")
 	
 	# Load building definitions
 	_load_building_definitions()
@@ -33,7 +33,7 @@ func _ready():
 	_initialize_building_states()
 	
 	# Connect to save system
-	var save_system = get_node_or_null("/root/SaveSystem")
+	var save_system = get_node_or_null("/root / SaveSystem")
 	if save_system:
 		save_system.save_data_loaded.connect(_on_save_data_loaded)
 
@@ -58,7 +58,7 @@ func _create_default_buildings():
 	office.effects = [
 		"Unlock worker hiring system",
 		"Enable worker station assignments",
-		"Access to worker-specific upgrades"
+		"Access to worker - specific upgrades"
 	]
 	building_definitions.append(office)
 
@@ -121,7 +121,7 @@ func purchase_building(building_id: String) -> bool:
 	emit_signal("building_purchased", building_id, cost)
 	
 	# Add event to event log
-	var event_log_manager = get_node_or_null("/root/EventLogManager")
+	var event_log_manager = get_node_or_null("/root / EventLogManager")
 	if event_log_manager:
 		event_log_manager.add_purchase_event(building.display_name, cost, "building")
 	

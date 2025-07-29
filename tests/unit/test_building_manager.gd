@@ -9,16 +9,16 @@ var mock_save_system: Node
 
 func before():
 	"""Setup before each test"""
-	building_manager = get_node_or_null("/root/BuildingManager")
+	building_manager = get_node_or_null("/root / BuildingManager")
 	if not building_manager:
 		# If autoload not available, create a mock instance for testing
-		building_manager = preload("res://scripts/autoload/BuildingManager.gd").new()
+		building_manager = preload("res://scripts / autoload / BuildingManager.gd").new()
 		add_child(building_manager)
 	
-	hot_dog_manager = get_node_or_null("/root/HotDogManager")
+	hot_dog_manager = get_node_or_null("/root / HotDogManager")
 	if not hot_dog_manager:
 		# Create mock HotDogManager for testing
-		hot_dog_manager = preload("res://scripts/autoload/HotDogManager.gd").new()
+		hot_dog_manager = preload("res://scripts / autoload / HotDogManager.gd").new()
 		add_child(hot_dog_manager)
 		building_manager.hot_dog_manager = hot_dog_manager
 	
@@ -79,9 +79,8 @@ func test_successful_purchase():
 	hot_dog_manager.total_currency_earned = 100
 	hot_dog_manager.currency_balance = 500
 	
-	# Connect to signals for testing
-	var purchase_signal_emitted = false
-	building_manager.building_purchased.connect(func(building_id, cost): purchase_signal_emitted = true)
+	# Monitor signals using GdUnit4 approach
+	var signal_monitor = monitor_signal(building_manager, "building_purchased")
 	
 	# Purchase office
 	var result = building_manager.purchase_building("office")
@@ -91,7 +90,10 @@ func test_successful_purchase():
 	assert_bool(building_manager.is_building_purchased("office")).is_true()
 	assert_int(building_manager.get_purchased_building_count()).is_equal(1)
 	assert_int(hot_dog_manager.currency_balance).is_equal(0)  # 500 - 500
-	assert_bool(purchase_signal_emitted).is_true()
+	
+	# Allow one frame for signal processing
+	await get_tree().process_frame
+	assert_signal(signal_monitor).is_emitted()
 
 func test_cannot_purchase_twice():
 	"""Test that buildings cannot be purchased multiple times"""

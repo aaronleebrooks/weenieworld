@@ -13,6 +13,6 @@ extends Resource
 @export var efficiency_bonus: float = 1.0  # For office workers
 
 enum WorkerAssignment {
-	KITCHEN,  # Auto-produce hot dogs
+	KITCHEN,  # Auto - produce hot dogs
 	OFFICE    # Improve all worker efficiency
 }

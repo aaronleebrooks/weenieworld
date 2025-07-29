@@ -3,7 +3,7 @@ extends GdUnitTestSuite
 # Test suite for WorkerManager autoload
 # Tests worker hiring, assignment, production, and consumption functionality
 
-const WorkerDefinition = preload("res://scripts/resources/WorkerDefinition.gd")
+const WorkerDefinition = preload("res://scripts / resources / WorkerDefinition.gd")
 
 var worker_manager: Node
 var hot_dog_manager: Node
@@ -11,23 +11,23 @@ var building_manager: Node
 
 func before():
 	# Setup before each test
-	worker_manager = get_node_or_null("/root/WorkerManager")
+	worker_manager = get_node_or_null("/root / WorkerManager")
 	if not worker_manager:
 		# If autoload not available, create a mock instance for testing
-		worker_manager = preload("res://scripts/autoload/WorkerManager.gd").new()
+		worker_manager = preload("res://scripts / autoload / WorkerManager.gd").new()
 		add_child(worker_manager)
 	
-	hot_dog_manager = get_node_or_null("/root/HotDogManager")
+	hot_dog_manager = get_node_or_null("/root / HotDogManager")
 	if not hot_dog_manager:
 		# Create mock HotDogManager for testing
-		hot_dog_manager = preload("res://scripts/autoload/HotDogManager.gd").new()
+		hot_dog_manager = preload("res://scripts / autoload / HotDogManager.gd").new()
 		add_child(hot_dog_manager)
 		worker_manager.hot_dog_manager = hot_dog_manager
 	
-	building_manager = get_node_or_null("/root/BuildingManager")
+	building_manager = get_node_or_null("/root / BuildingManager")
 	if not building_manager:
 		# Create mock BuildingManager for testing
-		building_manager = preload("res://scripts/autoload/BuildingManager.gd").new()
+		building_manager = preload("res://scripts / autoload / BuildingManager.gd").new()
 		add_child(building_manager)
 		worker_manager.building_manager = building_manager
 	
@@ -47,11 +47,29 @@ func test_hire_cost_scaling():
 	"""Test worker hire cost scaling (10, 100, 1000)"""
 	assert_int(worker_manager.get_next_hire_cost()).is_equal(10)
 	
-	# Simulate hiring workers to test cost scaling
-	worker_manager.hired_workers.append({"worker_id": "test1"})
+	# Simulate hiring workers to test cost scaling with complete worker structures
+	worker_manager.hired_workers.append({
+		"worker_id": "test1",
+		"display_name": "Test Worker 1",
+		"assignment": WorkerDefinition.WorkerAssignment.KITCHEN,
+		"hire_cost": 10,
+		"hot_dogs_consumed": 0.0,
+		"hot_dogs_produced": 0.0,
+		"production_buffer": 0.0,
+		"hire_time": "test_time"
+	})
 	assert_int(worker_manager.get_next_hire_cost()).is_equal(100)
 	
-	worker_manager.hired_workers.append({"worker_id": "test2"})
+	worker_manager.hired_workers.append({
+		"worker_id": "test2",
+		"display_name": "Test Worker 2",
+		"assignment": WorkerDefinition.WorkerAssignment.OFFICE,
+		"hire_cost": 100,
+		"hot_dogs_consumed": 0.0,
+		"hot_dogs_produced": 0.0,
+		"production_buffer": 0.0,
+		"hire_time": "test_time"
+	})
 	assert_int(worker_manager.get_next_hire_cost()).is_equal(1000)
 
 func test_cannot_hire_without_office():
@@ -87,9 +105,18 @@ func test_worker_limit():
 	# Should be able to hire up to limit
 	assert_bool(worker_manager.can_hire_worker()).is_true()
 	
-	# Simulate hiring to the limit
+	# Simulate hiring to the limit with complete worker structures
 	for i in range(worker_manager.max_workers):
-		worker_manager.hired_workers.append({"worker_id": "test_%d" % i})
+		worker_manager.hired_workers.append({
+			"worker_id": "test_%d" % i,
+			"display_name": "Test Worker %d" % i,
+			"assignment": WorkerDefinition.WorkerAssignment.KITCHEN,
+			"hire_cost": 10,
+			"hot_dogs_consumed": 0.0,
+			"hot_dogs_produced": 0.0,
+			"production_buffer": 0.0,
+			"hire_time": "test_time"
+		})
 	
 	# Should not be able to hire more
 	assert_bool(worker_manager.can_hire_worker()).is_false()
@@ -100,13 +127,8 @@ func test_successful_hire():
 	building_manager.purchased_buildings["office"] = true
 	hot_dog_manager.currency_balance = 100
 	
-	# Connect to signals for testing
-	var hire_signal_emitted = false
-	var hired_worker_id = ""
-	worker_manager.worker_hired.connect(func(worker_id, cost): 
-		hire_signal_emitted = true
-		hired_worker_id = worker_id
-	)
+	# Monitor signals using GdUnit4 approach
+	var signal_monitor = monitor_signal(worker_manager, "worker_hired")
 	
 	# Hire worker
 	var result = worker_manager.hire_worker(WorkerDefinition.WorkerAssignment.KITCHEN)
@@ -115,8 +137,10 @@ func test_successful_hire():
 	# Verify state changes
 	assert_int(worker_manager.get_worker_count()).is_equal(1)
 	assert_int(hot_dog_manager.currency_balance).is_equal(90)  # 100 - 10
-	assert_bool(hire_signal_emitted).is_true()
-	assert_str(hired_worker_id).is_equal("worker_1")
+	
+	# Allow one frame for signal processing
+	await get_tree().process_frame
+	assert_signal(signal_monitor).is_emitted()
 	
 	# Check worker data
 	var worker = worker_manager.hired_workers[0]
@@ -134,14 +158,16 @@ func test_worker_assignment():
 	
 	var worker_id = worker_manager.hired_workers[0]["worker_id"]
 	
-	# Connect to signals
-	var assignment_signal_emitted = false
-	worker_manager.worker_assigned.connect(func(id, assignment): assignment_signal_emitted = true)
+	# Monitor signals using GdUnit4 approach
+	var signal_monitor = monitor_signal(worker_manager, "worker_assigned")
 	
 	# Change assignment
 	var result = worker_manager.assign_worker(worker_id, WorkerDefinition.WorkerAssignment.OFFICE)
 	assert_bool(result).is_true()
-	assert_bool(assignment_signal_emitted).is_true()
+	
+	# Allow one frame for signal processing
+	await get_tree().process_frame
+	assert_signal(signal_monitor).is_emitted()
 	
 	# Verify assignment changed
 	var worker = worker_manager.get_worker_by_id(worker_id)
@@ -220,9 +246,8 @@ func test_kitchen_worker_insufficient_hotdogs():
 	worker_manager.hire_worker(WorkerDefinition.WorkerAssignment.KITCHEN)
 	var worker = worker_manager.hired_workers[0]
 	
-	# Connect to quota warning signal
-	var quota_warning_emitted = false
-	worker_manager.worker_quota_warning.connect(func(worker_id, deficit): quota_warning_emitted = true)
+	# Monitor signals using GdUnit4 approach
+	var signal_monitor = monitor_signal(worker_manager, "worker_quota_warning")
 	
 	# Process worker production
 	worker_manager._process_kitchen_worker(worker)
@@ -231,7 +256,10 @@ func test_kitchen_worker_insufficient_hotdogs():
 	assert_int(hot_dog_manager.hot_dogs_inventory).is_equal(0)
 	assert_float(worker["hot_dogs_consumed"]).is_equal(0.0)
 	assert_float(worker["hot_dogs_produced"]).is_equal(0.0)
-	assert_bool(quota_warning_emitted).is_true()
+	
+	# Allow one frame for signal processing
+	await get_tree().process_frame
+	assert_signal(signal_monitor).is_emitted()
 
 func test_office_worker_consumption():
 	"""Test office worker consumption"""
@@ -285,8 +313,10 @@ func test_backward_compatibility():
 				"worker_id": "worker_1",
 				"display_name": "Worker 1",
 				"assignment": WorkerDefinition.WorkerAssignment.KITCHEN,
+				"hire_cost": 10,
 				"hot_dogs_consumed": 0.0,
-				"hot_dogs_produced": 0.0
+				"hot_dogs_produced": 0.0,
+				"hire_time": "test_time"
 				# No production_buffer field
 			}
 		],

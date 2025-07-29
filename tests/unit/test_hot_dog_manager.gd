@@ -8,10 +8,10 @@ var hot_dog_manager: Node
 
 func before():
 	"""Setup before each test"""
-	hot_dog_manager = get_node_or_null("/root/HotDogManager")
+	hot_dog_manager = get_node_or_null("/root / HotDogManager")
 	if not hot_dog_manager:
 		# If autoload not available, create a mock instance for testing
-		hot_dog_manager = preload("res://scripts/autoload/HotDogManager.gd").new()
+		hot_dog_manager = preload("res://scripts / autoload / HotDogManager.gd").new()
 		add_child(hot_dog_manager)
 
 	# Reset state for clean tests
@@ -31,12 +31,14 @@ func test_produce_hot_dogs():
 
 func test_produce_hot_dogs_emits_signal():
 	"""Test that producing hot dogs emits the correct signal"""
-	var signal_emitted = false
-	hot_dog_manager.hot_dogs_produced.connect(func(amount, reason): signal_emitted = true)
+	# Use GdUnit4's signal monitoring approach
+	var signal_monitor = monitor_signal(hot_dog_manager, "hot_dogs_produced")
 	
 	hot_dog_manager.produce_hot_dogs(3, "unit_test")
 	
-	assert_bool(signal_emitted).is_true()
+	# Allow one frame for signal processing
+	await get_tree().process_frame
+	assert_signal(signal_monitor).is_emitted()
 
 
 func test_sell_hot_dogs_success():
@@ -70,12 +72,14 @@ func test_sell_hot_dogs_emits_signal():
 	hot_dog_manager.hot_dogs_inventory = 10
 	hot_dog_manager.sale_value = 3
 	
-	var signal_emitted = false
-	hot_dog_manager.hot_dogs_sold.connect(func(amount, value): signal_emitted = true)
+	# Use GdUnit4's signal monitoring approach
+	var signal_monitor = monitor_signal(hot_dog_manager, "hot_dogs_sold")
 
 	hot_dog_manager.sell_hot_dogs(2)
 
-	assert_bool(signal_emitted).is_true()
+	# Allow one frame for signal processing  
+	await get_tree().process_frame
+	assert_signal(signal_monitor).is_emitted()
 
 
 func test_zero_production():
@@ -110,7 +114,7 @@ func test_manual_hot_dogs_per_second():
 	hot_dog_manager.hot_dogs_per_click = 2
 	
 	var manual_rate = hot_dog_manager.get_hot_dogs_per_second_manual()
-	# 2 hot dogs per click * 0.5 clicks per second = 1.0 hot dogs/second
+	# 2 hot dogs per click * 0.5 clicks per second = 1.0 hot dogs / second
 	assert_float(manual_rate).is_equal(1.0)
 
 
