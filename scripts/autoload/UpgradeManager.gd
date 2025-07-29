@@ -6,6 +6,7 @@ extends Node
 const UpgradeEnums = preload("res://scripts/resources/UpgradeEnums.gd")
 const UpgradeDefinition = preload("res://scripts/resources/UpgradeDefinition.gd")
 
+# Signals
 signal upgrade_purchased(upgrade_id: String, level: int, cost: int)
 signal upgrade_effect_applied(upgrade_id: String, effect_type: String, value: float)
 

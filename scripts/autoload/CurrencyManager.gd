@@ -94,14 +94,14 @@ func spend_currency(amount: int, reason: String = "unknown") -> bool:
 			)
 		)
 		return true
-	else:
-		print(
-			(
-				"CurrencyManager: Insufficient currency for %s (need %d, have %d)"
-				% [reason, amount, currency_balance]
-			)
+
+	print(
+		(
+			"CurrencyManager: Insufficient currency for %s (need %d, have %d)"
+			% [reason, amount, currency_balance]
 		)
-		return false
+	)
+	return false
 
 
 func can_afford(amount: int) -> bool:
@@ -134,9 +134,8 @@ class CurrencyFormatter:
 		"""Format currency amount with appropriate suffixes"""
 		if amount < 1000:
 			return str(amount)
-		elif amount < 1000000:
+		if amount < 1000000:
 			return "%.1fK" % (amount / 1000.0)
-		elif amount < 1000000000:
+		if amount < 1000000000:
 			return "%.1fM" % (amount / 1000000.0)
-		else:
-			return "%.1fB" % (amount / 1000000000.0)
+		return "%.1fB" % (amount / 1000000000.0)

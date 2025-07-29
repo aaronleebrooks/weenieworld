@@ -11,6 +11,7 @@ disable:
   - too-many-locals             # Allow more than 15 local variables
   - too-many-branches           # Allow more than 12 branches in function
   - too-many-statements         # Allow more than 50 statements in function
+  - class-definitions-order     # Allow flexible ordering of class definitions
 
 # Enable additional checks
 enable: 

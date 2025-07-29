@@ -3,14 +3,6 @@ extends Node
 # Animation system for hot dog store idle game
 # Uses intentional naming conventions for future maintainability
 
-# Animation squares for visual feedback
-var production_square: ColorRect  # Yellow square for production
-var sales_square: ColorRect  # Orange square for sales
-
-# Store original positions to prevent drift
-var production_square_original_position: Vector2
-var sales_square_original_position: Vector2
-
 # Animation configuration
 const ANIMATION_CONFIG = {
 	"production":
@@ -34,6 +26,14 @@ const ANIMATION_CONFIG = {
 		"production_return_duration": 0.2
 	}
 }
+
+# Animation squares for visual feedback
+var production_square: ColorRect  # Yellow square for production
+var sales_square: ColorRect  # Orange square for sales
+
+# Store original positions to prevent drift
+var production_square_original_position: Vector2
+var sales_square_original_position: Vector2
 
 # Animation properties
 var animation_duration: float = 0.15
@@ -142,7 +142,7 @@ func _create_square(color: Color, size: Vector2, position: Vector2, parent: Node
 	return square
 
 
-func _on_click_state_changed(is_clicking: bool, is_holding: bool):
+func _on_click_state_changed(_is_clicking: bool, is_holding: bool):
 	"""Handle click state changes"""
 	# If we were holding and now we're not, stop the hold animation
 	if not is_holding and production_square.has_meta("hold_tween"):
@@ -155,7 +155,7 @@ func _on_click_started(click_type: String):
 		_start_hold_animation()
 
 
-func _on_click_completed(click_type: String, hot_dogs_produced: int):
+func _on_click_completed(click_type: String, _hot_dogs_produced: int):
 	"""Handle click completion events"""
 	if click_type == "click":
 		_animate_production_pulse()  # Animate on click completion since clicks are instant
@@ -164,7 +164,7 @@ func _on_click_completed(click_type: String, hot_dogs_produced: int):
 	# The hold animation will be stopped when the hold action actually ends
 
 
-func _on_hot_dogs_produced(amount: int, source: String):
+func _on_hot_dogs_produced(_amount: int, _source: String):
 	"""Handle hot dog production events - animate production square"""
 	print("AnimationManager: Hot dogs produced - animating production square")
 	if production_square and is_instance_valid(production_square):
@@ -173,7 +173,7 @@ func _on_hot_dogs_produced(amount: int, source: String):
 		print("AnimationManager: Production square is null or invalid")
 
 
-func _on_hot_dogs_sold(amount: int, value: int):
+func _on_hot_dogs_sold(_amount: int, _value: int):
 	"""Handle hot dog sales events - animate sales square"""
 	print("AnimationManager: Hot dogs sold - animating sales square")
 	if sales_square and is_instance_valid(sales_square):

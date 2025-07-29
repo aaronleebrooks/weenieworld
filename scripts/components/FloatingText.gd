@@ -3,11 +3,11 @@ extends Control
 # Floating text component for showing hot dog gains and currency gains
 # Uses intentional naming conventions for future maintainability
 
-@onready var label = $Label
-
 var fade_duration: float = 2.0
 var move_distance: float = 80.0
 var fade_timer: Timer
+
+@onready var label = $Label
 
 
 func _ready():

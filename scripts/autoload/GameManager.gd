@@ -7,6 +7,12 @@ extends Node
 const MAIN_MENU_SCENE = "res://scenes/main_menu/MainMenu.tscn"
 const GAME_SCENE = "res://scenes/game/Game.tscn"
 
+# Signals
+signal game_started
+signal game_paused
+signal game_resumed
+signal scene_changed(scene_name: String)
+
 # Game state
 var is_game_active: bool = false
 var current_scene: String = ""
@@ -16,12 +22,6 @@ var save_system: Node
 var hot_dog_manager: Node
 var customer_manager: Node
 var upgrade_manager: Node
-
-# Signals
-signal game_started
-signal game_paused
-signal game_resumed
-signal scene_changed(scene_name: String)
 
 
 func _ready():
@@ -180,7 +180,7 @@ func load_specific_save(save_name: String):
 
 
 # Handle save data loaded
-func _on_save_data_loaded(data: Dictionary):
+func _on_save_data_loaded(_data: Dictionary):
 	"""Handle save data loaded from SaveSystem"""
 	print("GameManager: Save data loaded")
 	is_game_active = true

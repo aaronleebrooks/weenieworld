@@ -135,10 +135,10 @@ func _get_character_position(char: String) -> int:
 	# Handle letters (a-z, A-Z)
 	if code >= 97 and code <= 122:  # lowercase a-z
 		return code - 97
-	elif code >= 65 and code <= 90:  # uppercase A-Z
+	if code >= 65 and code <= 90:  # uppercase A-Z
 		return code - 65
 	# Handle numbers (0-9)
-	elif code >= 48 and code <= 57:  # 0-9
+	if code >= 48 and code <= 57:  # 0-9
 		return code - 48 + 26  # Numbers start at position 26
 
 	return -1
@@ -151,8 +151,8 @@ func _get_character_from_position(pos: int, original_char: String) -> String:
 
 	if pos < 26:  # Letters
 		return char(pos + 97)  # Convert to lowercase letter
-	else:  # Numbers
-		return char(pos - 26 + 48)  # Convert to number
+	# Numbers
+	return char(pos - 26 + 48)  # Convert to number
 
 
 # Set cypher intensity level

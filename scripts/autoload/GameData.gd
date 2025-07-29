@@ -1,5 +1,5 @@
-extends RefCounted
 class_name GameData
+extends RefCounted
 
 
 # Default save data structure for Alien Hot Dog Food Truck

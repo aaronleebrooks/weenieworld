@@ -32,12 +32,12 @@ func _get_floating_text() -> Node:
 		var floating_text = floating_text_pool.pop_back()
 		active_floating_texts.append(floating_text)
 		return floating_text
-	else:
-		# Create a new one if pool is empty
-		var floating_text = FLOATING_TEXT_SCENE.instantiate()
-		add_child(floating_text)
-		active_floating_texts.append(floating_text)
-		return floating_text
+
+	# Create a new one if pool is empty
+	var floating_text = FLOATING_TEXT_SCENE.instantiate()
+	add_child(floating_text)
+	active_floating_texts.append(floating_text)
+	return floating_text
 
 
 func _return_floating_text(floating_text: Node):

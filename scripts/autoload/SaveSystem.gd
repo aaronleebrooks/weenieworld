@@ -66,9 +66,9 @@ func save_game(save_name: String) -> bool:
 		print("SaveSystem: Game saved to %s" % file_path)
 		emit_signal("save_created", save_name)
 		return true
-	else:
-		print("SaveSystem: Failed to save game to %s" % file_path)
-		return false
+
+	print("SaveSystem: Failed to save game to %s" % file_path)
+	return false
 
 
 func load_game(save_name: String) -> bool:
@@ -93,12 +93,12 @@ func load_game(save_name: String) -> bool:
 			print("SaveSystem: Game loaded from %s" % file_path)
 			emit_signal("save_data_loaded", save_data)
 			return true
-		else:
-			print("SaveSystem: Failed to parse save file: %s" % file_path)
-			return false
-	else:
-		print("SaveSystem: Failed to open save file: %s" % file_path)
+
+		print("SaveSystem: Failed to parse save file: %s" % file_path)
 		return false
+
+	print("SaveSystem: Failed to open save file: %s" % file_path)
+	return false
 
 
 func delete_save(save_name: String) -> bool:
@@ -113,15 +113,15 @@ func delete_save(save_name: String) -> bool:
 				print("SaveSystem: Save deleted: %s" % save_name)
 				emit_signal("save_deleted", save_name)
 				return true
-			else:
-				print("SaveSystem: Failed to delete save: %s" % save_name)
-				return false
-		else:
-			print("SaveSystem: Failed to access save directory")
+
+			print("SaveSystem: Failed to delete save: %s" % save_name)
 			return false
-	else:
-		print("SaveSystem: Save file not found: %s" % save_name)
+
+		print("SaveSystem: Failed to access save directory")
 		return false
+
+	print("SaveSystem: Save file not found: %s" % save_name)
+	return false
 
 
 func get_save_list() -> Array[Dictionary]:
@@ -190,11 +190,11 @@ func _collect_save_data() -> Dictionary:
 	return save_data
 
 
-func _apply_save_data(save_data: Dictionary):
+func _apply_save_data(_save_data: Dictionary):
 	"""Apply save data to all managers"""
 	# Data will be applied through the save_data_loaded signal
 	# which each manager listens to
-	pass
+	# Function kept for future expansion when direct data application is needed
 
 
 func create_new_game():

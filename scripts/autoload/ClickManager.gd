@@ -66,7 +66,7 @@ func _setup_timers():
 	print("ClickManager: Timers initialized")
 
 
-func _on_hot_dogs_changed(new_inventory: int, change_amount: int):
+func _on_hot_dogs_changed(_new_inventory: int, _change_amount: int):
 	"""Update timer durations when hot dog values change"""
 	_update_timer_durations()
 
@@ -210,7 +210,6 @@ func get_current_action_type() -> String:
 	"""Get the type of action currently in progress"""
 	if is_clicking:
 		return "click"
-	elif is_holding:
+	if is_holding:
 		return "hold"
-	else:
-		return "none"
+	return "none"
