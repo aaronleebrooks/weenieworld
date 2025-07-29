@@ -26,8 +26,8 @@ func _ready():
 	print("UpgradeManager: Initialized")
 
 	# Get references to other managers
-	hot_dog_manager = get_node("/root / HotDogManager")
-	customer_manager = get_node("/root / CustomerManager")
+	hot_dog_manager = get_node("/root/HotDogManager")
+	customer_manager = get_node("/root/CustomerManager")
 
 	# Load upgrade definitions
 	_load_upgrade_definitions()
@@ -36,7 +36,7 @@ func _ready():
 	_initialize_upgrade_levels()
 
 	# Connect to save system
-	var save_system = get_node_or_null("/root / SaveSystem")
+	var save_system = get_node_or_null("/root/SaveSystem")
 	if save_system:
 		save_system.save_data_loaded.connect(_on_save_data_loaded)
 
@@ -180,7 +180,7 @@ func purchase_upgrade(upgrade_id: String) -> bool:
 	emit_signal("upgrade_purchased", upgrade_id, upgrade_levels[upgrade_id], cost)
 
 	# Add event to event log
-	var event_log_manager = get_node_or_null("/root / EventLogManager")
+	var event_log_manager = get_node_or_null("/root/EventLogManager")
 	if event_log_manager:
 		event_log_manager.add_purchase_event(upgrade.display_name, cost, "upgrade")
 
@@ -254,7 +254,7 @@ func _apply_upgrade_effects(upgrade_id: String):
 			emit_signal("upgrade_effect_applied", upgrade_id, "sale_value", total_effect)
 
 	# Force update the game display to show new values immediately
-	var game = get_node_or_null("/root / Game")
+	var game = get_node_or_null("/root/Game")
 	if game and game.has_method("display_game_data"):
 		game.display_game_data()
 

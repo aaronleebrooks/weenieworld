@@ -36,14 +36,14 @@ func _ready():
 	print("WorkerManager: Initialized")
 
 	# Get references to other managers
-	hot_dog_manager = get_node_or_null("/root / HotDogManager")
-	building_manager = get_node_or_null("/root / BuildingManager")
+	hot_dog_manager = get_node_or_null("/root/HotDogManager")
+	building_manager = get_node_or_null("/root/BuildingManager")
 
 	# Setup production timer for kitchen workers
 	_setup_production_timer()
 
 	# Connect to save system
-	var save_system = get_node_or_null("/root / SaveSystem")
+	var save_system = get_node_or_null("/root/SaveSystem")
 	if save_system:
 		save_system.save_data_loaded.connect(_on_save_data_loaded)
 
@@ -124,7 +124,7 @@ func hire_worker(
 	emit_signal("worker_hired", worker_data["worker_id"], hire_cost)
 
 	# Add event to event log
-	var event_log_manager = get_node_or_null("/root / EventLogManager")
+	var event_log_manager = get_node_or_null("/root/EventLogManager")
 	if event_log_manager:
 		event_log_manager.add_worker_event(
 			"Worker Hired", "Hired %s for %d currency" % [worker_data["display_name"], hire_cost]
