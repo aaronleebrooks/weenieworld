@@ -3,6 +3,8 @@ extends Node
 # Hot dog production system autoload for global hot dog management
 # Uses intentional naming conventions for future maintainability
 
+const DEBUG_MODE: bool = false
+
 signal hot_dogs_changed(new_inventory: int, change_amount: int)
 signal hot_dogs_produced(amount: int, source: String)
 signal hot_dogs_sold(amount: int, value: int)
@@ -49,19 +51,22 @@ var total_currency_earned: int = 0
 # Currency formatting
 var currency_formatter: CurrencyFormatter
 
-func _ready():
-	print("HotDogManager: Initialized")
+
+func _ready() -> void:
+	if DEBUG_MODE:
+		print("HotDogManager: Initialized")
 	currency_formatter = CurrencyFormatter.new()
-	
+
 	# Connect to save system for persistence
-	var save_system = get_node_or_null("/root/SaveSystem")
+	var save_system: Node = get_node_or_null("/root/SaveSystem")
 	if save_system:
 		save_system.save_data_loaded.connect(_on_save_data_loaded)
 
-func _on_save_data_loaded(save_data: Dictionary):
+
+func _on_save_data_loaded(save_data: Dictionary) -> void:
 	"""Load hot dog data from save file"""
 	if save_data.has("hot_dogs"):
-		var hot_dogs_data = save_data["hot_dogs"]
+		var hot_dogs_data: Dictionary = save_data["hot_dogs"]
 		hot_dogs_inventory = hot_dogs_data.get("inventory", 0)
 		hot_dogs_per_click = hot_dogs_data.get("per_click", 1)
 		production_rate_seconds = hot_dogs_data.get("production_rate", 0.3)
@@ -70,18 +75,22 @@ func _on_save_data_loaded(save_data: Dictionary):
 		total_hot_dogs_produced = hot_dogs_data.get("total_produced", 0)
 		total_hot_dogs_sold = hot_dogs_data.get("total_sold", 0)
 		total_currency_earned = hot_dogs_data.get("total_currency_earned", 0)
-		print("HotDogManager: Loaded hot dog data from save")
-	
+		if DEBUG_MODE:
+			print("HotDogManager: Loaded hot dog data from save")
+
 	# Load currency data
 	if save_data.has("currency"):
-		var currency_data = save_data["currency"]
+		var currency_data: Dictionary = save_data["currency"]
 		currency_balance = currency_data.get("balance", 0)
-		print("HotDogManager: Loaded currency data from save")
+		if DEBUG_MODE:
+			print("HotDogManager: Loaded currency data from save")
+
 
 func get_save_data() -> Dictionary:
 	"""Get hot dog data for saving"""
 	return {
-		"hot_dogs": {
+		"hot_dogs":
+		{
 			"inventory": hot_dogs_inventory,
 			"per_click": hot_dogs_per_click,
 			"production_rate": production_rate_seconds,
@@ -91,10 +100,9 @@ func get_save_data() -> Dictionary:
 			"total_sold": total_hot_dogs_sold,
 			"total_currency_earned": total_currency_earned
 		},
-		"currency": {
-			"balance": currency_balance
-		}
+		"currency": {"balance": currency_balance}
 	}
+
 
 func produce_hot_dogs(amount: int, source: String = "unknown") -> void:
 	"""Produce hot dogs and add to inventory"""
@@ -103,46 +111,64 @@ func produce_hot_dogs(amount: int, source: String = "unknown") -> void:
 		total_hot_dogs_produced += amount
 		emit_signal("hot_dogs_produced", amount, source)
 
+
 func sell_hot_dogs(amount: int) -> bool:
 	"""Sell hot dogs from inventory and earn currency"""
 	if amount <= 0 or hot_dogs_inventory < amount:
 		return false
-	
+
 	hot_dogs_inventory -= amount
-	var earned_currency = amount * sale_value
+	var earned_currency: int = amount * sale_value
 	currency_balance += earned_currency
 	total_hot_dogs_sold += amount
 	total_currency_earned += earned_currency
-	
+
 	emit_signal("hot_dogs_sold", amount, earned_currency)
 	emit_signal("currency_earned", earned_currency, "hot_dog_sale")
 	return true
+
 
 func spend_currency(amount: int, reason: String = "unknown") -> bool:
 	"""Spend currency if sufficient balance exists"""
 	if amount <= 0:
 		return false
-	
+
 	if currency_balance >= amount:
 		currency_balance -= amount
 		emit_signal("currency_spent", amount, reason)
-		print("HotDogManager: Spent %d currency for %s (new balance: %d)" % [amount, reason, currency_balance])
+		if DEBUG_MODE:
+			print(
+				(
+					"HotDogManager: Spent %d currency for %s (new balance: %d)"
+					% [amount, reason, currency_balance]
+				)
+			)
 		return true
-	else:
-		print("HotDogManager: Insufficient currency for %s (need %d, have %d)" % [reason, amount, currency_balance])
-		return false
+
+	if DEBUG_MODE:
+		print(
+			(
+				"HotDogManager: Insufficient currency for %s (need %d, have %d)"
+				% [reason, amount, currency_balance]
+			)
+		)
+	return false
+
 
 func can_afford(amount: int) -> bool:
 	"""Check if player can afford the specified amount"""
 	return currency_balance >= amount
 
+
 func get_formatted_currency() -> String:
 	"""Get formatted currency string (e.g., "1,234" or "1.2K")"""
 	return currency_formatter.format(currency_balance)
 
+
 func get_formatted_hot_dogs() -> String:
 	"""Get formatted hot dog inventory string"""
 	return currency_formatter.format(hot_dogs_inventory)
+
 
 func reset_hot_dogs() -> void:
 	"""Reset hot dog system to starting values (for new game)"""
@@ -155,12 +181,14 @@ func reset_hot_dogs() -> void:
 	total_hot_dogs_sold = 0
 	total_currency_earned = 0
 	currency_balance = 0
-	print("HotDogManager: Reset to starting values")
-	
+	if DEBUG_MODE:
+		print("HotDogManager: Reset to starting values")
+
 	# Also reset upgrades
-	var upgrade_manager = get_node_or_null("/root/UpgradeManager")
+	var upgrade_manager: Node = get_node_or_null("/root/UpgradeManager")
 	if upgrade_manager:
 		upgrade_manager.reset_upgrades()
+
 
 # Currency formatting helper class
 class CurrencyFormatter:
@@ -168,9 +196,8 @@ class CurrencyFormatter:
 		"""Format amount with appropriate suffixes"""
 		if amount < 1000:
 			return str(amount)
-		elif amount < 1000000:
+		if amount < 1000000:
 			return "%.1fK" % (amount / 1000.0)
-		elif amount < 1000000000:
+		if amount < 1000000000:
 			return "%.1fM" % (amount / 1000000.0)
-		else:
-			return "%.1fB" % (amount / 1000000000.0) 
+		return "%.1fB" % (amount / 1000000000.0)

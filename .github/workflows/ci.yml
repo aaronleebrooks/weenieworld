@@ -1,0 +1,196 @@
+name: CI - Code Quality & Testing
+
+on:
+  push:
+    branches: [ main, refactor/* ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  GODOT_VERSION: 4.4
+
+jobs:
+  # Code Quality Checks
+  code-quality:
+    runs-on: ubuntu-latest
+    name: Code Quality (Formatting & Linting)
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+        
+    - name: Install gdtoolkit
+      run: |
+        pip install gdtoolkit>=4.0.0
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        
+    - name: Check code formatting
+      run: |
+        echo "Checking GDScript formatting..."
+        gdformat --check scripts/**/*.gd tests/**/*.gd
+        
+    - name: Run linting
+      run: |
+        echo "Running GDScript linting..."
+        gdlint scripts/**/*.gd tests/**/*.gd
+        
+    - name: Validate project structure
+      run: |
+        echo "Validating project structure..."
+        # Check that scripts are properly organized
+        [ -d "scripts/autoload" ] || exit 1
+        [ -d "scripts/scenes" ] || exit 1
+        [ -d "tests/unit" ] || exit 1
+        echo "✓ Project structure is correct"
+
+  # Unit Testing
+  testing:
+    runs-on: ubuntu-latest
+    name: Unit Tests
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download Godot
+      run: |
+        wget -q https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
+        unzip -q Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
+        chmod +x Godot_v${GODOT_VERSION}-stable_linux.x86_64
+        
+    - name: Import project
+      run: |
+        # Import the project (this will generate .godot folder)
+        timeout 30 ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --import || true
+        
+    - name: Run unit tests
+      run: |
+        echo "Running GdUnit4 tests..."
+        # Import project first to ensure .godot folder is generated
+        timeout 30 ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --import || true
+        # Wait for import to complete
+        sleep 2
+        # Run tests using GdUnit4 command line tool  
+        ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --script addons/gdUnit4/bin/GdUnitCmdTool.gd -a tests/unit/ -c --ignoreHeadlessMode
+        
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          reports/
+          *.xml
+          *.html
+
+  # Security & Dependency Check
+  security:
+    runs-on: ubuntu-latest
+    name: Security & Dependencies
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check for secrets
+      run: |
+        echo "Checking for potential secrets..."
+        # More specific secret detection patterns to avoid false positives
+        if grep -r -E "(password\s*=|secret\s*=|api_key\s*=|token\s*=|\"password\"|\"secret\"|\"api_key\"|\"token\")" --include="*.gd" . --exclude-dir=".git" --exclude-dir="addons"; then
+          echo "⚠️  Potential secrets found in code"
+          exit 1
+        fi
+        echo "✓ No obvious secrets detected"
+        
+    - name: Validate dependencies
+      run: |
+        echo "Validating project dependencies..."
+        # Check for proper addon structure
+        [ -f "addons/gdUnit4/plugin.cfg" ] || exit 1
+        echo "✓ Dependencies are properly structured"
+
+  # Performance & Build Check
+  build-check:
+    runs-on: ubuntu-latest
+    name: Build Validation
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download Godot
+      run: |
+        wget -q https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
+        unzip -q Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
+        chmod +x Godot_v${GODOT_VERSION}-stable_linux.x86_64
+        
+    - name: Validate project files
+      run: |
+        echo "Validating Godot project..."
+        # Check project.godot exists and is readable
+        if [ ! -f "project.godot" ]; then
+          echo "ERROR: project.godot not found!"
+          exit 1
+        fi
+        # Try to import the project (this validates the project files)
+        ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --quit
+        echo "✓ Project validation completed"
+        
+    - name: Test export capabilities
+      run: |
+        echo "Testing export presets..."
+        # Check if export presets exist first
+        if [ -f "export_presets.cfg" ]; then
+          echo "Export presets found, testing export..."
+          ./Godot_v${GODOT_VERSION}-stable_linux.x86_64 --headless --export-debug "Linux/X11" --no-window test_build.x86_64 || true
+        else
+          echo "No export presets configured - skipping export test"
+        fi
+        echo "✓ Export validation completed"
+
+  # Documentation & Code Coverage (Future)
+  documentation:
+    runs-on: ubuntu-latest
+    name: Documentation Check
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check documentation
+      run: |
+        echo "Checking project documentation..."
+        # Verify key documentation files exist
+        [ -f "README.md" ] || exit 1
+        [ -f "REFACTOR_IMPROVEMENTS.md" ] || exit 1
+        
+        # Check for TODO comments in code
+        echo "Checking for TODO comments..."
+        if find scripts/ -name "*.gd" -exec grep -l "TODO" {} \; | head -5; then
+          echo "ℹ️  Found TODO comments (this is informational)"
+        fi
+        
+        echo "✓ Documentation check completed"
+
+  # All checks must pass
+  all-checks:
+    runs-on: ubuntu-latest
+    name: All Checks Complete
+    needs: [code-quality, testing, security, build-check, documentation]
+    
+    steps:
+    - name: All checks passed
+      run: |
+        echo "🎉 All CI checks have passed successfully!"
+        echo "✓ Code quality: Formatting and linting"
+        echo "✓ Testing: Unit tests"
+        echo "✓ Security: No secrets detected"
+        echo "✓ Build: Project validation"
+        echo "✓ Documentation: Files present"
+        echo ""
+        echo "Ready for merge! 🚀"

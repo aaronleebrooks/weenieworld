@@ -44,6 +44,9 @@ ui_cancel={
 ]
 }
 
+[plugins]
+
+enabled=PackedStringArray("gdUnit4")
 
 [rendering]
 

@@ -1,5 +1,6 @@
-extends RefCounted
 class_name GameData
+extends RefCounted
+
 
 # Default save data structure for Alien Hot Dog Food Truck
 static func get_default_save_data() -> Dictionary:
@@ -23,10 +24,12 @@ static func get_default_save_data() -> Dictionary:
 		"max_events": 50
 	}
 
+
 # Upgrade definitions for hot dog store theme
 static func get_upgrade_definitions() -> Dictionary:
 	return {
-		"faster_production": {
+		"faster_production":
+		{
 			"name": "Faster Production",
 			"description": "Reduces production time by 0.02s",
 			"base_cost": 10,
@@ -34,7 +37,8 @@ static func get_upgrade_definitions() -> Dictionary:
 			"effect_multiplier": 1.2,
 			"max_level": 10
 		},
-		"efficient_cooking": {
+		"efficient_cooking":
+		{
 			"name": "Efficient Cooking",
 			"description": "Reduces continuous production time by 0.05s",
 			"base_cost": 50,
@@ -42,7 +46,8 @@ static func get_upgrade_definitions() -> Dictionary:
 			"effect_multiplier": 1.1,
 			"max_level": 5
 		},
-		"better_recipe": {
+		"better_recipe":
+		{
 			"name": "Better Recipe",
 			"description": "+1 hot dog per click",
 			"base_cost": 25,
@@ -50,7 +55,8 @@ static func get_upgrade_definitions() -> Dictionary:
 			"effect_multiplier": 1.0,
 			"max_level": 8
 		},
-		"customer_service": {
+		"customer_service":
+		{
 			"name": "Customer Service",
 			"description": "Customers arrive 0.2s faster",
 			"base_cost": 75,
@@ -58,7 +64,8 @@ static func get_upgrade_definitions() -> Dictionary:
 			"effect_multiplier": 1.1,
 			"max_level": 6
 		},
-		"premium_pricing": {
+		"premium_pricing":
+		{
 			"name": "Premium Pricing",
 			"description": "+1 currency per hot dog sold",
 			"base_cost": 100,
@@ -68,20 +75,22 @@ static func get_upgrade_definitions() -> Dictionary:
 		}
 	}
 
+
 # Calculate upgrade cost
 static func calculate_upgrade_cost(upgrade_type: String, current_level: int) -> int:
 	var definitions = get_upgrade_definitions()
 	if not definitions.has(upgrade_type):
 		return 0
-	
+
 	var upgrade = definitions[upgrade_type]
 	return int(upgrade.base_cost * pow(upgrade.cost_multiplier, current_level))
+
 
 # Calculate upgrade effect
 static func calculate_upgrade_effect(upgrade_type: String, current_level: int) -> float:
 	var definitions = get_upgrade_definitions()
 	if not definitions.has(upgrade_type):
 		return 1.0
-	
+
 	var upgrade = definitions[upgrade_type]
-	return pow(upgrade.effect_multiplier, current_level) 
+	return pow(upgrade.effect_multiplier, current_level)
