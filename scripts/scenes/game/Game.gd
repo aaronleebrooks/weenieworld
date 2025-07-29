@@ -3,6 +3,8 @@ extends Control
 # Main game scene for hot dog store idle game
 # Uses intentional naming conventions for future maintainability
 
+const DEBUG_MODE: bool = false
+
 @onready var truck_name_display = $TruckNameDisplay
 @onready var menu_toggle_button = $TopLeftMenu/MenuToggleButton
 @onready var menu_buttons_container = $TopLeftMenu/MenuButtonsContainer
@@ -29,7 +31,8 @@ var menu_expanded: bool = true  # true = full mode, false = icon mode
 
 
 func _ready():
-	print("Game: _ready() called")
+	if DEBUG_MODE:
+		print("Game: _ready() called")
 
 	# Get references to managers
 	hot_dog_manager = get_node("/root/HotDogManager")
@@ -434,7 +437,8 @@ func _update_currency_button_display():
 
 func display_game_data():
 	"""Display current game data for debugging"""
-	print("Game: Displaying current game data")
+	if DEBUG_MODE:
+		print("Game: Displaying current game data")
 
 	if hot_dog_manager:
 		print(
