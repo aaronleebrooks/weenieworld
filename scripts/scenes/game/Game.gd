@@ -12,10 +12,12 @@ const DEBUG_MODE: bool = false
 @onready var upgrade_button = $TopLeftMenu/MenuButtonsContainer/UpgradeButton
 @onready var save_button = $TopLeftMenu/MenuButtonsContainer/SaveButton
 @onready var exit_button = $TopLeftMenu/MenuButtonsContainer/ExitButton
+@onready var debug_button = $TopLeftMenu/MenuButtonsContainer/DebugButton
 
 @onready var hot_dog_display = $HotDogDisplay
 @onready var currency_display = $CurrencyDisplay
 @onready var upgrade_panel = $UpgradePanel
+@onready var debug_panel = $DebugPanel
 @onready var event_log = $EventLog
 
 # References to managers
@@ -55,6 +57,7 @@ func _ready():
 	upgrade_button.pressed.connect(_on_upgrade_button_pressed)
 	save_button.pressed.connect(_on_save_button_pressed)
 	exit_button.pressed.connect(_on_exit_button_pressed)
+	debug_button.pressed.connect(_on_debug_button_pressed)
 
 	# Setup menu buttons
 	_setup_menu_buttons()
@@ -175,6 +178,8 @@ func _debug_verify_ui_elements():
 	_debug_check_node("UpgradeButton", upgrade_button)
 	_debug_check_node("SaveButton", save_button)
 	_debug_check_node("ExitButton", exit_button)
+	_debug_check_node("DebugButton", debug_button)
+	_debug_check_node("DebugPanel", debug_panel)
 
 	# Check manager connections
 	print("\nChecking manager connections...")
@@ -235,6 +240,8 @@ func _setup_menu_buttons():
 		save_button.tooltip_text = "Save Game"
 	if exit_button:
 		exit_button.tooltip_text = "Exit to Main Menu"
+	if debug_button:
+		debug_button.tooltip_text = "Debug Panel (F12)"
 
 
 func _update_menu_display():
@@ -258,6 +265,9 @@ func _update_menu_button_texts():
 		if exit_button:
 			exit_button.text = "🚪 Exit"
 			exit_button.custom_minimum_size.x = 0
+		if debug_button:
+			debug_button.text = "🔧 Debug"
+			debug_button.custom_minimum_size.x = 0
 	else:
 		# Icon mode: narrow buttons with icons only
 		if currency_button:
@@ -271,6 +281,9 @@ func _update_menu_button_texts():
 		if exit_button:
 			exit_button.text = "🚪"
 			exit_button.custom_minimum_size.x = 40
+		if debug_button:
+			debug_button.text = "🔧"
+			debug_button.custom_minimum_size.x = 40
 
 
 func _on_viewport_size_changed():
@@ -420,6 +433,13 @@ func _on_exit_button_pressed():
 	"""Handle exit button press"""
 	print("Game: Exit button pressed")
 	_show_exit_confirmation_modal()
+
+
+func _on_debug_button_pressed():
+	"""Handle debug button press"""
+	print("Game: Debug button pressed")
+	if debug_panel:
+		debug_panel.toggle_debug_panel()
 
 
 func _show_exit_confirmation_modal():
