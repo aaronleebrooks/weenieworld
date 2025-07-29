@@ -5,10 +5,11 @@ extends Control
 
 @onready var truck_name_display = $TruckNameDisplay
 @onready var menu_toggle_button = $TopLeftMenu/MenuToggleButton
-@onready var currency_button = $TopLeftMenu/CurrencyButton
-@onready var upgrade_button = $TopLeftMenu/UpgradeButton
-@onready var save_button = $TopLeftMenu/SaveButton
-@onready var exit_button = $TopLeftMenu/ExitButton
+@onready var menu_buttons_container = $TopLeftMenu/MenuButtonsContainer
+@onready var currency_button = $TopLeftMenu/MenuButtonsContainer/CurrencyButton
+@onready var upgrade_button = $TopLeftMenu/MenuButtonsContainer/UpgradeButton
+@onready var save_button = $TopLeftMenu/MenuButtonsContainer/SaveButton
+@onready var exit_button = $TopLeftMenu/MenuButtonsContainer/ExitButton
 
 @onready var hot_dog_display = $HotDogDisplay
 @onready var currency_display = $CurrencyDisplay
@@ -24,7 +25,7 @@ var floating_text_manager: Node
 var event_log_manager: Node
 
 # Menu state
-var menu_visible: bool = true
+var menu_expanded: bool = true  # true = full mode, false = icon mode
 
 
 
@@ -49,17 +50,11 @@ func _ready():
 	
 
 	
-	# Setup currency button (non-clickable, blue text)
-	_setup_currency_button()
-	
-	# Setup tooltips for buttons
-	_setup_tooltips()
+	# Setup menu buttons
+	_setup_menu_buttons()
 	
 	# Set initial menu state
-	_update_menu_button_texts()
-	
-	# Update currency display
-	_update_currency_button_display()
+	_update_menu_display()
 	
 
 	
@@ -215,49 +210,63 @@ func _debug_check_manager(manager_name: String, manager: Node):
 
 
 
-func _setup_currency_button():
-	"""Setup currency button display"""
+func _setup_menu_buttons():
+	"""Setup initial menu button configuration"""
+	# Set up tooltips for icon mode
 	if currency_button:
-		currency_button.text = "💰 Currency"
-		currency_button.add_theme_font_size_override("font_size", 16)
-		currency_button.tooltip_text = "Currency Balance"
+		currency_button.tooltip_text = "Currency and Hot Dog Balance"
+	if upgrade_button:
+		upgrade_button.tooltip_text = "Upgrades"
+	if save_button:
+		save_button.tooltip_text = "Save Game"
+	if exit_button:
+		exit_button.tooltip_text = "Exit to Main Menu"
 
-func _setup_tooltips():
-	"""Setup tooltips for UI buttons"""
-	# Only add tooltips for buttons that need additional info
-	if currency_button:
-		currency_button.tooltip_text = "Currency Balance"
+func _update_menu_display():
+	"""Update entire menu display based on current state"""
+	_update_menu_button_texts()
+	_update_currency_display()
 
 func _update_menu_button_texts():
-	"""Update button texts based on current menu state"""
-	if currency_button:
-		if not menu_visible:
-			currency_button.text = "💰"
-			currency_button.custom_minimum_size.x = 50
-		else:
-			currency_button.text = "💰 Currency"
-			currency_button.custom_minimum_size.x = 0
-	if upgrade_button:
-		if not menu_visible:
-			upgrade_button.text = "⚡"
-			upgrade_button.custom_minimum_size.x = 50
-		else:
+	"""Update button texts and sizes based on menu state"""
+	if menu_expanded:
+		# Full mode: wide buttons with labels
+		if currency_button:
+			currency_button.custom_minimum_size.x = 0  # Auto-size
+		if upgrade_button:
 			upgrade_button.text = "⚡ Upgrades"
 			upgrade_button.custom_minimum_size.x = 0
-	if save_button:
-		if not menu_visible:
-			save_button.text = "💾"
-			save_button.custom_minimum_size.x = 50
-		else:
+		if save_button:
 			save_button.text = "💾 Save"
 			save_button.custom_minimum_size.x = 0
-	if exit_button:
-		if not menu_visible:
-			exit_button.text = "🚪"
-			exit_button.custom_minimum_size.x = 50
-		else:
+		if exit_button:
 			exit_button.text = "🚪 Exit"
 			exit_button.custom_minimum_size.x = 0
+	else:
+		# Icon mode: narrow buttons with icons only
+		if currency_button:
+			currency_button.custom_minimum_size.x = 40  # Very narrow
+		if upgrade_button:
+			upgrade_button.text = "⚡"
+			upgrade_button.custom_minimum_size.x = 40
+		if save_button:
+			save_button.text = "💾"
+			save_button.custom_minimum_size.x = 40
+		if exit_button:
+			exit_button.text = "🚪"
+			exit_button.custom_minimum_size.x = 40
+
+func _update_currency_display():
+	"""Update currency button with current values"""
+	if currency_button and hot_dog_manager:
+		var currency = hot_dog_manager.currency_balance
+		var hot_dogs = hot_dog_manager.hot_dogs_inventory
+		
+		if menu_expanded:
+			currency_button.text = "💰 Currency: %d | Hot Dogs: %d" % [currency, hot_dogs]
+		else:
+			currency_button.text = "💰"
+			currency_button.tooltip_text = "Currency: %d\nHot Dogs: %d" % [currency, hot_dogs]
 
 
 func _on_viewport_size_changed():
@@ -350,21 +359,14 @@ func _on_click_completed(click_type: String, hot_dogs_produced: int):
 func _on_menu_toggle_pressed():
 	"""Handle menu toggle button press"""
 	print("Game: Menu toggle pressed")
-	menu_visible = !menu_visible
+	menu_expanded = !menu_expanded
 	
 	# Update toggle button text
 	if menu_toggle_button:
-		menu_toggle_button.text = "<" if menu_visible else ">"
+		menu_toggle_button.text = "<" if menu_expanded else ">"
 	
-	# Toggle between icon-only and full-button modes
-	if currency_button:
-		currency_button.text = "💰" if not menu_visible else "💰 Currency"
-	if upgrade_button:
-		upgrade_button.text = "⚡" if not menu_visible else "⚡ Upgrades"
-	if save_button:
-		save_button.text = "💾" if not menu_visible else "💾 Save"
-	if exit_button:
-		exit_button.text = "🚪" if not menu_visible else "🚪 Exit"
+	# Update menu display
+	_update_menu_display()
 
 func _on_upgrade_button_pressed():
 	"""Handle upgrade button press"""
@@ -421,7 +423,7 @@ func _update_currency_button_display():
 		var currency = hot_dog_manager.currency_balance
 		var hot_dogs = hot_dog_manager.hot_dogs_inventory
 		
-		if not menu_visible:
+		if not menu_expanded:
 			currency_button.text = "💰"
 			currency_button.tooltip_text = "Currency: %d\nHot Dogs: %d" % [currency, hot_dogs]
 		else:

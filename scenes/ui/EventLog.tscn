@@ -19,31 +19,29 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0, 0, 0, 0.7)
 
-[node name="EventContainer" type="VBoxContainer" parent="."]
+[node name="MainContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = -5.0
-offset_bottom = -5.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
 
-[node name="Header" type="HBoxContainer" parent="EventContainer"]
+[node name="Header" type="Label" parent="MainContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 30)
-
-[node name="Title" type="Label" parent="EventContainer/Header"]
-layout_mode = 2
-size_flags_horizontal = 3
 text = "Event Log"
 horizontal_alignment = 1
-font_size = 14
+font_size = 16
 
-[node name="EventList" type="ScrollContainer" parent="EventContainer"]
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="EventListContainer" type="VBoxContainer" parent="EventContainer/EventList"]
+[node name="EventListContainer" type="VBoxContainer" parent="MainContainer/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3 

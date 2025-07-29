@@ -65,23 +65,27 @@ offset_bottom = 200.0
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 text = "<"
+horizontal_alignment = 1
 
-[node name="CurrencyButton" type="Button" parent="TopLeftMenu"]
+[node name="MenuButtonsContainer" type="VBoxContainer" parent="TopLeftMenu"]
+layout_mode = 2
+
+[node name="CurrencyButton" type="Button" parent="TopLeftMenu/MenuButtonsContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "💰 Currency"
 
-[node name="UpgradeButton" type="Button" parent="TopLeftMenu"]
+[node name="UpgradeButton" type="Button" parent="TopLeftMenu/MenuButtonsContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "⚡ Upgrades"
 
-[node name="SaveButton" type="Button" parent="TopLeftMenu"]
+[node name="SaveButton" type="Button" parent="TopLeftMenu/MenuButtonsContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "💾 Save"
 
-[node name="ExitButton" type="Button" parent="TopLeftMenu"]
+[node name="ExitButton" type="Button" parent="TopLeftMenu/MenuButtonsContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "🚪 Exit"
