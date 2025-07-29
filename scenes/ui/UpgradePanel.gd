@@ -111,7 +111,7 @@ func _create_building_buttons():
 	print("UpgradePanel: Created %d building buttons" % building_buttons.size())
 
 
-func _create_upgrade_button(upgrade: Dictionary) -> Button:
+func _create_upgrade_button(upgrade: Resource) -> Button:
 	"""Create a button for a specific upgrade"""
 	var button = Button.new()
 	button.custom_minimum_size = Vector2(0, 60)
@@ -124,7 +124,7 @@ func _create_upgrade_button(upgrade: Dictionary) -> Button:
 	return button
 
 
-func _create_building_button(building: Dictionary) -> Button:
+func _create_building_button(building: Resource) -> Button:
 	"""Create a button for a specific building"""
 	var button = Button.new()
 	button.custom_minimum_size = Vector2(0, 80)
@@ -137,7 +137,7 @@ func _create_building_button(building: Dictionary) -> Button:
 	return button
 
 
-func _get_upgrade_button_text(upgrade: Dictionary) -> String:
+func _get_upgrade_button_text(upgrade: Resource) -> String:
 	"""Get the text to display on an upgrade button"""
 	if not upgrade_manager:
 		return upgrade.display_name
@@ -161,7 +161,7 @@ func _get_upgrade_button_text(upgrade: Dictionary) -> String:
 	return text
 
 
-func _get_building_button_text(building: Dictionary) -> String:
+func _get_building_button_text(building: Resource) -> String:
 	"""Get the text to display on a building button"""
 	if not building_manager:
 		return building.display_name
