@@ -1,5 +1,5 @@
 # This class implements the JUnit XML file format
-# based checked https://github.com/windyroad/JUnit-Schema/blob/master/JUnit.xsd
+# based on https://github.com/windyroad/JUnit-Schema/blob/master/JUnit.xsd
 class_name JUnitXmlReport
 extends RefCounted
 
