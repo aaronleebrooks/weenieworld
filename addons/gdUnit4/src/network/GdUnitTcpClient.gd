@@ -46,7 +46,7 @@ func start(host: String, port: int) -> GdUnitResult:
 		#prints("connect_to_host", host, port, err)
 		if err != OK:
 			return GdUnitResult.error("GdUnit4: Can't establish client, error code: %s" % err)
-	return GdUnitResult.success("GdUnit4: Client connected checked port %d" % port)
+	return GdUnitResult.success("GdUnit4: Client connected on port %d" % port)
 
 
 func _process(_delta: float) -> void:
