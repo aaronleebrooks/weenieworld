@@ -45,4 +45,5 @@ size_flags_vertical = 3
 
 [node name="EventListContainer" type="VBoxContainer" parent="EventContainer/EventList"]
 layout_mode = 2
-size_flags_horizontal = 3 
+size_flags_horizontal = 3
+offset_top = 10.0 

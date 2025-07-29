@@ -61,63 +61,31 @@ offset_top = 20.0
 offset_right = 200.0
 offset_bottom = 200.0
 
-
-
-[node name="CurrencyRow" type="HBoxContainer" parent="TopLeftMenu"]
+[node name="MenuToggleButton" type="Button" parent="TopLeftMenu"]
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
+text = "<"
+horizontal_alignment = 1
 
-[node name="CurrencyIcon" type="Button" parent="TopLeftMenu/CurrencyRow"]
-custom_minimum_size = Vector2(40, 40)
+[node name="CurrencyButton" type="Button" parent="TopLeftMenu"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-text = "💰"
+text = "💰 Currency"
 
-[node name="CurrencyLabel" type="Label" parent="TopLeftMenu/CurrencyRow"]
+[node name="UpgradeButton" type="Button" parent="TopLeftMenu"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-size_flags_horizontal = 3
-text = "Currency"
-vertical_alignment = 1
+text = "⚡ Upgrades"
 
-[node name="UpgradeRow" type="HBoxContainer" parent="TopLeftMenu"]
+[node name="SaveButton" type="Button" parent="TopLeftMenu"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+text = "💾 Save"
 
-[node name="UpgradeIcon" type="Button" parent="TopLeftMenu/UpgradeRow"]
-custom_minimum_size = Vector2(40, 40)
+[node name="ExitButton" type="Button" parent="TopLeftMenu"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-text = "⚡"
-
-[node name="UpgradeLabel" type="Label" parent="TopLeftMenu/UpgradeRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Upgrades"
-vertical_alignment = 1
-
-[node name="SaveRow" type="HBoxContainer" parent="TopLeftMenu"]
-layout_mode = 2
-
-[node name="SaveIcon" type="Button" parent="TopLeftMenu/SaveRow"]
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-text = "💾"
-
-[node name="SaveLabel" type="Label" parent="TopLeftMenu/SaveRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Save"
-vertical_alignment = 1
-
-[node name="ExitRow" type="HBoxContainer" parent="TopLeftMenu"]
-layout_mode = 2
-
-[node name="ExitIcon" type="Button" parent="TopLeftMenu/ExitRow"]
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-text = "🚪"
-
-[node name="ExitLabel" type="Label" parent="TopLeftMenu/ExitRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Exit"
-vertical_alignment = 1
+text = "🚪 Exit"
 
 [node name="EventLog" parent="." instance=ExtResource("7_eventlog")]
 grow_horizontal = 2

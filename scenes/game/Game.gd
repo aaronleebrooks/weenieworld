@@ -4,10 +4,11 @@ extends Control
 # Uses intentional naming conventions for future maintainability
 
 @onready var truck_name_display = $TruckNameDisplay
-@onready var currency_icon = $TopLeftMenu/CurrencyRow/CurrencyIcon
-@onready var upgrade_icon = $TopLeftMenu/UpgradeRow/UpgradeIcon
-@onready var save_icon = $TopLeftMenu/SaveRow/SaveIcon
-@onready var exit_icon = $TopLeftMenu/ExitRow/ExitIcon
+@onready var menu_toggle_button = $TopLeftMenu/MenuToggleButton
+@onready var currency_button = $TopLeftMenu/CurrencyButton
+@onready var upgrade_button = $TopLeftMenu/UpgradeButton
+@onready var save_button = $TopLeftMenu/SaveButton
+@onready var exit_button = $TopLeftMenu/ExitButton
 
 @onready var hot_dog_display = $HotDogDisplay
 @onready var currency_display = $CurrencyDisplay
@@ -21,6 +22,9 @@ var upgrade_manager: Node
 var save_system: Node
 var floating_text_manager: Node
 var event_log_manager: Node
+
+# Menu state
+var menu_visible: bool = true
 
 
 
@@ -38,16 +42,17 @@ func _ready():
 
 	
 	# Connect button signals
-	upgrade_icon.pressed.connect(_on_upgrade_icon_pressed)
-	save_icon.pressed.connect(_on_save_icon_pressed)
-	exit_icon.pressed.connect(_on_exit_icon_pressed)
+	menu_toggle_button.pressed.connect(_on_menu_toggle_pressed)
+	upgrade_button.pressed.connect(_on_upgrade_button_pressed)
+	save_button.pressed.connect(_on_save_button_pressed)
+	exit_button.pressed.connect(_on_exit_button_pressed)
 	
 
 	
-	# Setup currency icon (non-clickable, blue text)
-	_setup_currency_icon()
+	# Setup currency button (non-clickable, blue text)
+	_setup_currency_button()
 	
-	# Setup tooltips for icons
+	# Setup tooltips for buttons
 	_setup_tooltips()
 	
 
@@ -151,10 +156,11 @@ func _debug_verify_ui_elements():
 	
 	# Check top-left menu elements
 	print("\nChecking top-left menu elements...")
-	_debug_check_node("CurrencyIcon", currency_icon)
-	_debug_check_node("UpgradeIcon", upgrade_icon)
-	_debug_check_node("SaveIcon", get_node_or_null("TopLeftMenu/SaveIcon"))
-	_debug_check_node("ExitIcon", get_node_or_null("TopLeftMenu/ExitIcon"))
+	_debug_check_node("MenuToggleButton", menu_toggle_button)
+	_debug_check_node("CurrencyButton", currency_button)
+	_debug_check_node("UpgradeButton", upgrade_button)
+	_debug_check_node("SaveButton", save_button)
+	_debug_check_node("ExitButton", exit_button)
 	
 	# Check manager connections
 	print("\nChecking manager connections...")
@@ -203,20 +209,20 @@ func _debug_check_manager(manager_name: String, manager: Node):
 
 
 
-func _setup_currency_icon():
-	"""Setup currency icon display"""
-	if currency_icon:
-		currency_icon.text = "💰"
-		currency_icon.add_theme_font_size_override("font_size", 24)
+func _setup_currency_button():
+	"""Setup currency button display"""
+	if currency_button:
+		currency_button.text = "💰 Currency"
+		currency_button.add_theme_font_size_override("font_size", 16)
 
 func _setup_tooltips():
-	"""Setup tooltips for UI icons"""
-	if upgrade_icon:
-		upgrade_icon.tooltip_text = "Upgrades"
-	if save_icon:
-		save_icon.tooltip_text = "Save Game"
-	if exit_icon:
-		exit_icon.tooltip_text = "Exit to Menu"
+	"""Setup tooltips for UI buttons"""
+	if upgrade_button:
+		upgrade_button.tooltip_text = "Upgrades"
+	if save_button:
+		save_button.tooltip_text = "Save Game"
+	if exit_button:
+		exit_button.tooltip_text = "Exit to Menu"
 
 
 func _on_viewport_size_changed():
@@ -273,7 +279,7 @@ func _display_truck_name(truck_name: String):
 
 func _on_hot_dogs_changed(new_inventory: int, change_amount: int):
 	"""Handle hot dog inventory changes"""
-	_update_currency_icon_display()
+	_update_currency_button_display()
 
 func _on_hot_dogs_produced(amount: int, source: String):
 	"""Handle hot dog production events"""
@@ -286,7 +292,7 @@ func _on_hot_dogs_sold(amount: int, value: int):
 
 func _on_currency_changed(new_balance: int, change_amount: int):
 	"""Handle currency balance changes"""
-	_update_currency_icon_display()
+	_update_currency_button_display()
 
 func _on_currency_earned(amount: int, source: String):
 	"""Handle currency earned events"""
@@ -306,15 +312,32 @@ func _on_customer_arrived():
 func _on_click_completed(click_type: String, hot_dogs_produced: int):
 	"""Handle click completion events"""
 
-func _on_upgrade_icon_pressed():
-	"""Handle upgrade icon press"""
-	print("Game: Upgrade icon pressed")
+func _on_menu_toggle_pressed():
+	"""Handle menu toggle button press"""
+	print("Game: Menu toggle pressed")
+	menu_visible = !menu_visible
+	
+	# Update toggle button text
+	if menu_toggle_button:
+		menu_toggle_button.text = "<" if menu_visible else ">"
+	
+	# Toggle menu visibility
+	var top_left_menu = get_node_or_null("TopLeftMenu")
+	if top_left_menu:
+		# Hide/show all buttons except the toggle button
+		for child in top_left_menu.get_children():
+			if child != menu_toggle_button:
+				child.visible = menu_visible
+
+func _on_upgrade_button_pressed():
+	"""Handle upgrade button press"""
+	print("Game: Upgrade button pressed")
 	if upgrade_panel:
 		upgrade_panel.visible = !upgrade_panel.visible
 
-func _on_save_icon_pressed():
-	"""Handle save icon press"""
-	print("Game: Save icon pressed")
+func _on_save_button_pressed():
+	"""Handle save button press"""
+	print("Game: Save button pressed")
 	if save_system:
 		save_system.save_game("autosave")
 		# Add save event to event log
@@ -325,9 +348,9 @@ func _on_save_icon_pressed():
 
 
 
-func _on_exit_icon_pressed():
-	"""Handle exit icon press"""
-	print("Game: Exit icon pressed")
+func _on_exit_button_pressed():
+	"""Handle exit button press"""
+	print("Game: Exit button pressed")
 	_show_exit_confirmation_modal()
 
 func _show_exit_confirmation_modal():
@@ -355,11 +378,11 @@ func _on_exit_cancelled():
 	"""Handle exit cancellation"""
 	print("Game: Exit cancelled, staying in game")
 
-func _update_currency_icon_display():
-	"""Update currency icon tooltip with current balance"""
-	if currency_icon and hot_dog_manager:
+func _update_currency_button_display():
+	"""Update currency button tooltip with current balance"""
+	if currency_button and hot_dog_manager:
 		var formatted_currency = hot_dog_manager.get_formatted_currency()
-		currency_icon.tooltip_text = formatted_currency
+		currency_button.tooltip_text = formatted_currency
 
 func display_game_data():
 	"""Display current game data for debugging"""
@@ -376,4 +399,4 @@ func display_game_data():
 		print("  Customers per minute: %.1f" % customer_manager.get_customers_per_minute())
 	
 	# Update displays
-	_update_currency_icon_display() 
+	_update_currency_button_display() 
