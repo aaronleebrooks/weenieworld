@@ -2,8 +2,8 @@ extends Control
 
 signal event_log_closed()
 
-@onready var event_list_container = $EventContainer/EventList/EventListContainer
-@onready var title_label = $EventContainer/Header/Title
+@onready var event_list_container = $MainContainer/ScrollContainer/EventListContainer
+@onready var title_label = $MainContainer/Header
 
 var event_log_manager: Node
 var event_item_scene = preload("res://scenes/ui/EventLogItem.tscn")

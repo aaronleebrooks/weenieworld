@@ -65,7 +65,6 @@ offset_bottom = 200.0
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 text = "<"
-horizontal_alignment = 1
 
 [node name="MenuButtonsContainer" type="VBoxContainer" parent="TopLeftMenu"]
 layout_mode = 2
