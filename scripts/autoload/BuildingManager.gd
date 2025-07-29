@@ -172,7 +172,7 @@ func _apply_building_effects(building_id: String):
 	match building_id:
 		"office":
 			# Office unlocks worker system
-			# This will be implemented when WorkerManager is created
+			emit_signal("building_unlocked", "office")
 			print("BuildingManager: Office purchased - worker system unlocked")
 		_:
 			if DEBUG_MODE:
