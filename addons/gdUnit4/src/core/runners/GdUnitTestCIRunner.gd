@@ -117,7 +117,7 @@ func _ready() -> void:
 func _notification(what: int) -> void:
 	super(what)
 	if what == NOTIFICATION_PREDELETE:
-		prints("Finallize .. done")
+		prints("Finalize .. done")
 
 
 func init_runner() -> void:
