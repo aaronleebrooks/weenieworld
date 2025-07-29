@@ -5,6 +5,11 @@ extends Node
 
 const WorkerDefinition = preload("res://scripts/resources/WorkerDefinition.gd")
 
+# Constants for worker mechanics (extracted per code review feedback)
+const WORKER_QUOTA_PER_SECOND: float = 1.0
+const KITCHEN_PRODUCTION_RATE: float = 0.5
+const OFFICE_EFFICIENCY_BONUS_PER_WORKER: float = 0.1  # 10% bonus per office worker
+
 # Signals
 signal worker_hired(worker_id: String, cost: int)
 signal worker_assigned(worker_id: String, assignment: WorkerDefinition.WorkerAssignment)
@@ -141,8 +146,8 @@ func _process_worker_production():
 	var kitchen_workers = get_workers_by_assignment(WorkerDefinition.WorkerAssignment.KITCHEN)
 	var office_workers = get_workers_by_assignment(WorkerDefinition.WorkerAssignment.OFFICE)
 	
-	# Calculate office efficiency bonus
-	office_efficiency_bonus = 1.0 + (office_workers.size() * 0.1)  # 10% bonus per office worker
+	# Update office efficiency bonus
+	office_efficiency_bonus = 1.0 + (office_workers.size() * OFFICE_EFFICIENCY_BONUS_PER_WORKER)
 	
 	# Process kitchen workers
 	for worker in kitchen_workers:
@@ -154,8 +159,8 @@ func _process_worker_production():
 
 func _process_kitchen_worker(worker: Dictionary):
 	"""Process a kitchen worker's production and consumption"""
-	var quota_per_second = 1.0
-	var production_per_second = 0.5 * office_efficiency_bonus
+	var quota_per_second = WORKER_QUOTA_PER_SECOND
+	var production_per_second = KITCHEN_PRODUCTION_RATE * office_efficiency_bonus
 	
 	# Initialize production buffer if not already present
 	if not worker.has("production_buffer"):
@@ -184,7 +189,7 @@ func _process_kitchen_worker(worker: Dictionary):
 
 func _process_office_worker(worker: Dictionary):
 	"""Process an office worker's consumption (no production)"""
-	var quota_per_second = 1.0
+	var quota_per_second = WORKER_QUOTA_PER_SECOND
 	
 	# Check if we have enough hot dogs for quota
 	if hot_dog_manager and hot_dog_manager.hot_dogs_inventory >= int(quota_per_second):
@@ -219,11 +224,11 @@ func get_worker_count() -> int:
 func get_kitchen_production_rate() -> float:
 	"""Get the total hot dog production rate from kitchen workers"""
 	var kitchen_workers = get_workers_by_assignment(WorkerDefinition.WorkerAssignment.KITCHEN)
-	return kitchen_workers.size() * 0.5 * office_efficiency_bonus
+	return kitchen_workers.size() * KITCHEN_PRODUCTION_RATE * office_efficiency_bonus
 
 func get_total_consumption_rate() -> float:
 	"""Get the total hot dog consumption rate from all workers"""
-	return hired_workers.size() * 1.0  # 1 hot dog per second per worker
+	return hired_workers.size() * WORKER_QUOTA_PER_SECOND  # 1 hot dog per second per worker
 
 func get_worker_by_id(worker_id: String) -> Dictionary:
 	"""Get worker data by ID"""

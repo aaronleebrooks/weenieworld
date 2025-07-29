@@ -10,7 +10,7 @@ var hot_dog_manager: Node
 var building_manager: Node
 
 func before():
-	"""Setup before each test"""
+	# Setup before each test
 	worker_manager = get_node_or_null("/root/WorkerManager")
 	if not worker_manager:
 		# If autoload not available, create a mock instance for testing
